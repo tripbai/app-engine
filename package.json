@@ -1,0 +1,27 @@
+{
+  "name": "app-engine",
+  "version": "1.0.0",
+  "description": "Backend application instance",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tripbai/app-engine.git"
+  },
+  "keywords": [],
+  "author": "",
+  "devDependencies": {
+    "@types/node": "^20.17.5",
+    "typescript": "^4.9.4"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tripbai/app-engine/issues"
+  },
+  "homepage": "https://github.com/tripbai/app-engine#readme",
+  "dependencies": {
+    "mysql": "^2.18.1"
+  }
+}
