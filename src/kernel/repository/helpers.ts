@@ -10,7 +10,7 @@ export const RepositoryHelper = {
     return value instanceof Date
   },
 
-  toDatabaseRecordDTO: <TModel extends BaseEntity<TModel>>(model: Readonly<TModel>): DatabaseRecordDTO => {
+  toDatabaseRecordDTO: <TModel extends BaseEntity<TModel>>(model: ReturnType<TModel['export']>): DatabaseRecordDTO => {
     const transformed: DatabaseRecordDTO = Object.create(null)
     for (const key in model) {
       const value = model[key]

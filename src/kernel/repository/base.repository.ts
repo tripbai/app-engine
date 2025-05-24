@@ -73,13 +73,13 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
    * Retrieves the model with all its fields rendered as readonly. 
    * @returns The model object.
    */
-  async get(options?: RepositoryGetOptions): Promise<Readonly<TModel>>{
+  async get(options?: RepositoryGetOptions): Promise<Readonly<ReturnType<BaseEntity<TModel>['export']>>>{
     await this.initproviders()
     const model = this.model
 
     /** First, we'll try to see if the model has been previously initialized */
     if (this.modelInitialized) {
-      return this.export()
+      return this.model.export()
     }
 
     /** If not, then, we'll attempt to retrieve data from cache */
@@ -157,10 +157,14 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
     }
 
     this.modelInitialized = true
-    return this.export()
+    return this.model.export()
 
   }
 
+  /**
+   * Ingests data into the model
+   * @param Data 
+   */
   private ingest(Data: any){
     for (const key in Data) {
       if (RepositoryHelper.isDateObject(Data[key])) {
@@ -169,23 +173,6 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
         this.model[key] = Data[key]
       }
     }
-  }
-
-  /**
-   * Exports data into an plain object literal. The object
-   * that is being returned by this function is a copy of 
-   * Entity Object. 
-   */
-  export(): Readonly<TModel> {
-    let data = {}
-    for (const alias in this.model) {
-      /** Function members must not be exported */
-      if (typeof this.model[alias] === 'function') continue;
-      if (alias[0] !== '_') continue;
-      const key = alias.slice(1);
-      data[key] = this.model[alias];
-    }
-    return data as Readonly<TModel>
   }
 
   import(Data: Readonly<TModel>): void {
@@ -308,7 +295,7 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
 
   async commit() {
     let transaction: DatabaseSingleTransaction | null = null 
-    const model = this.export()
+    const model = this.model.export()
     switch(this.lockedTransaction) {
       case 'create': 
         await this.initproviders()

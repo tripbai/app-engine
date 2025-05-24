@@ -145,27 +145,8 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
           }
         })
       }
-      this.models.push(
-        RegistryRepository.export(Registry)
-      )
+      this.models.push(Registry)
     }
-  }
-
-  /**
-   * Exports data into an plain object literal. The object
-   * that is being returned by this function is a copy of 
-   * Entity Object. 
-   */
-  private static export<TModel extends BaseEntity<TModel>>(model: TModel): Readonly<TModel> {
-    let data: TModel = Object.create(null)
-    for (const alias in model) {
-      /** Function members must not be exported */
-      if (typeof model === 'function') continue
-      if (alias[0] !== '_') continue
-      const key = alias.slice(1)
-      data[key] = model[alias]
-    }
-    return data
   }
 
   /**
@@ -199,12 +180,10 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
     const singleOp = this.providers.database.create().entity(
       this.collection,
       RepositoryHelper.toDatabaseRecordDTO(
-        RegistryRepository.export(Registry)
+        Registry.export()
       )
     )
-    this.models.push(
-      RegistryRepository.export(Registry)
-    )
+    this.models.push(Registry)
     await this.providers.database.beginTransaction([singleOp])
   }
 
@@ -213,7 +192,7 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
    * @param entityId 
    * @returns 
    */
-  async get(entityId: Entity.Id): Promise<Readonly<TModel>>{
+  async get(entityId: Entity.Id): Promise<Readonly<ReturnType<BaseEntity<TModel>['export']>>>{
     await this.initializeData()
     const filtered = this.models.filter(model=>{
       return model.entity_id === entityId
@@ -224,7 +203,7 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
         data: {entity_id: entityId, collection: this.collection}
       })
     }
-    return filtered[0]
+    return filtered[0].export()
   }
 
   /**
@@ -267,7 +246,7 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
     const singleOp = this.providers.database.update().entity(
       this.collection,
       RepositoryHelper.toDatabaseRecordDTO(
-        RegistryRepository.export(UpdatedModel)
+        UpdatedModel.export()
       )
     )
     await this.providers.database.beginTransaction([singleOp])
@@ -277,9 +256,9 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
    * Retrieves all records in the Registry
    * @returns 
    */
-  async getAll(): Promise<Array<Readonly<TModel>>>{
+  async getAll(): Promise<Array<Readonly<ReturnType<BaseEntity<TModel>['export']>>>>{
     await this.initializeData()
-    return this.models
+    return this.models.map(model => model.export())
   }
 
   async archive(entityId: Entity.Id): Promise<void> {
@@ -293,7 +272,7 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
     const singleOp = this.providers.database.update().entity(
       this.collection,
       RepositoryHelper.toDatabaseRecordDTO(
-        RegistryRepository.export(UpdatedModel)
+        UpdatedModel.export()
       )
     )
     await this.providers.database.beginTransaction([singleOp])
@@ -310,7 +289,7 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
     const singleOp = this.providers.database.update().entity(
       this.collection,
       RepositoryHelper.toDatabaseRecordDTO(
-        RegistryRepository.export(UpdatedModel)
+        UpdatedModel.export()
       )
     )
     await this.providers.database.beginTransaction([singleOp])

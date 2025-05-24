@@ -86,7 +86,17 @@ export class BaseEntity<TModel> {
     return this[alias]
   }
 
-  
+  export(){
+    const data: Omit<Record<keyof TModel, TModel[keyof TModel]>, 'export'> = Object.create(null)
+    for (const alias in this) {
+      /** Function members must not be exported */
+      if (typeof this[alias] === 'function') continue
+      if (alias[0] !== '_') continue
+      const key = alias.slice(1)
+      data[key] = this[alias]
+    }
+    return data
+  }
 
 }
 
