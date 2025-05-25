@@ -45,6 +45,7 @@ describe('BaseRepository tests', () => {
       TestUserRepo.create({
         first_name: 'Elven',
         age: 25,
+        group_id: Pseudorandom.alphanum32(),
         is_verified: false,
         enrolled_at: TimeStamp.now(),
         metadata: '{"citizenship":"Japanese"}'
@@ -58,6 +59,7 @@ describe('BaseRepository tests', () => {
       TestUserRepo.create({
         first_name: 'Elven',
         age: 25,
+        group_id: Pseudorandom.alphanum32(),
         is_verified: false,
         enrolled_at: TimeStamp.now(),
         metadata: '{"citizenship":"Japanese"}'
@@ -74,6 +76,7 @@ describe('BaseRepository tests', () => {
         TestUserRepo.create({
           first_name: 'Elven',
           age: 25,
+          group_id: Pseudorandom.alphanum32(),
           is_verified: false,
           enrolled_at: TimeStamp.now(),
           metadata: '{"citizenship":"Japanese"}',
@@ -89,6 +92,7 @@ describe('BaseRepository tests', () => {
         TestUserRepo.create({
           first_name: 'Elven',
           age: 13,
+          group_id: Pseudorandom.alphanum32(),
           is_verified: false,
           enrolled_at: TimeStamp.now(),
           metadata: '{"citizenship":"Japanese"}',
@@ -135,6 +139,7 @@ describe('BaseRepository tests', () => {
       TestUserRepo.create({
         first_name: 'Elven',
         age: 25,
+        group_id: Pseudorandom.alphanum32(),
         is_verified: false,
         enrolled_at: TimeStamp.now(),
         metadata: '{"citizenship":"Japanese"}'

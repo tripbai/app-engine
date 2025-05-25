@@ -1,3 +1,5 @@
+import { Entity } from "../../../interface";
+import { AssertEntity } from "../../entity/assertions";
 import { boolean, int, json, timestamp, varchar } from "../../entity/decorators";
 import { BaseEntity } from "../../entity/entity";
 import { TestUserValidator } from "./test-user.validation";
@@ -18,5 +20,8 @@ export class TestUser extends BaseEntity<TestUser> {
 
   @json<{citizenship: string}>(TestUserValidator.isValidAgeToDrink)
   metadata: string
+
+  @varchar(AssertEntity.idIsValid)
+  group_id: Entity.Id
 
 }
