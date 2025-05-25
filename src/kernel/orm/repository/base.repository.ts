@@ -1,11 +1,12 @@
 import { BaseEntity } from "../entity/entity";
-import { ArchivedRecordException, BadRequestException, DataIntegrityException, LogicException, RecordNotFoundException } from "../exceptions/exceptions";
-import { thisJSON } from "../helpers/thisjson";
-import { TimeStamp } from "../helpers/timestamp";
-import { Entity } from "../interface";
-import { DatabaseRecordDTO, DatabaseSingleTransaction } from "../services/database/interface";
+import { ArchivedRecordException, BadRequestException, DataIntegrityException, LogicException, RecordNotFoundException } from "../../exceptions/exceptions";
+import { thisJSON } from "../../helpers/thisjson";
+import { TimeStamp } from "../../helpers/timestamp";
+import { Entity } from "../../interface";
+import { DatabaseRecordDTO, DatabaseSingleTransaction } from "../../services/database/interface";
 import { RepositoryHelper } from "./helpers";
 import { RepositoryGetOptions, RepositoryServiceProviders } from "./types";
+import { EntityToolkit } from "../entity/toolkit";
 
 export class BaseRepository<TModel extends BaseEntity<TModel>> {
   
@@ -73,13 +74,13 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
    * Retrieves the model with all its fields rendered as readonly. 
    * @returns The model object.
    */
-  async get(options?: RepositoryGetOptions): Promise<Readonly<ReturnType<BaseEntity<TModel>['export']>>>{
+  async get(options?: RepositoryGetOptions): Promise<Readonly<Record<keyof TModel, TModel[keyof TModel]>>>{
     await this.initproviders()
     const model = this.model
 
     /** First, we'll try to see if the model has been previously initialized */
     if (this.modelInitialized) {
-      return this.model.export()
+      return EntityToolkit.serialize(this.model)
     }
 
     /** If not, then, we'll attempt to retrieve data from cache */
@@ -157,7 +158,7 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
     }
 
     this.modelInitialized = true
-    return this.model.export()
+    return EntityToolkit.serialize(this.model)
 
   }
 
@@ -295,7 +296,7 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
 
   async commit() {
     let transaction: DatabaseSingleTransaction | null = null 
-    const model = this.model.export()
+    const model = EntityToolkit.serialize(this.model)
     switch(this.lockedTransaction) {
       case 'create': 
         await this.initproviders()

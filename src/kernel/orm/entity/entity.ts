@@ -1,8 +1,8 @@
-import { DataIntegrityException } from "../exceptions/exceptions"
-import { TimeStamp } from "../helpers/timestamp"
-import { Entity } from "../interface"
+import { DataIntegrityException } from "../../exceptions/exceptions"
+import { TimeStamp } from "../../helpers/timestamp"
+import { Entity } from "../../interface"
 import { AssertEntity } from "./assertions"
-import { EntityHelper } from "./helpers"
+import { EntityToolkit } from "./toolkit"
 
 /**
  * Base object of all Entity Objects
@@ -19,11 +19,11 @@ export class BaseEntity<TModel> {
    */
   set entity_id (value: Entity.Id){
     AssertEntity.idIsValid(value)
-    const alias = EntityHelper.createPropAlias('entity_id')
+    const alias = EntityToolkit.PropAlias.create('entity_id')
     if (undefined === this[alias]) this[alias] = value
   }
   get entity_id (): Entity.Id {
-    const alias = EntityHelper.createPropAlias('entity_id')
+    const alias = EntityToolkit.PropAlias.create('entity_id')
     return this[alias]
   }
 
@@ -32,10 +32,10 @@ export class BaseEntity<TModel> {
    * provided by the Storage Provider, and cannot be overridden.
    */
   set created_at (value: string) {
-    const alias = EntityHelper.createPropAlias('created_at')
+    const alias = EntityToolkit.PropAlias.create('created_at')
     if (!TimeStamp.isValid(value)){
       throw new DataIntegrityException({
-        message: 'entity created_at value is not valid ISO string',
+        message: 'entity created_at value is not valid timestamp string',
         data: {entity_id: this.entity_id, value: value}
       })
     }
@@ -43,7 +43,7 @@ export class BaseEntity<TModel> {
       this[alias] = value
   }
   get created_at(): string {
-    const alias = EntityHelper.createPropAlias('created_at')
+    const alias = EntityToolkit.PropAlias.create('created_at')
     return this[alias]
   }
 
@@ -52,17 +52,17 @@ export class BaseEntity<TModel> {
    * provided and updated by the Storage Provider.
    */
   set updated_at (value: string) {
-    const alias = EntityHelper.createPropAlias('updated_at')
+    const alias = EntityToolkit.PropAlias.create('updated_at')
     if (!TimeStamp.isValid(value)){
       throw new DataIntegrityException({
-        message: 'updated_at value is not valid ISO string',
+        message: 'updated_at value is not valid timestamp string',
         data: {entity_id: this.entity_id, value: value}
       })
     }
     this[alias] = value
   }
   get updated_at(): string {
-    const alias = EntityHelper.createPropAlias('updated_at')
+    const alias = EntityToolkit.PropAlias.create('updated_at')
     return this[alias]
   }
 
@@ -72,30 +72,18 @@ export class BaseEntity<TModel> {
    * when cleaning up unused soft-deleted records.
    */
   set archived_at (value: string | null) {
-    const alias = EntityHelper.createPropAlias('archived_at')
+    const alias = EntityToolkit.PropAlias.create('archived_at')
     if (value !== null && !TimeStamp.isValid(value)) {
       throw new DataIntegrityException({
-        message: 'archived_at value is not valid ISO string',
+        message: 'archived_at value is not valid timestamp string',
         data: {entity_id: this.entity_id, value: value}
       })
     }
     this[alias] = value
   }
-  get archived_at(): string {
-    const alias = EntityHelper.createPropAlias('archived_at')
+  get archived_at(): string | null {
+    const alias = EntityToolkit.PropAlias.create('archived_at')
     return this[alias]
-  }
-
-  export(){
-    const data: Omit<Record<keyof TModel, TModel[keyof TModel]>, 'export'> = Object.create(null)
-    for (const alias in this) {
-      /** Function members must not be exported */
-      if (typeof this[alias] === 'function') continue
-      if (alias[0] !== '_') continue
-      const key = alias.slice(1)
-      data[key] = this[alias]
-    }
-    return data
   }
 
 }

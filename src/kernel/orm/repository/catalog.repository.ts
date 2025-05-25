@@ -1,7 +1,7 @@
 import { BaseEntity } from "../entity/entity"
-import { DataIntegrityException } from "../exceptions/exceptions"
-import { TimeStamp } from "../helpers/timestamp"
-import { Entity } from "../interface"
+import { DataIntegrityException } from "../../exceptions/exceptions"
+import { TimeStamp } from "../../helpers/timestamp"
+import { Entity } from "../../interface"
 import { RepositoryHelper } from "./helpers"
 import { RepositoryServiceProviders } from "./types"
 

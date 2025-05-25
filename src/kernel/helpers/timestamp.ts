@@ -13,8 +13,10 @@ export namespace TimeStamp {
     if (!validRegex.test(date)) {
       return false
     }
-    const dateobj = new Date(date)
-    return !isNaN(dateobj.getTime()) && dateobj.toISOString() === date
+    const newdate = date.replace(' ', 'T') + '.000Z'
+    const dateobj = new Date(newdate)
+    const normalized = normalize(dateobj)
+    return !isNaN(dateobj.getTime()) && normalized === date
   }
 
   const pad = (n: number) => n.toString().padStart(2, '0')

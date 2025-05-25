@@ -1,4 +1,3 @@
-import { BaseEntity } from "../../entity/entity"
 import { Entity } from "../../interface"
 
 export type DatabaseSingleTransaction = {

@@ -1,7 +1,8 @@
 import { BaseEntity } from "../entity/entity"
-import { DataIntegrityException, LogicException } from "../exceptions/exceptions"
-import { Entity } from "../interface"
-import { DatabaseRecordDTO } from "../services/database/interface"
+import { DataIntegrityException, LogicException } from "../../exceptions/exceptions"
+import { Entity } from "../../interface"
+import { DatabaseRecordDTO } from "../../services/database/interface"
+import { EntityToolkit } from "../entity/toolkit"
 
 export const RepositoryHelper = {
 
@@ -10,7 +11,7 @@ export const RepositoryHelper = {
     return value instanceof Date
   },
 
-  toDatabaseRecordDTO: <TModel extends BaseEntity<TModel>>(model: ReturnType<TModel['export']>): DatabaseRecordDTO => {
+  toDatabaseRecordDTO: (model: ReturnType<typeof EntityToolkit.serialize>): DatabaseRecordDTO => {
     const transformed: DatabaseRecordDTO = Object.create(null)
     for (const key in model) {
       const value = model[key]

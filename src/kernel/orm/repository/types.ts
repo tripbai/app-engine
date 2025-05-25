@@ -1,5 +1,5 @@
-import { CacheProviderInterface } from "../services/cache/interface"
-import { DatabaseProviderInterface } from "../services/database/interface"
+import { CacheProviderInterface } from "../../services/cache/interface"
+import { DatabaseProviderInterface } from "../../services/database/interface"
 
 /** Declaration of Service Providers */
 export type RepositoryServiceProviders = {

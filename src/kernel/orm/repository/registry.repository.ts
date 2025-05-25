@@ -1,10 +1,11 @@
 import { AssertEntity } from "../entity/assertions"
 import { BaseEntity } from "../entity/entity"
-import { BadRequestException, DataIntegrityException, LogicException, RecordNotFoundException } from "../exceptions/exceptions"
-import { TimeStamp } from "../helpers/timestamp"
-import { Entity } from "../interface"
+import { BadRequestException, DataIntegrityException, LogicException, RecordNotFoundException } from "../../exceptions/exceptions"
+import { TimeStamp } from "../../helpers/timestamp"
+import { Entity } from "../../interface"
 import { RepositoryHelper } from "./helpers"
 import { RepositoryServiceProviders } from "./types"
+import { EntityToolkit } from "../entity/toolkit"
 
 /**
  * A registry is an abstract structure or collection of related data 
@@ -180,7 +181,7 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
     const singleOp = this.providers.database.create().entity(
       this.collection,
       RepositoryHelper.toDatabaseRecordDTO(
-        Registry.export()
+        EntityToolkit.serialize(Registry)
       )
     )
     this.models.push(Registry)
@@ -192,7 +193,7 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
    * @param entityId 
    * @returns 
    */
-  async get(entityId: Entity.Id): Promise<Readonly<ReturnType<BaseEntity<TModel>['export']>>>{
+  async get(entityId: Entity.Id): Promise<Readonly<Record<keyof TModel, TModel[keyof TModel]>>>{
     await this.initializeData()
     const filtered = this.models.filter(model=>{
       return model.entity_id === entityId
@@ -203,7 +204,7 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
         data: {entity_id: entityId, collection: this.collection}
       })
     }
-    return filtered[0].export()
+    return EntityToolkit.serialize(filtered[0])
   }
 
   /**
@@ -226,7 +227,8 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
     const ExistingModel = await this.get(data.entity_id)
     let UpdatedModel: TModel = Object.create(this.model)
     for (const key in ExistingModel) {
-      UpdatedModel[key] = ExistingModel[key]
+      const keyd: keyof TModel = key
+      UpdatedModel[keyd] = ExistingModel[key]
     }
     try {
       /** Overrides with the updated value */
@@ -246,7 +248,7 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
     const singleOp = this.providers.database.update().entity(
       this.collection,
       RepositoryHelper.toDatabaseRecordDTO(
-        UpdatedModel.export()
+        EntityToolkit.serialize(UpdatedModel)
       )
     )
     await this.providers.database.beginTransaction([singleOp])
@@ -256,23 +258,25 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
    * Retrieves all records in the Registry
    * @returns 
    */
-  async getAll(): Promise<Array<Readonly<ReturnType<BaseEntity<TModel>['export']>>>>{
+  async getAll(): Promise<Array<Readonly<Record<keyof TModel, TModel[keyof TModel]>>>>{
     await this.initializeData()
-    return this.models.map(model => model.export())
+    return this.models.map(model => EntityToolkit.serialize(model))
   }
 
   async archive(entityId: Entity.Id): Promise<void> {
     const ExistingModel = await this.get(entityId)
     let UpdatedModel: TModel = Object.create(this.model)
+    //let UpdatedModel: TModel = Object.create(this.model)
     for (const key in ExistingModel) {
-      UpdatedModel[key] = ExistingModel[key]
+      const keyd: keyof TModel = key
+      UpdatedModel[keyd] = ExistingModel[key]
     }
     UpdatedModel.archived_at = TimeStamp.now()
     UpdatedModel.updated_at = TimeStamp.now()
     const singleOp = this.providers.database.update().entity(
       this.collection,
       RepositoryHelper.toDatabaseRecordDTO(
-        UpdatedModel.export()
+        EntityToolkit.serialize(UpdatedModel)
       )
     )
     await this.providers.database.beginTransaction([singleOp])
@@ -282,14 +286,15 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
     const ExistingModel = await this.get(entityId)
     let UpdatedModel: TModel = Object.create(this.model)
     for (const key in ExistingModel) {
-      UpdatedModel[key] = ExistingModel[key]
+      const keyd: keyof TModel = key
+      UpdatedModel[keyd] = ExistingModel[key]
     }
     UpdatedModel.archived_at = null
     UpdatedModel.updated_at = TimeStamp.now()
     const singleOp = this.providers.database.update().entity(
       this.collection,
       RepositoryHelper.toDatabaseRecordDTO(
-        UpdatedModel.export()
+        EntityToolkit.serialize(UpdatedModel)
       )
     )
     await this.providers.database.beginTransaction([singleOp])
