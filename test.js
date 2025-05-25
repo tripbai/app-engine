@@ -11,7 +11,7 @@ const DbClient1 = new SessionDBModule.SessionDBClient()
 TestUserRepo1.setDatabaseProvider(DbClient1)
 
 const userId2 = PseudoRandomModule.Pseudorandom.alphanum32()
-const TestUserRepo2 = new RepoModule.TestUserRepository(userId2)
+const TestUserRepo2 = new RepoModule.TestUserRepository(PseudoRandomModule.Pseudorandom.alphanum32())
 const DbClient2 = new SessionDBModule.SessionDBClient()
 TestUserRepo2.setDatabaseProvider(DbClient2)
 
