@@ -6,6 +6,7 @@ import { SessionDBClient } from "../../../services/database/sessiondb/sessiondb"
 import { Pseudorandom } from "../../../helpers/pseudorandom"
 import { TestUsers, getTestUsers } from "../users/test-users"
 import { TimeStamp } from "../../../helpers/timestamp"
+import { TestUserGroupRegistry } from "../users/test-user-group.registry"
 
 
 const SessionDB = new SessionDBClient()
@@ -175,6 +176,19 @@ describe('BaseRepository tests', () => {
       TestTestUserRepo.setDatabaseProvider(LocalSessionDB3)
       const TestTestUserModel = await TestTestUserRepo.get()
       expect(LocalSessionDB3.stats().number_of_get_invocations).to.equal(2)
+    })
+  })
+  describe('import()', () => {
+    it('should successly import data from other valid sources', async () => {
+      const LocalSessionDB3 = new SessionDBClient()
+      LocalSessionDB3.import({users: getTestUsers()})
+      const UserGroupRegistry = new TestUserGroupRegistry(TestUsers['Eve'].group_id)
+      const TestUserFromRegistry = await UserGroupRegistry.get(TestUsers['Dave'].entity_id)
+      const TestUserRepo = new TestUserRepository()
+      TestUserRepo.setDatabaseProvider(LocalSessionDB3)
+      TestUserRepo.import(TestUserFromRegistry)
+      const TestUser = await TestUserRepo.get()
+      expect(LocalSessionDB3.stats().number_of_get_invocations).to.equal(0)
     })
   })
 })

@@ -1,6 +1,6 @@
 import { Entity } from "../../../interface";
 import { AssertEntity } from "../../entity/assertions";
-import { boolean, int, json, timestamp, varchar } from "../../entity/decorators";
+import { boolean, int, json, nullable, timestamp, varchar } from "../../entity/decorators";
 import { BaseEntity } from "../../entity/entity";
 import { TestUserValidator } from "./test-user.validation";
 

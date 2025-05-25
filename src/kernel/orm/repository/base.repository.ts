@@ -176,7 +176,7 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
     }
   }
 
-  import(Data: Readonly<TModel>): void {
+  import(Data: Readonly<Record<keyof TModel, TModel[keyof TModel]>>): void {
     try {
       this.ingest(Data)
     } catch (error) {

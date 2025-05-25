@@ -35,7 +35,7 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
   /**
    * Binds service providers to a Registry instance
    */
-  protected readonly providers: RepositoryServiceProviders
+  protected readonly providers: Omit<RepositoryServiceProviders,'cache'>
 
   /**
    * Refers to the entity_id of the foriegn key
@@ -65,7 +65,6 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
    */
   protected readonly models: Array<Readonly<TModel>>
 
-  
   constructor(foreignKeyEntityId: Entity.Id){
     this.foreignKeyEntityId = foreignKeyEntityId
     this.hasFetchedOnce = false
@@ -79,15 +78,7 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
    * declared service providers
    */
   protected async connectProviders(): Promise<boolean>{
-    for (const key in this.providers) {
-      const provider = this.providers[key]
-      if (
-        provider !== null && 
-        'connect' in this.providers[key]
-      ) {
-        await this.providers[key].connect()
-      }
-    }
+    this.providers.database.connect()
     return true
   }
 
@@ -95,7 +86,8 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
    * Retieves data from the Database provider, and 
    * initializes the model. 
    * 
-   * @throws BadRegistryDataException
+   * @throws LogicException
+   * @throws DataIntegrityException
    */
   private async initializeData(): Promise<void>{
     /** Simply returns if data has been fetched previously */
@@ -137,7 +129,7 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
         }
       } catch (error) {
         throw new DataIntegrityException({
-          message: 'database record contains invalid data',
+          message: 'one of registry records contains invalid data',
           data: {
             foreign_key: this.foreignKeyEntityId,
             reference_key: this.reference,
@@ -148,44 +140,6 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
       }
       this.models.push(Registry)
     }
-  }
-
-  /**
-   * Creates a new record in the Registry
-   * @param data 
-   * @returns 
-   */
-  async create(
-    data: Omit<{[K in keyof TModel]: unknown}, Exclude<Entity.ReservedFields, 'entity_id'>>
-  ): Promise<void> {
-    await this.initializeData()
-    const Registry: TModel = Object.create(this.model)
-    try {
-      for (const key in data) {
-        Registry[key] = data[key]
-      }
-    } catch (error) {
-      throw new BadRequestException({
-        message: 'create data contains one or more invalid fields',
-        data: {
-          foreign_key: this.foreignKeyEntityId,
-          reference_key: this.reference,
-          collection: this.collection,
-          data: data
-        }
-      })
-    }
-    Registry.created_at = TimeStamp.now()
-    Registry.updated_at = TimeStamp.now()
-    Registry.archived_at = null
-    const singleOp = this.providers.database.create().entity(
-      this.collection,
-      RepositoryHelper.toDatabaseRecordDTO(
-        EntityToolkit.serialize(Registry)
-      )
-    )
-    this.models.push(Registry)
-    await this.providers.database.beginTransaction([singleOp])
   }
 
   /**
@@ -200,58 +154,11 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
     })
     if (filtered.length === 0) {
       throw new RecordNotFoundException({
-        message: 'record not found from database',
+        message: 'record not found from registry',
         data: {entity_id: entityId, collection: this.collection}
       })
     }
     return EntityToolkit.serialize(filtered[0])
-  }
-
-  /**
-   * Updates a record in the Registry
-   * @param UpdatedModel 
-   * @returns 
-   */
-  async update(data: Partial<Omit<{[K in keyof TModel]: unknown}, Exclude<Entity.ReservedFields, 'entity_id'>>>): Promise<void> {
-    try {
-      AssertEntity.idIsValid(data.entity_id)
-    } catch (error) {
-      throw new LogicException({
-        message: 'invalid entity_id value',
-        data: {
-          entity_id: data.entity_id,
-          error: error
-        }
-      })
-    }
-    const ExistingModel = await this.get(data.entity_id)
-    let UpdatedModel: TModel = Object.create(this.model)
-    for (const key in ExistingModel) {
-      const keyd: keyof TModel = key
-      UpdatedModel[keyd] = ExistingModel[key]
-    }
-    try {
-      /** Overrides with the updated value */
-      for (const key in data) {
-        UpdatedModel[key] = data[key]
-      }
-    } catch (error) {
-      throw new BadRequestException({
-        message: 'update data contains one or more invalid fields',
-        data: {
-          data: data,
-          error: error
-        }
-      })
-    }
-    UpdatedModel.updated_at = TimeStamp.now()
-    const singleOp = this.providers.database.update().entity(
-      this.collection,
-      RepositoryHelper.toDatabaseRecordDTO(
-        EntityToolkit.serialize(UpdatedModel)
-      )
-    )
-    await this.providers.database.beginTransaction([singleOp])
   }
 
   /**
@@ -261,43 +168,6 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
   async getAll(): Promise<Array<Readonly<Record<keyof TModel, TModel[keyof TModel]>>>>{
     await this.initializeData()
     return this.models.map(model => EntityToolkit.serialize(model))
-  }
-
-  async archive(entityId: Entity.Id): Promise<void> {
-    const ExistingModel = await this.get(entityId)
-    let UpdatedModel: TModel = Object.create(this.model)
-    //let UpdatedModel: TModel = Object.create(this.model)
-    for (const key in ExistingModel) {
-      const keyd: keyof TModel = key
-      UpdatedModel[keyd] = ExistingModel[key]
-    }
-    UpdatedModel.archived_at = TimeStamp.now()
-    UpdatedModel.updated_at = TimeStamp.now()
-    const singleOp = this.providers.database.update().entity(
-      this.collection,
-      RepositoryHelper.toDatabaseRecordDTO(
-        EntityToolkit.serialize(UpdatedModel)
-      )
-    )
-    await this.providers.database.beginTransaction([singleOp])
-  }
-
-  async reactivate(entityId: Entity.Id): Promise<void> {
-    const ExistingModel = await this.get(entityId)
-    let UpdatedModel: TModel = Object.create(this.model)
-    for (const key in ExistingModel) {
-      const keyd: keyof TModel = key
-      UpdatedModel[keyd] = ExistingModel[key]
-    }
-    UpdatedModel.archived_at = null
-    UpdatedModel.updated_at = TimeStamp.now()
-    const singleOp = this.providers.database.update().entity(
-      this.collection,
-      RepositoryHelper.toDatabaseRecordDTO(
-        EntityToolkit.serialize(UpdatedModel)
-      )
-    )
-    await this.providers.database.beginTransaction([singleOp])
   }
 
 }
