@@ -4,7 +4,7 @@
   "description": "Backend application instance",
   "main": "index.js",
   "scripts": {
-    "test": "tsc || mocha dist/**/*.test.js"
+    "test": "tsc && mocha dist/**/*.test.js"
   },
   "repository": {
     "type": "git",

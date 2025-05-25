@@ -34,7 +34,7 @@ describe('BaseRepository tests', () => {
         await TestUserRepo.get()
         throw new Error()
       } catch (err) {
-        expect(err.message).to.include('required set of data that is not found')
+        expect(err.message).to.include('record not found from database')
       }
     })
   })
@@ -65,7 +65,7 @@ describe('BaseRepository tests', () => {
       const TestUserModel = await TestUserRepo.get()
       expect(() => {
         TestUserRepo.update({ first_name: 'Kevin' })
-      }).to.throw('due to a logic error that occured')
+      }).to.throw('attempts to do another transaction when it is locked to a certain state')
     })
     it('should not contain reserved entity fields', async () => {
       const newUserId = Pseudorandom.alphanum32()
@@ -80,7 +80,7 @@ describe('BaseRepository tests', () => {
           // @ts-expect-error
           archived_at: TimeStamp.now()
         })
-      }).to.throw('due to a logic error that occured')
+      }).to.throw('passing archived_at field name to base repository model not allowed')
     })
     it('should validate fields of TEntity', async () => {
       const newUserId = Pseudorandom.alphanum32()
@@ -93,7 +93,7 @@ describe('BaseRepository tests', () => {
           enrolled_at: TimeStamp.now(),
           metadata: '{"citizenship":"Japanese"}',
         })
-      }).to.throw('invalid syntax in the request')
+      }).to.throw('create data contains one or more invalid fields')
     })
   })
 })

@@ -32,7 +32,7 @@ export const RepositoryHelper = {
       isLocked: (state: null | 'create' | 'update') => {
         if (state !== null) {
           let message = `attempts to do another transaction `
-          message += `when it is locked to ${state}`
+          message += `when it is locked to a certain state`
           throw new LogicException({
             message: message,
             data: {state: state}

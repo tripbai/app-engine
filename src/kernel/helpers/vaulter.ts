@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 import { LogicException } from "../exceptions/exceptions"
 import { AppLogger } from './logger'
+import { Application } from '../application'
 
 export type ToNullOrUndefined<T> = {
   [K in keyof T]: T[K] | null | undefined;

@@ -1,3 +1,4 @@
+import { Application } from "../application"
 import { TimeStamp } from "./timestamp"
 
 export namespace AppLogger {
@@ -8,10 +9,15 @@ export namespace AppLogger {
   }) => {
     const timestamp = TimeStamp.now()
     const stack = new Error().stack
-    console.log(`${timestamp} | ERROR | ${params.message} | ${JSON.stringify(params.data)}`)
+    if (Application.deployment() !== 'test') {
+      console.log(`${timestamp} | ERROR | ${params.message} | ${JSON.stringify(params.data)}`)
+    }
+    
   }
   export const info = (message: string) => {
     const timestamp = TimeStamp.now()
-    console.log(`${timestamp} | INFO | ${message}`)
+    if (Application.deployment() !== 'test') {
+      console.log(`${timestamp} | INFO | ${message}`)
+    }
   }
 }
