@@ -18,7 +18,8 @@ export const RepositoryHelper = {
       if (
         typeof value === 'string' ||
         typeof value === 'boolean' || 
-        typeof value === 'number'
+        typeof value === 'number' || 
+        value === null
       ) {
         transformed[key] = value
       }

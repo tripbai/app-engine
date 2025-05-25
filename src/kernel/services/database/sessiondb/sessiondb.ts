@@ -93,7 +93,7 @@ export class SessionDBClient implements DatabaseProviderInterface {
           ExistingData[collection] = {}
         }
         if (typeof entityId !== 'boolean' && entityId !== null) {
-          ExistingData[collection][entityId] = singleOp.data
+          ExistingData[collection][entityId] = JSON.parse(JSON.stringify(singleOp.data))
         }
         continue
       }
@@ -108,7 +108,7 @@ export class SessionDBClient implements DatabaseProviderInterface {
           + `${entityId} in collection ${collection}`)
         }
         if (typeof entityId !== 'boolean' && entityId !== null) {
-          ExistingData[collection][entityId] = singleOp.data
+          ExistingData[collection][entityId] = JSON.parse(JSON.stringify(singleOp.data))
         }
         continue
       }
