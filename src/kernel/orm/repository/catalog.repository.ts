@@ -5,7 +5,7 @@ import { Entity } from "../../interface"
 import { RepositoryHelper } from "./helpers"
 import { RepositoryServiceProviders } from "./types"
 
-export class CatalogController<TModel extends BaseEntity<TModel>> {
+export class CatalogRepository<TModel extends BaseEntity<TModel>> {
   /**
    * In NoSQL databases, the collection refers to the database collection itself. 
    * For relational databases, this collection value refers
@@ -30,7 +30,7 @@ export class CatalogController<TModel extends BaseEntity<TModel>> {
    * @returns Array<TModel extends BaseEntity<TModel>>
    */
   static async find<TModel extends BaseEntity<TModel>>(
-    this: new () => CatalogController<TModel>,
+    this: new () => CatalogRepository<TModel>,
     entityIds: Array<Entity.Id>
   ): Promise<Array<TModel>>{
     const CatalogInstance = new this()

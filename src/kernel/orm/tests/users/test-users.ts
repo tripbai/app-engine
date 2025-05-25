@@ -111,6 +111,17 @@ export const TestUsers: { [key: string]: TestUser} = {
     created_at: '2025-02-14 19:00:00',
     updated_at: '2025-02-14 19:00:00',
     archived_at: null
+  },
+  MinorJake: {
+    first_name: 'MinorJake',
+    age: 13,
+    is_verified: true,
+    enrolled_at: '2025-02-15 20:20:20',
+    metadata: `{"citizenship":"Russian"}`,
+    entity_id: 'ffeeddccbbaa99887766uuoo33221100' as Entity.Id,
+    created_at: '2025-02-14 19:00:00',
+    updated_at: '2025-02-14 19:00:00',
+    archived_at: null
   }
 };
 
