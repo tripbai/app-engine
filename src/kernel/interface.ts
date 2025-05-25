@@ -180,3 +180,8 @@ export type Requester = {
   readonly ipAddress: string; 
   readonly userAgent: string
 };
+
+export type AuthTokenPayload = {
+  user: { id: string; status: string }
+  permissions: Array<ConcretePermissionToken>
+}
