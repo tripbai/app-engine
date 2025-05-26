@@ -38,7 +38,7 @@ export namespace RequesterToken {
    * @param data - the required data for authorization
    * @returns 
    */
-  export const generate = (data: AuthTokenPayload) => {
+  export const generate = (data: AuthTokenPayload): string => {
     return JwtHelper.generate<{payload: AuthTokenPayload}>({
       secret: AppENV.get('JWT_SECRET'),
       untilMinutes: 30,
