@@ -130,7 +130,7 @@ export namespace Route {
   };
 
   export type ProxyInterface = {
-    [M in Http.Method]: <
+    [M in 'get'|'post'|'patch'|'put'|'delete']: <
       R extends Route.Endpoint.Schema & { request: { method: M } }
     >(
       uri: R["request"]["path"],
