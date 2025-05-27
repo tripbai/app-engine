@@ -22,22 +22,13 @@ describe('RequesterFactory', () => {
 
     it('should create public requester if there is no payload data in the token', () => {
       const container = new Container()
-      class JWTProviderTest implements JWTProviderInterface {
-        generate(param): string {return '';}
-        parse(secret: string, token: string): { iss: unknown; aud: unknown; data: unknown; } {
-          // @ts-expect-error
-          return {
-            iss: 'core/rbac',
-            aud: 'test'
-          }
-        }
+      // @ts-expect-error
+      const testPayload: { iss: unknown; aud: unknown; data: unknown; } = {
+        iss: 'core/rbac', aud: 'test'
       }
-      class RequesterTokenServiceTest {
-        JWTProvider = new JWTProviderTest 
-        issuer = ''
-        parse() {return {iss: this.issuer, aud: '', data: this.JWTProvider.parse('','').data}}
+      class RequesterTokenServiceTest extends RequesterTokenService {
+        parse() {return {iss: this.issuer, aud: '', data: testPayload}}
       }
-      container.bind(JsonWebToken).to(JWTProviderTest)
       container.bind(RequesterTokenService).to(RequesterTokenServiceTest)
       container.bind(RequesterFactory).toSelf()
       const requesterFactory = container.get(RequesterFactory)
@@ -45,24 +36,14 @@ describe('RequesterFactory', () => {
     })
 
 
-    it('should create public requester if there is no payload data in the token', () => {
+    it('should create public requester if there is no user data in the token', () => {
       const container = new Container()
-      class JWTProviderTest implements JWTProviderInterface {
-        generate(param): string {return '';}
-        parse(secret: string, token: string): { iss: unknown; aud: unknown; data: unknown; } {
-          return {
-            iss: 'core/rbac',
-            aud: 'test',
-            data: { permissions: [ 'users:1838127318271123' ] }
-          }
-        }
+      const testPayload: { iss: unknown; aud: unknown; data: unknown; } = {
+        iss: 'core/rbac', aud: 'test', data: { permissions: [ 'users:1838127318271123' ] }
       }
-      class RequesterTokenServiceTest {
-        JWTProvider = new JWTProviderTest 
-        issuer = ''
-        parse() {return {iss: this.issuer, aud: '', data: this.JWTProvider.parse('','').data}}
+      class RequesterTokenServiceTest extends RequesterTokenService {
+        parse() {return {iss: this.issuer, aud: '', data: testPayload}}
       }
-      container.bind(JsonWebToken).to(JWTProviderTest)
       container.bind(RequesterTokenService).to(RequesterTokenServiceTest)
       container.bind(RequesterFactory).toSelf()
       const requesterFactory = container.get(RequesterFactory)
@@ -71,22 +52,12 @@ describe('RequesterFactory', () => {
 
     it('should create public requester if the user status is invalid in the token', () => {
       const container = new Container()
-      class JWTProviderTest implements JWTProviderInterface {
-        generate(param): string {return '';}
-        parse(secret: string, token: string): { iss: unknown; aud: unknown; data: unknown; } {
-          return {
-            iss: 'core/rbac',
-            aud: 'test',
-            data: { user: { id: 'test', status: 'invalid-status',}, permissions: [ 'users:1838127318271123' ] }
-          }
-        }
+      const testPayload: { iss: unknown; aud: unknown; data: unknown; } = {
+        iss: 'core/rbac', aud: 'test', data: { user: { id: 'test', status: 'invalid-status',}, permissions: [ 'users:1838127318271123' ] }
       }
-      class RequesterTokenServiceTest {
-        JWTProvider = new JWTProviderTest 
-        issuer = ''
-        parse() {return {iss: this.issuer, aud: '', data: this.JWTProvider.parse('','').data}}
+      class RequesterTokenServiceTest extends RequesterTokenService {
+        parse() {return {iss: this.issuer, aud: '', data: testPayload}}
       }
-      container.bind(JsonWebToken).to(JWTProviderTest)
       container.bind(RequesterTokenService).to(RequesterTokenServiceTest)
       container.bind(RequesterFactory).toSelf()
       const requesterFactory = container.get(RequesterFactory)
@@ -95,22 +66,12 @@ describe('RequesterFactory', () => {
 
     it('should successfully create requester given all the validations passed', () => {
       const container = new Container()
-      class JWTProviderTest implements JWTProviderInterface {
-        generate(param): string {return '';}
-        parse(secret: string, token: string): { iss: unknown; aud: unknown; data: unknown; } {
-          return {
-            iss: 'core/rbac',
-            aud: 'test',
-            data: { user: { id: 'test', status: 'active',}, permissions: [ 'users:1838127318271123' ] }
-          }
-        }
+      const testPayload: { iss: unknown; aud: unknown; data: unknown; } = {
+        iss: 'core/rbac', aud: 'test', data: { user: { id: 'test', status: 'active',}, permissions: [ 'users:1838127318271123' ] }
       }
-      class RequesterTokenServiceTest {
-        JWTProvider = new JWTProviderTest 
-        issuer = ''
-        parse() {return {iss: this.issuer, aud: '', data: this.JWTProvider.parse('','').data}}
+      class RequesterTokenServiceTest extends RequesterTokenService {
+        parse() {return {iss: this.issuer, aud: '', data: testPayload}}
       }
-      container.bind(JsonWebToken).to(JWTProviderTest)
       container.bind(RequesterTokenService).to(RequesterTokenServiceTest)
       container.bind(RequesterFactory).toSelf()
       const requesterFactory = container.get(RequesterFactory)

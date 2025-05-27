@@ -13,11 +13,8 @@ AppENV.set('JWT_SECRET', 'asdasd')
 describe('RequesterTokenService', () => {
   describe('parse()', () => {
     it('should return expected object shape given the token is valid', () => {
-      class JWTProviderTest implements JWTProviderInterface {
-        generate<TPayload extends { [key: string]: any; }>(param: JWTTokenParams<TPayload>): string {
-            return '';
-        }
-        parse(secret: string, token: string): { iss: unknown; aud: unknown; data: unknown; } {
+      class JWTProviderTest extends JsonWebToken {
+        parse(secret: string, token: string) {
           return {
             iss: 'core/rbac',
             aud: 'test',
@@ -33,10 +30,7 @@ describe('RequesterTokenService', () => {
     })
 
     it('should throw an error if the token is invalid', () => {
-      class JWTProviderTest implements JWTProviderInterface {
-        generate<TPayload extends { [key: string]: any; }>(param: JWTTokenParams<TPayload>): string {
-            return '';
-        }
+      class JWTProviderTest extends JsonWebToken {
         parse(secret: string, token: string): { iss: unknown; aud: unknown; data: unknown; } {
           throw new Error()
         }
