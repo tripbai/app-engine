@@ -1,31 +1,37 @@
+import { Container } from "inversify"
+
 export namespace Application {
 
-  let BootDate: Date | null
+  let _b: Date | null
   export const boot = () => {
-    BootDate = new Date()
+    _b = new Date()
   }
 
 
-  /** Application root directory */
-  let ROOT: string | null = null
+  /** Path to the application root */
+  let _r: string | null = null
 
   /**
-   * Retrieves the path to Application root directory
+   * Sets or retrieves the path to Application root directory
    * @param path - to initialize application root path 
    * @returns 
    */
   export const root = (path?: string|undefined) => {
-    if (path && ROOT === null) (ROOT = path)
-    return ROOT
+    if (path && _r === null) (_r = path)
+    return _r
   }
 
-  /** == DEPLOYMENTS ==*/
-  let DEPLOYMENT: 'test' | 'staging' | 'production' | 'development' | null = null
-  export const deployment=(name:'test' | 'staging' | 'production' | 'development' | null = null)=>{
-    if (name !== null && DEPLOYMENT === null) {
-      DEPLOYMENT = name
-    }
-    return DEPLOYMENT ?? 'test'
+  /** Type of enviroment */
+  let _e: 'test' | 'staging' | 'production' | 'development' | null = null
+  export const environment = (name: typeof _e = null)=>{
+    if (name !== null && _e === null) _e = name
+    return _e ?? 'test'
   }
   
+  let _c = new Container()
+  export const container = () => {
+    return _c
+  }
+
+
 }

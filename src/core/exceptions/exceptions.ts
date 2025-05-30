@@ -12,7 +12,7 @@ export class DataIntegrityException extends Error {
     let generic = `Request failed due to complete due to unexpected or invalid data `
     generic += `retrieved from an internal source. Please contact your provider for `
     generic += `more information.`
-    const message = Application.deployment() === 'test' ? params.message : generic
+    const message = Application.environment() === 'test' ? params.message : generic
     super(message)
     AppLogger.error(
       { severity: 1, message: params.message, data: params.data }
@@ -29,7 +29,7 @@ export class JSONParsingError extends Error {
   constructor(params: {severity: number, message: string, data: Record<string,any>}) {
     let generic = `Parsing of string to JSON resulted to an error. Please refer to `;
     generic += `your provider's documentation for more information.`;
-    const message = Application.deployment() === 'test' ? params.message : generic
+    const message = Application.environment() === 'test' ? params.message : generic
     super(message)
     AppLogger.error(params)
     this.message = message;
@@ -45,7 +45,7 @@ export class LogicException extends Error {
     let generic = `Request failed to complete due to a logic error that occured `
     generic += `within the application. Please notify your provider for more `
     generic += `information.`
-    const message = Application.deployment() === 'test' ? params.message : generic
+    const message = Application.environment() === 'test' ? params.message : generic
     super(message)
     AppLogger.error(
       { severity: 1, message: params.message, data: params.data }
@@ -63,7 +63,7 @@ export class BadRequestException extends Error {
     let generic = `We are unable to process your request due to missing information `;
     generic += `or invalid syntax in the request. Please refer to your provider's `;
     generic += `documentation for more information.`;
-    const message = Application.deployment() === 'test' ? params.message : generic
+    const message = Application.environment() === 'test' ? params.message : generic
     super(message)
     AppLogger.error(
       { severity: 5, message: params.message, data: params.data }
@@ -81,7 +81,7 @@ export class RecordNotFoundException extends Error {
     let generic = `Request failed to complete due to required set of data that `
     generic += `is not found. Please refer to your provider's documentation `
     generic += `for more information. `
-    const message = Application.deployment() === 'test' ? params.message : generic
+    const message = Application.environment() === 'test' ? params.message : generic
     super(message)
     AppLogger.error(
       { severity: 5, message: params.message, data: params.data }
@@ -98,7 +98,7 @@ export class ResourceAccessForbiddenException extends Error {
   constructor(params: {message: string, data: Record<string,any>}) {
     let generic = `You do not have the neccessary permissions to access this resource. `;
     generic += `Please refer to  your provider's documentation for more information.`;
-    const message = Application.deployment() === 'test' ? params.message : generic
+    const message = Application.environment() === 'test' ? params.message : generic
     super(message)
     AppLogger.error(
       { severity: 5, message: params.message, data: params.data }
@@ -116,7 +116,7 @@ export class UnauthorizedAccessException extends Error {
   constructor(params: {message: string, data: Record<string,any>}) {
     let generic = `Your credentials are not valid to be able to proceed with the request. `;
     generic += `Please refer to your provider's documentation for more information.`;
-    const message = Application.deployment() === 'test' ? params.message : generic
+    const message = Application.environment() === 'test' ? params.message : generic
     super(message)
     AppLogger.error(
       { severity: 5, message: params.message, data: params.data }
@@ -134,7 +134,7 @@ export class RecordAlreadyExistsException extends Error {
     let generic = `The record you are trying to create already exists in the system. `;
     generic += `Please check your input or try updating the existing record. `;
     generic += `Please refer to  your provider's documentation for more information.`;
-    const message = Application.deployment() === 'test' ? params.message : generic
+    const message = Application.environment() === 'test' ? params.message : generic
     super(message)
     AppLogger.error(
       { severity: 5, message: params.message, data: params.data }
@@ -150,7 +150,7 @@ export class ExternalApiException extends Error {
   code: number
   constructor(params: {message: string, statusCode: number, data: Record<string,any>}) {
     let generic = `The request could not be completed due to an error response from the external API endpoint`
-    const message = Application.deployment() === 'test' ? params.message : generic
+    const message = Application.environment() === 'test' ? params.message : generic
     super(message)
     AppLogger.error(
       { severity: 3, message: params.message, data: params.data }
@@ -168,7 +168,7 @@ export class GenericServiceProviderException extends Error {
   constructor(params: {severity: number, message: string, data: Record<string,any>}) {
     let generic = `This exception was thrown due to an issue encountered by one of your `;
     generic += `service providers. Please refer to your application logs for more information.`;
-    const message = Application.deployment() === 'test' ? params.message : generic
+    const message = Application.environment() === 'test' ? params.message : generic
     super(message)
     AppLogger.error(
       { severity: params.severity, message: params.message, data: params.data }

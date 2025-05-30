@@ -4,7 +4,8 @@
   "description": "Backend application instance",
   "main": "index.js",
   "scripts": {
-    "test": "tsc && mocha dist/**/*.test.js"
+    "test": "tsc && mocha dist/**/*.test.js",
+    "container:build": "node bin/container/build.js"
   },
   "repository": {
     "type": "git",
@@ -45,6 +46,7 @@
     "redis": "^4.6.12",
     "reflect-metadata": "^0.2.2",
     "sanitize-html": "^2.14.0",
+    "ts-morph": "^26.0.0",
     "uuid": "^9.0.1"
   }
 }
