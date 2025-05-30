@@ -1,11 +1,12 @@
 import { inject, injectable } from "inversify"
-import { Core } from "../../core.types"
-import { PublicRequester } from "./public-requester"
+import { Core } from "../core.types"
+import { PublicRequester } from "./requester-public"
 import { RequesterTokenService } from "./requester-token.service"
-import { BaseRequester } from "./base-requester"
+import { BaseRequester } from "./requester-base"
+
 
 @injectable()
-export class RequesterFactory {
+export class RequesterIdentityFactory {
 
   constructor(
     @inject(RequesterTokenService) public readonly RequesterTokenService: RequesterTokenService
@@ -27,7 +28,7 @@ export class RequesterFactory {
 
     const parsed = this.RequesterTokenService.parse(token)
 
-    if (!RequesterFactory.doesTokenHasValidPayload(parsed)){
+    if (!RequesterIdentityFactory.doesTokenHasValidPayload(parsed)){
       return new PublicRequester({
         ipAddress: ipAddress,
         userAgent: userAgent

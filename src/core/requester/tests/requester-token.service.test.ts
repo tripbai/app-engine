@@ -1,11 +1,9 @@
 import { describe, it } from "node:test"
 import { expect } from 'chai'
 import { Container } from "inversify";
-import { JsonWebToken } from "../../../providers/jwt/jsonwebtoken/json-web-token.service";
+import { JsonWebToken } from "../../providers/jwt/jsonwebtoken/json-web-token.service";
 import { RequesterTokenService } from "../requester-token.service";
-import { Core } from "../../../core.types";
-import { PermissionTokenValidator } from "../permission-token.validator";
-import { AppENV } from "../../../helpers/env";
+import { AppENV } from "../../helpers/env";
 
 AppENV.set('JWT_SECRET', 'asdasd')
 
@@ -15,7 +13,7 @@ describe('RequesterTokenService', () => {
       class JWTProviderTest extends JsonWebToken {
         parse(secret: string, token: string) {
           return {
-            iss: 'core/rbac',
+            iss: 'core/requester',
             aud: 'test',
             data: { user: { id: 'test', status: 'active',}, permissions: [ 'users:1838127318271123' ] }
           }
@@ -25,7 +23,7 @@ describe('RequesterTokenService', () => {
       container.bind(JsonWebToken).to(JWTProviderTest)
       container.bind(RequesterTokenService).toSelf()
       const requesterTokenService = container.get(RequesterTokenService)
-      expect(requesterTokenService.parse('testtoken').iss).to.equal('core/rbac')
+      expect(requesterTokenService.parse('testtoken').iss).to.equal('core/requester')
     })
 
     it('should throw an error if the token is invalid', () => {

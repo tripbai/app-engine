@@ -1,4 +1,4 @@
-import { BaseRequester } from "./base-requester"
+import { BaseRequester } from "./requester-base"
 
 /**
  * A Public Requester is a Requester that is not associated with any

@@ -1,4 +1,4 @@
-import { Core } from "../../core.types"
+import { Core } from "../core.types"
 
 export class BaseRequester implements Core.Authorization.Requester {
   readonly user: Core.User.Data | null

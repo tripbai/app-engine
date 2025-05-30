@@ -1,16 +1,15 @@
 import { inject, injectable } from 'inversify'
-import { JWTProviderInterface } from '../../providers/jwt/jwt.provider';
-import { JsonWebToken } from '../../providers/jwt/jsonwebtoken/json-web-token.service';
-import { Core } from '../../core.types';
-import { AppENV } from '../../helpers/env';
-import { ResourceAccessForbiddenException } from '../../exceptions/exceptions';
-import { PermissionTokenValidator } from './permission-token.validator';
+import { ResourceAccessForbiddenException } from '../exceptions/exceptions'
+import { AppENV } from '../helpers/env'
+import { JsonWebToken } from '../providers/jwt/jsonwebtoken/json-web-token.service'
+import { JWTProviderInterface } from '../providers/jwt/jwt.provider'
+
 
 
 @injectable()
 export class RequesterTokenService {
 
-  issuer = 'core/rbac'
+  issuer = 'core/requester'
 
   constructor(
     @inject(JsonWebToken) public readonly JWTProvider: JWTProviderInterface
