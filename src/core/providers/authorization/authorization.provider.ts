@@ -1,0 +1,17 @@
+import { Core } from "../../core.types";
+
+export abstract class AuthorizationProvider {
+
+  abstract canOperate(
+    resourceObject: {[key:string]:any}, 
+    requiredPermission: Core.Authorization.AbstractToken,
+    grantedPermissions: Array<Core.Authorization.ConcreteToken>
+  ): boolean
+
+  abstract grantPermission(
+    requester: Core.Authorization.Requester,
+    resourceObject: {[key:string]:any},
+    permissionToken: Core.Authorization.AbstractToken
+  ): void
+
+}
