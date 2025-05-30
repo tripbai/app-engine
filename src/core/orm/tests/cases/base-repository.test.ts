@@ -298,4 +298,125 @@ describe('BaseRepository', () => {
       expect(TestUserRepo.hasModelInitialized()).to.equal(true)
     })
   })
+
+  describe('create()', () => {
+    it('should throw an error when the action is locked to update', async () => {
+      const container = new Container()
+      const userId = Pseudorandom.alphanum32()
+      const user: TestUserModel = {
+        entity_id: userId,
+        first_name: 'John',
+        age: 23,
+        is_verified: true,
+        enrolled_at: '2024-12-04 11:23:21',
+        group_id: Pseudorandom.alphanum32(),
+        metadata: `{"citizenship":"American"}`,
+        created_at: '2024-12-01 11:23:21',
+        updated_at: '2024-12-01 11:23:21',
+        archived_at: null
+      }
+      class TestCache extends MockCacheProvider {}
+      class TestDatabase extends MockDatabaseProvider {
+        async getRecordById(collectionName: string, id: Core.Entity.Id) {
+            return [BaseRepository.flattenAsDatabaseRecord(user)]
+        }
+      }
+      container.bind(TestUserModel).toSelf()
+      container.bind(AbstractDatabaseProvider).to(TestDatabase)
+      container.bind(AbstractCacheProvider).to(TestCache)
+      container.bind(TestUserRepository).toSelf()
+      const TestUserRepo = container.get(TestUserRepository)
+      const TestUser = await TestUserRepo.getById(userId)
+      TestUserRepo.update({
+        age: 30
+      })
+      try {
+        TestUserRepo.create(userId, {
+          first_name: 'John',
+          age: 23,
+          is_verified: true,
+          enrolled_at: '2024-12-04 11:23:21',
+          group_id: Pseudorandom.alphanum32(),
+          metadata: `{"citizenship":"American"}`
+        })
+        throw new Error('the above code did not throw an error')
+      } catch (error) {
+        expect(error.message).to.equal('Attempts to do another action when it is locked to a certain state')
+      }
+    })
+
+    it('should throw an error when the create data contains reserved fields', async () => {
+      const container = new Container()
+      const userId = Pseudorandom.alphanum32()
+      class TestCache extends MockCacheProvider {}
+      class TestDatabase extends MockDatabaseProvider {}
+      container.bind(TestUserModel).toSelf()
+      container.bind(AbstractDatabaseProvider).to(TestDatabase)
+      container.bind(AbstractCacheProvider).to(TestCache)
+      container.bind(TestUserRepository).toSelf()
+      const TestUserRepo = container.get(TestUserRepository)
+      try {
+        TestUserRepo.create(userId, {
+          first_name: 'John',
+          age: 23,
+          is_verified: true,
+          enrolled_at: '2024-12-04 11:23:21',
+          group_id: Pseudorandom.alphanum32(),
+          metadata: `{"citizenship":"American"}`,
+          // @ts-expect-error
+          created_at: '2024-12-04 11:23:21'
+        })
+        throw new Error('the above code did not throw an error')
+      } catch (error) {
+        expect(error.message).to.equal('Attempts to override reserved entity fields')
+      }
+    })
+
+    it('should throw an error when the create data contains invalid fields', async () => {
+      const container = new Container()
+      const userId = Pseudorandom.alphanum32()
+      class TestCache extends MockCacheProvider {}
+      class TestDatabase extends MockDatabaseProvider {}
+      container.bind(TestUserModel).toSelf()
+      container.bind(AbstractDatabaseProvider).to(TestDatabase)
+      container.bind(AbstractCacheProvider).to(TestCache)
+      container.bind(TestUserRepository).toSelf()
+      const TestUserRepo = container.get(TestUserRepository)
+      try {
+        TestUserRepo.create(userId, {
+          first_name: 'John',
+          age: 23,
+          is_verified: true,
+          enrolled_at: '2024-12-04INVALID11:23:21',
+          group_id: Pseudorandom.alphanum32(),
+          metadata: `{"citizenship":"American"}`
+        })
+        throw new Error('the above code did not throw an error')
+      } catch (error) {
+        expect(error.message).to.equal('create data contains one or more invalid fields')
+      }
+    })
+
+    it('should successfully create the model and populate the reserved fields', async () => {
+      const container = new Container()
+      const userId = Pseudorandom.alphanum32()
+      class TestCache extends MockCacheProvider {}
+      class TestDatabase extends MockDatabaseProvider {}
+      container.bind(TestUserModel).toSelf()
+      container.bind(AbstractDatabaseProvider).to(TestDatabase)
+      container.bind(AbstractCacheProvider).to(TestCache)
+      container.bind(TestUserRepository).toSelf()
+      const TestUserRepo = container.get(TestUserRepository)
+      TestUserRepo.create(userId, {
+        first_name: 'John',
+        age: 23,
+        is_verified: true,
+        enrolled_at: '2024-12-04 11:23:21',
+        group_id: Pseudorandom.alphanum32(),
+        metadata: `{"citizenship":"American"}`
+      })
+      const TestUser = await TestUserRepo.getById(userId)
+      expect(TestUser.archived_at).to.equal(null)
+    })
+  })
 })
