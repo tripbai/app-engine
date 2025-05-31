@@ -37,7 +37,7 @@ export namespace Application {
   const _x: Array<{
     path: string,
     method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE',
-    className: string
+    Controller: string
     handler: string
   }> = []
   export const route = (config: typeof _x[0] | null = null): typeof _x => {

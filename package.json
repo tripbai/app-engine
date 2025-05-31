@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "tsc && mocha dist/**/*.test.js",
-    "container:build": "node bin/container/build.js"
+    "container:build": "node bin/container/build.js",
+    "start:development": "node bin/container/build.js && tsc && node dist/core/bootstrap.js --env=development --port=5458"
   },
   "repository": {
     "type": "git",

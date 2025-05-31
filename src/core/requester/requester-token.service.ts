@@ -3,6 +3,7 @@ import { ResourceAccessForbiddenException } from '../exceptions/exceptions'
 import { AppENV } from '../helpers/env'
 import { JsonWebToken } from '../providers/jwt/jsonwebtoken/json-web-token.service'
 import { JWTProviderInterface } from '../providers/jwt/jwt.provider'
+import { Core } from '../core.types'
 
 
 
@@ -66,5 +67,18 @@ export class RequesterTokenService {
       aud: parsed.aud,
       data: parsed.data
     }
+  }
+
+  generate(payload: {
+    user: { id: string, status: Core.User.Status },
+    permissions: Array<Core.Authorization.ConcreteToken>
+  }){
+    return this.JWTProvider.generate({
+      secret: AppENV.get('JWT_SECRET'),
+      untilMinutes: 30,
+      data: payload,
+      issuer: this.issuer,
+      audience: payload.user.id
+    })
   }
 }

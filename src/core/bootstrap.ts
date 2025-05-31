@@ -105,11 +105,13 @@ if (framework === 'express') {
   /** Route Registry */
   const Router = Application.container().get(ProxyRouter)
   Application.route().forEach(routeConfig => {
-    const HandlerController = Application.container().get(routeConfig.className) as object
+    const Controller = Application.container().get(routeConfig.Controller) as object
     Router.register(
       app,
       routeConfig.path,
-      HandlerController[routeConfig.handler],
+      async (data) => {
+        return await Controller[routeConfig.handler](data)
+      },
       routeConfig.method
     )
   })
