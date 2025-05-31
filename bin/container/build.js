@@ -58,7 +58,7 @@ contents += ` */\n`
 const injectables = findInjectables(srcDir);
 for (let i = 0; i < injectables.length; i++) {
   const injectable = injectables[i]
-  const filePath = injectable.filePath.replace('../../src', '.')
+  const filePath = injectable.filePath.replace('../src', '.')
   contents += `import { ${injectable.className} } from "${filePath}";\n`
 }
 contents += `import { Application } from "./core/application";`

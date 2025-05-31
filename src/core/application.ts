@@ -1,4 +1,5 @@
 import { Container } from "inversify"
+import { ProxyRouter } from "./router/proxy-router"
 
 export namespace Application {
 
@@ -31,6 +32,18 @@ export namespace Application {
   let _c = new Container()
   export const container = () => {
     return _c
+  }
+
+  const _x: Array<{
+    path: string,
+    method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE',
+    className: string
+    handler: string
+  }> = []
+  export const route = (config: typeof _x[0] | null = null): typeof _x => {
+    if (config === null) return _x
+    _x.push(config)
+    return _x
   }
 
 

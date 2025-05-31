@@ -3,7 +3,7 @@ import { ArchivedRecordException, BadRequestException, DataIntegrityException, L
 import { thisJSON } from "../../helpers/thisjson";
 import { TimeStamp } from "../../helpers/timestamp";
 import { Core } from "../../core.types";
-import { RepositoryGetOptions, RepositoryServiceProviders } from "./types";
+import { RepositoryGetOptions, RepositoryServiceProviders, WithReservedFields } from "./types";
 import { EntityToolkit } from "../entity/entity-toolkit";
 import { inject, injectable } from "inversify";
 import { AbstractCacheProvider } from "../../providers/cache/cache.provider";
@@ -20,32 +20,17 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
   protected readonly collection: string
 
   /**
-   * The TEntityObject itself
+   * The class definition of TModel itself
    */
-  protected readonly model: TModel
-
-  /**
-   * Determines whether we've already imported data to the
-   * linked model or not. This allows us to avoid querying
-   * the database provider once again after calling the 
-   * Repository:get method
-   */
-  private modelInitialized: boolean = false
+  protected readonly model: new (...args: any[]) => TModel
 
   /**
    * Binds service providers to a Repository instance
    */
   protected readonly providers: RepositoryServiceProviders
 
-  /**
-   * You can't do create and update within a single repository instance. 
-   * After calling either of them, a lock is put in place to avoid
-   * executing the other action
-   */
-  protected lockedAction: null | 'create' | 'update'
-
   constructor(
-    @inject(BaseEntity) Model: TModel,
+    @inject(BaseEntity) Model: new (...args: any[]) => TModel,
     @inject(AbstractDatabaseProvider) DatabaseProvider: AbstractDatabaseProvider,
     @inject(AbstractCacheProvider) CacheProvider: AbstractCacheProvider
   ){
@@ -54,7 +39,6 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
       database: DatabaseProvider,
       cache: CacheProvider
     }
-    this.lockedAction = null
   }
 
   /**
@@ -77,13 +61,11 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
    * Retrieves the model data by id with all its fields rendered as readonly. 
    * @returns The model object.
    */
-  async getById(entityId: Core.Entity.Id, options?: RepositoryGetOptions): Promise<Readonly<Record<keyof TModel, TModel[keyof TModel]>>>{
+  async getById(
+    entityId: Core.Entity.Id, 
+    options?: RepositoryGetOptions
+  ): Promise<WithReservedFields<TModel, 'entity_id' | 'created_at' | 'updated_at'>>{
     await this.initproviders()
-
-    /** First, we'll try to see if the model has been previously initialized */
-    if (this.modelInitialized) {
-      return EntityToolkit.serialize(this.model)
-    }
 
     /** If not, then, we'll attempt to retrieve data from cache */
     let cached: string | null = null
@@ -135,9 +117,11 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
         }
       })
     }
+
+    const Model = new this.model()
     
     try {
-      this.ingest(Data)
+      this.ingest(Model, Data)
     } catch (error) {
       throw new DataIntegrityException({
         message: 'database record contains invalid data',
@@ -162,13 +146,12 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
     }
 
     if (undefined !== options) {
-      if (!options.allow_archived_record && this.model.archived_at !== null) {
-        throw new ArchivedRecordException(this.model.entity_id)
+      if (!options.allow_archived_record && Model.archived_at !== null) {
+        throw new ArchivedRecordException(Model.entity_id)
       }
     }
 
-    this.modelInitialized = true
-    return EntityToolkit.serialize(this.model)
+    return EntityToolkit.serialize(Model) 
 
   }
 
@@ -176,30 +159,14 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
    * Ingests data into the model
    * @param Data 
    */
-  private ingest(Data: any){
+  private ingest(Model: TModel, Data: any){
     for (const key in Data) {
       if (BaseRepository.isDateObject(Data[key])) {
-        this.model[key] = TimeStamp.normalize(Data[key])
+        Model[key] = TimeStamp.normalize(Data[key])
       } else {
-        this.model[key] = Data[key]
+        Model[key] = Data[key]
       }
     }
-  }
-
-  import(Data: Readonly<Record<keyof TModel, TModel[keyof TModel]>>): void {
-    try {
-      this.ingest(Data)
-    } catch (error) {
-      throw new DataIntegrityException({
-        message: 'imported record contains invalid data',
-        data: {
-          collection: this.collection,
-          data: Data,
-          error: error
-        }
-      })
-    }
-    this.modelInitialized = true
   }
 
   /**
@@ -207,20 +174,17 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
    * @param data - The data object containing fields to be set in the model, 
    * excluding reserved fields.
    */
-  create(entityId: Core.Entity.Id, data: Omit<{[K in keyof TModel]: unknown}, Core.Entity.ReservedFields>){
-    if (this.isActionIsLocked()) {
-      throw new OverridingLockedActionException({
-        attemptedAction: 'create',
-        lockedAction: this.lockedAction,
-        data: data
-      })
-    }
+  async create(
+    entityId: Core.Entity.Id, 
+    data: Omit<{[K in keyof TModel]: unknown}, Core.Entity.ReservedFields>
+  ): Promise<void> {
     if (this.containsReservedFields(data)){
       throw new OverridingReservedFieldsException(data)
     }
+    const Model = new this.model()
     try {
       for (const key in data) {
-        this.model[key] = data[key]
+        Model[key] = data[key]
       }
     } catch (error) {
       throw new BadRequestException({
@@ -231,12 +195,17 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
         }
       })
     }
-    this.model.entity_id = entityId
-    this.model.created_at = TimeStamp.now()
-    this.model.updated_at = TimeStamp.now()
-    this.model.archived_at = null
-    this.modelInitialized = true
-    this.lockedAction = 'create'
+    Model.entity_id = entityId
+    Model.created_at = TimeStamp.now()
+    Model.updated_at = TimeStamp.now()
+    Model.archived_at = null
+    const transaction = this.providers.database.createRecord(
+      this.collection,
+      BaseRepository.flattenAsDatabaseRecord(
+        EntityToolkit.serialize(Model)
+      )
+    )
+    await this.providers.database.beginTransaction([transaction])
   }
 
   /**
@@ -244,129 +213,33 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
    * @param data - A partial data object containing fields to update, 
    * excluding reserved fields.
    */
-  update(data: Partial<Omit<{[K in keyof TModel]: unknown}, Core.Entity.ReservedFields>>){
-    if (!this.hasModelInitialized()) {
-      throw new UpdatingUninitializedDataException(data)
+  async update(
+    Model: WithReservedFields<TModel, 'entity_id' | 'created_at' | 'updated_at'>
+  ): Promise<void> {
+    const UpdatedModel = new this.model()
+    for (const key in Model) {
+      UpdatedModel[key] = Model[key]
     }
-    if (this.isActionIsLocked()) {
-      throw new OverridingLockedActionException({
-        attemptedAction: 'update',
-        lockedAction: this.lockedAction,
-        data: data
+    UpdatedModel.updated_at = TimeStamp.now()
+    /** Removing any cached data of this model */
+    if (this.providers.cache !== null) {
+      await this.providers.cache.flushItem({
+        collection: this.collection,
+        entityId: UpdatedModel.entity_id
       })
     }
-    if (this.containsReservedFields(data)){
-      throw new OverridingReservedFieldsException(data)
-    }
-    try {
-      for (const key in data) {
-        this.model[key] = data[key]
-      }
-    } catch (error) {
-      throw new BadRequestException({
-        message: 'update data contains one or more invalid fields',
-        data: {
-          data: data,
-          error: error
-        }
-      })
-    }
-    this.model.updated_at = TimeStamp.now()
-    this.lockedAction = 'update'
-  }
-
-   /**
-   * Archives the model by setting the `archived_at` timestamp to the current UTC time.
-   * There will a service that checks if this value isn't null, and deletes the record 
-   * if it is X days ago.
-   */
-  archive(data?: Partial<Omit<{[K in keyof TModel]: unknown}, Core.Entity.ReservedFields>>){
-    if (!this.hasModelInitialized()) {
-      throw new UpdatingUninitializedDataException(data ?? {collection: this.collection})
-    }
-    if (this.isActionIsLocked()) {
-      throw new OverridingLockedActionException({
-        attemptedAction: 'update',
-        lockedAction: this.lockedAction,
-        data: data ?? {collection: this.collection}
-      })
-    }
-    if (data !== undefined) {
-      this.update(data)
-    }
-    this.model.archived_at = TimeStamp.now()
-    this.model.updated_at = TimeStamp.now()
-    this.lockedAction = 'update'
-  }
-
-  /**
-   * Reactivates the model by setting the `archived_at` field to null.
-   */
-  reactivate(data?: Partial<Omit<{[K in keyof TModel]: unknown}, Core.Entity.ReservedFields>>){
-    if (!this.hasModelInitialized()) {
-      throw new UpdatingUninitializedDataException(data ?? {collection: this.collection})
-    }
-    if (this.isActionIsLocked()) {
-      throw new OverridingLockedActionException({
-        attemptedAction: 'update',
-        lockedAction: this.lockedAction,
-        data: data ?? {collection: this.collection}
-      })
-    }
-    if (data !== undefined) {
-      this.update(data)
-    }
-    this.model.archived_at = null
-    this.model.updated_at = TimeStamp.now()
-    this.lockedAction = 'update'
-  }
-
-  async commit() {
-    let transaction: DatabaseTransactionStep | null = null 
-    const model = EntityToolkit.serialize(this.model)
-    switch(this.lockedAction) {
-      case 'create': 
-        await this.initproviders()
-        transaction 
-          = this.providers.database.createRecord(
-            this.collection,
-            BaseRepository.flattenAsDatabaseRecord(model)
-          )
-        break
-      case 'update': 
-        /** Removing any cached data of this model */
-        if (this.providers.cache !== null) {
-          this.providers.cache.flushItem({
-            collection: this.collection,
-            entityId: this.model.entity_id
-          })
-        }
-        transaction 
-          = this.providers.database.updateRecord(
-            this.collection,
-            BaseRepository.flattenAsDatabaseRecord(model)
-          )
-        break
-      default: 
-        throw new LogicException({
-          message: `committing changes without any transaction`,
-          data: {entity_id: this.model.entity_id, collection: this.collection}
-        })
-        break
-    }
-
-    if (transaction !== null) {
-      await this.providers.database.beginTransaction([transaction])
-    }
-  }
-
-  private isActionIsLocked(){
-    return this.lockedAction !== null
+    const transaction = this.providers.database.updateRecord(
+      this.collection,
+      BaseRepository.flattenAsDatabaseRecord(
+        EntityToolkit.serialize(UpdatedModel)
+      )
+    )
+    await this.providers.database.beginTransaction([transaction])
   }
 
   private containsReservedFields(data: {[key:string]: any}): boolean {
     const reserved: Array<Core.Entity.ReservedFields> 
-      = ['entity_id', 'created_at', 'updated_at', 'archived_at']
+      = ['id', 'entity_id', 'created_at', 'updated_at']
     for (const key in data) {
       if (reserved.includes(key as Core.Entity.ReservedFields)) {
         return true
@@ -381,22 +254,14 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
   }
 
   private hasMissingReservedFields(data: { [key: string]: any }): boolean {
-    const reserved: Array<Core.Entity.ReservedFields> = [
-      'entity_id',
-      'created_at',
-      'updated_at',
-      'archived_at',
-    ]
+    const reserved: Array<Core.Entity.ReservedFields>
+      = ['entity_id', 'created_at', 'updated_at']
     for (const field of reserved) {
       if (!(field in data)) {
         return true
       }
     }
     return false
-  }
-  
-  hasModelInitialized(){
-    return this.modelInitialized
   }
 
   public static flattenAsDatabaseRecord(model: ReturnType<typeof EntityToolkit.serialize>): FlatDatabaseRecord {

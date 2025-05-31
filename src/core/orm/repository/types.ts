@@ -10,3 +10,6 @@ export type RepositoryServiceProviders = {
 export type RepositoryGetOptions = {
   allow_archived_record: boolean
 }
+
+export type WithReservedFields<T, K extends keyof T> =
+  Readonly<Pick<T, K>> & Omit<T, K>

@@ -10,7 +10,6 @@ export class TestUserRepository extends BaseRepository<TestUserModel> {
   protected collection: string = 'users'
 
   constructor(
-    @inject(TestUserModel) TestUserModel: TestUserModel,
     @inject(AbstractDatabaseProvider) DatabaseProvider: AbstractDatabaseProvider,
     @inject(AbstractCacheProvider) CacheProvider: AbstractCacheProvider
   ){

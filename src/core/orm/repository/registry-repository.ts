@@ -2,7 +2,7 @@ import { BaseEntity } from "../entity/base-entity"
 import { BadRequestException, DataIntegrityException, LogicException, RecordNotFoundException } from "../../exceptions/exceptions"
 import { TimeStamp } from "../../helpers/timestamp"
 import { Core } from "../../core.types"
-import { RepositoryServiceProviders } from "./types"
+import { RepositoryServiceProviders, WithReservedFields } from "./types"
 import { EntityToolkit } from "../entity/entity-toolkit"
 
 /**
@@ -144,7 +144,7 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
    * @param entityId 
    * @returns 
    */
-  async get(entityId: Core.Entity.Id): Promise<Readonly<Record<keyof TModel, TModel[keyof TModel]>>>{
+  async get(entityId: Core.Entity.Id): Promise<WithReservedFields<TModel, 'entity_id' | 'created_at' | 'updated_at'>>{
     await this.initializeData()
     const filtered = this.models.filter(model=>{
       return model.entity_id === entityId
@@ -162,7 +162,7 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
    * Retrieves all records in the Registry
    * @returns 
    */
-  async getAll(): Promise<Array<Readonly<Record<keyof TModel, TModel[keyof TModel]>>>>{
+  async getAll(): Promise<Array<WithReservedFields<TModel, 'entity_id' | 'created_at' | 'updated_at'>>>{
     await this.initializeData()
     return this.models.map(model => EntityToolkit.serialize(model))
   }

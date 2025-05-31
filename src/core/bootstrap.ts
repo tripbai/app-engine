@@ -18,7 +18,7 @@ import { Application } from "./application"
 const yargs = require('yargs')
 const path  = require('path')
 const cors  = require('cors')
-import * as fs from 'fs'
+import { AppENV } from "./helpers/env"
 global.APP_ROOT = path.resolve(__dirname, '../../')
 
 const createCommandOptions = () => {
@@ -28,9 +28,9 @@ const createCommandOptions = () => {
     description: 'Sets the environment',
     type: 'string',
   })
-  .option('router', {
+  .option('framework', {
     alias: 'r',
-    description: 'Sets the router framework',
+    description: 'Sets the web application framework',
     type: 'string',
   })
   .option('port', {
@@ -75,6 +75,56 @@ Application.boot()
 Application.environment(options.env)
 Application.root(global.APP_ROOT)
 
+/** Loads up environment variables to AppENV singleton */
+for (const key in process.env) {
+  AppENV.set(key, process.env[key] ?? '')
+}
+
 import '../bindings'
+import { ProxyRouter } from "./router/proxy-router"
+
+/** Loads web framework */
+let framework = 'express'
+if ('router' in options) {
+  /** @TODO implement fastify */
+}
+
+if (framework === 'express') {
+  const express = require('express')
+  const app = express()
+  app.use((request, response, next) => {
+    request.clientIp = request.ip
+    request.userAgent = request.headers['user-agent']
+    next()
+  })
+  app.use(require('express-fileupload')());
+
+  app.use(cors())
+  app.use(express.json())
+
+  /** Route Registry */
+  const Router = Application.container().get(ProxyRouter)
+  Application.route().forEach(routeConfig => {
+    const HandlerController = Application.container().get(routeConfig.className) as object
+    Router.register(
+      app,
+      routeConfig.path,
+      HandlerController[routeConfig.handler],
+      routeConfig.method
+    )
+  })
+
+
+  /** For all routes not found */
+  app.use((request, response)=>{
+      response.status(404)
+      response.json({error:'path not found'})
+  })
+
+  app.listen(port, () => {
+      console.log(`Functions service is listening on port ${port}`)
+  })
+}
+
 
 

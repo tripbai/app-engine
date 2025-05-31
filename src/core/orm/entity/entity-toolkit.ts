@@ -1,4 +1,6 @@
 import { Core } from "../../core.types";
+import { WithReservedFields } from "../repository/types";
+import { BaseEntity } from "./base-entity";
 
 export namespace EntityToolkit {
 
@@ -25,8 +27,8 @@ export namespace EntityToolkit {
     }
   }
 
-  export const serialize = <TModel>(data: TModel) => {
-    const serialized: Record<keyof TModel, TModel[keyof TModel]> = Object.create(null)
+  export const serialize = <TModel extends BaseEntity<TModel>>(data: TModel) => {
+    const serialized: WithReservedFields<TModel, 'entity_id' | 'created_at' | 'updated_at'> = Object.create(null)
     for (const alias in data) {
       /** Function members must not be exported */
       if (typeof data[alias] === 'function') continue
