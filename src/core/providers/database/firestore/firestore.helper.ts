@@ -22,7 +22,12 @@ export class FirestoreHelper {
   }
 
   createTransactionStep(qtype: FirestoreQueryType, collection: string, data: {[key:string]:any}): DatabaseTransactionStep {
-    return {query: `${qtype} ${collection}`, data: data}
+    return {
+      namespace: 'Firestore',
+      type: (qtype === 'document.create') ? 'create' : 'update',
+      query: `${qtype} ${collection}`, 
+      data: data
+    }
   }
 
   parseTransactionStep(query: string){

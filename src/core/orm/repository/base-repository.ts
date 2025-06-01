@@ -174,10 +174,10 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
    * @param data - The data object containing fields to be set in the model, 
    * excluding reserved fields.
    */
-  async create(
+  create(
     entityId: Core.Entity.Id, 
     data: Omit<{[K in keyof TModel]: unknown}, Core.Entity.ReservedFields>
-  ): Promise<void> {
+  ): Readonly<DatabaseTransactionStep> {
     if (this.containsReservedFields(data)){
       throw new OverridingReservedFieldsException(data)
     }
@@ -199,13 +199,12 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
     Model.created_at = TimeStamp.now()
     Model.updated_at = TimeStamp.now()
     Model.archived_at = null
-    const transaction = this.providers.database.createRecord(
+    return this.providers.database.createRecord(
       this.collection,
       BaseRepository.flattenAsDatabaseRecord(
         EntityToolkit.serialize(Model)
       )
     )
-    await this.providers.database.beginTransaction([transaction])
   }
 
   /**
@@ -215,7 +214,7 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
    */
   async update(
     Model: WithReservedFields<TModel, 'entity_id' | 'created_at' | 'updated_at'>
-  ): Promise<void> {
+  ): Promise<Readonly<DatabaseTransactionStep>> {
     const UpdatedModel = new this.model()
     for (const key in Model) {
       UpdatedModel[key] = Model[key]
@@ -228,13 +227,12 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
         entityId: UpdatedModel.entity_id
       })
     }
-    const transaction = this.providers.database.updateRecord(
+    return this.providers.database.updateRecord(
       this.collection,
       BaseRepository.flattenAsDatabaseRecord(
         EntityToolkit.serialize(UpdatedModel)
       )
     )
-    await this.providers.database.beginTransaction([transaction])
   }
 
   private containsReservedFields(data: {[key:string]: any}): boolean {

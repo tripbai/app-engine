@@ -18,13 +18,13 @@ export abstract class AbstractDatabaseProvider {
   abstract createRecord(
     collectionName: string,
     record: FlatDatabaseRecord
-  ): DatabaseTransactionStep
+  ): Readonly<DatabaseTransactionStep>
 
   /**
    * Begins a transaction with a series of database operations.
    * @param transactionableActions - Array of actions to be performed within the transaction.
    */
-  abstract beginTransaction(transactionableActions: Array<DatabaseTransactionStep>): Promise<void>
+  abstract beginTransaction(transactionableActions: Array<Readonly<DatabaseTransactionStep>>): Promise<void>
 
   /**
    * Queries a collection or table for records where the specified field has the given value.
@@ -58,7 +58,7 @@ export abstract class AbstractDatabaseProvider {
   abstract updateRecord(
     collectionName: string,
     record: FlatDatabaseRecord
-  ): DatabaseTransactionStep
+  ): Readonly<DatabaseTransactionStep>
 
   /**
    * Executes a query wrapped in a DatabaseTransactionableAction and returns the result.
@@ -79,6 +79,14 @@ export type FlatDatabaseRecord = { [key: string]: string | number | boolean | nu
  * Represents a single database operation, potentially within a transaction.
  */
 export type DatabaseTransactionStep = {
+  /**
+   * The namespace of the transaction
+   */
+  namespace: string
+  /**
+   * The type of step
+   */
+  type: 'create' | 'read' | 'update' | 'delete'
   /**
    * The query string to be used for a single operation.
    */

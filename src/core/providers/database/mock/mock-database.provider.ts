@@ -15,13 +15,13 @@ export class MockDatabaseProvider implements AbstractDatabaseProvider {
     return []
   }
   createRecord(collectionName: string, record: FlatDatabaseRecord): DatabaseTransactionStep {
-    return { query: '', data: {} as FlatDatabaseRecord }
+    return { namespace: 'MockDatabase', type: 'create', query: '', data: {} as FlatDatabaseRecord }
   }
   async beginTransaction(transactionableActions: DatabaseTransactionStep[]): Promise<void> {
       return
   }
   updateRecord(collectionName: string, record: FlatDatabaseRecord): DatabaseTransactionStep {
-    return { query: '', data: {} as FlatDatabaseRecord }
+    return { namespace: 'MockDatabase', type: 'update', query: '', data: {} as FlatDatabaseRecord }
   }
   async useQuery(transactionableAction: DatabaseTransactionStep): Promise<{ [key: string]: any; }[]> {
       return []

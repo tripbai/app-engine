@@ -1,6 +1,5 @@
 import { describe, it } from "node:test"
 import { expect } from 'chai'
-import { Container } from "inversify"
 import { AbstractDatabaseProvider, DatabaseTransactionStep, FlatDatabaseRecord } from "../../../providers/database/database.provider"
 import { Core } from "../../../core.types"
 import { TestUserRepository } from "../users/test-user.repository"
@@ -11,6 +10,7 @@ import { Pseudorandom } from "../../../helpers/pseudorandom"
 import { BaseEntity } from "../../entity/base-entity"
 import { TestUserModel } from "../users/test-user.model"
 import { BaseRepository } from "../../repository/base-repository"
+import { Container } from "inversify"
 
 describe('BaseRepository', () => {
 
@@ -278,6 +278,8 @@ describe('BaseRepository', () => {
       class TestDatabase extends MockDatabaseProvider {
         createRecord(collectionName: string, record: FlatDatabaseRecord): DatabaseTransactionStep {
             return {
+              namespace: 'TestDatabase',
+              type: 'create',
               query: '',
               data: record
             }
@@ -293,7 +295,7 @@ describe('BaseRepository', () => {
       container.bind(AbstractCacheProvider).to(TestCache)
       container.bind(TestUserRepository).toSelf()
       const TestUserRepo = container.get(TestUserRepository)
-      await TestUserRepo.create(userId, {
+      const testCreateStep = TestUserRepo.create(userId, {
         first_name: 'John',
         age: 23,
         is_verified: true,
@@ -302,6 +304,7 @@ describe('BaseRepository', () => {
         metadata: `{"citizenship":"American"}`,
         archived_at: null
       })
+      await container.get(AbstractDatabaseProvider).beginTransaction([testCreateStep])
       expect(finalTestData.entity_id).to.equal(userId)
     })
   })
@@ -337,7 +340,7 @@ describe('BaseRepository', () => {
       container.bind(TestUserRepository).toSelf()
       const TestUserRepo = container.get(TestUserRepository)
       const TestUser = await TestUserRepo.getById(userId)
-      TestUserRepo.update(TestUser)
+      await TestUserRepo.update(TestUser)
       expect(cached).to.equal(null)
     })
 
@@ -362,7 +365,12 @@ describe('BaseRepository', () => {
           return [BaseRepository.flattenAsDatabaseRecord(cached)]
         }
         updateRecord(collectionName: string, record: FlatDatabaseRecord): DatabaseTransactionStep {
-          return {query: '', data: record}
+          return {
+            namespace: 'TestDatabase',
+            type: 'create',
+            query: '',
+            data: record
+          }
         }
         async beginTransaction(transactionableActions: DatabaseTransactionStep[]): Promise<void> {
           // @ts-expect-error
@@ -375,7 +383,8 @@ describe('BaseRepository', () => {
       container.bind(TestUserRepository).toSelf()
       const TestUserRepo = container.get(TestUserRepository)
       const TestUser = await TestUserRepo.getById(userId)
-      await TestUserRepo.update(TestUser)
+      const transactionStep = await TestUserRepo.update(TestUser)
+      await container.get(AbstractDatabaseProvider).beginTransaction([transactionStep])
       expect(cached.updated_at).to.not.equal('2024-12-01 11:23:21')
     })
   })
