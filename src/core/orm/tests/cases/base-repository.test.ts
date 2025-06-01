@@ -1,7 +1,7 @@
 import { describe, it } from "node:test"
 import { expect } from 'chai'
 import { AbstractDatabaseProvider, DatabaseTransactionStep, FlatDatabaseRecord } from "../../../providers/database/database.provider"
-import { Core } from "../../../core.types"
+import { Core } from "../../../module/module"
 import { TestUserRepository } from "../users/test-user.repository"
 import { AbstractCacheProvider, CacheItem } from "../../../providers/cache/cache.provider"
 import { MockDatabaseProvider } from "../../../providers/database/mock/mock-database.provider"

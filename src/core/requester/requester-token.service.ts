@@ -3,7 +3,7 @@ import { ResourceAccessForbiddenException } from '../exceptions/exceptions'
 import { AppENV } from '../helpers/env'
 import { JsonWebToken } from '../providers/jwt/jsonwebtoken/json-web-token.service'
 import { JWTProviderInterface } from '../providers/jwt/jwt.provider'
-import { Core } from '../core.types'
+import { Core } from '../module/module'
 
 
 

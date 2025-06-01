@@ -1,6 +1,6 @@
 import { DataIntegrityException } from "../../exceptions/exceptions"
 import { TimeStamp } from "../../helpers/timestamp"
-import { Core } from "../../core.types"
+import { Core } from "../../module/module"
 import { EntityToolkit } from "./entity-toolkit"
 
 /**

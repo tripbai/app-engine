@@ -1,5 +1,5 @@
 import { injectable } from "inversify"
-import { Core } from "../../../core.types"
+import { Core } from "../../../module/module"
 import { GenericServiceProviderException } from "../../../exceptions/exceptions"
 import { AppENV } from "../../../helpers/env"
 import { AppLogger } from "../../../helpers/logger"

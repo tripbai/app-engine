@@ -1,4 +1,4 @@
-import { Core } from "../../core.types";
+import { Core } from "../../module/module";
 import { WithReservedFields } from "../repository/types";
 import { BaseEntity } from "./base-entity";
 

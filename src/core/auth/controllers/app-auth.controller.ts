@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { Core } from "../../core.types";
+import { Core } from "../../module/module";
 import { post } from "../../router/decorators";
 import { IsValid } from "../../helpers/isvalid";
 import { BadRequestException } from "../../exceptions/exceptions";

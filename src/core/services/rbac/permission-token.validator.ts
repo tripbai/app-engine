@@ -1,5 +1,5 @@
 import { injectable } from "inversify"
-import { Core } from "../../core.types"
+import { Core } from "../../module/module"
 
 @injectable()
 export class PermissionTokenValidator  {

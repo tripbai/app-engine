@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { Core } from "../../core.types";
+import { Core } from "../../module/module";
 import { JWTProviderInterface } from "../../providers/jwt/jwt.provider";
 import { JsonWebToken } from "../../providers/jwt/jsonwebtoken/json-web-token.service";
 import { AppENV } from "../../helpers/env";

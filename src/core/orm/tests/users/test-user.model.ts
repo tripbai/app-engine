@@ -1,5 +1,5 @@
 import { injectable } from "inversify";
-import { Core } from "../../../core.types";
+import { Core } from "../../../module/module";
 import { BaseEntity } from "../../entity/base-entity";
 import { boolean, int, json, timestamp, varchar } from "../../entity/decorators";
 import { EntityToolkit } from "../../entity/entity-toolkit";

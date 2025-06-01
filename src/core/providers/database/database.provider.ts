@@ -1,4 +1,4 @@
-import { Core } from "../../core.types"
+import { Core } from "../../module/module"
 
 /**
  * Implementing this as interface involves executing operations (e.g., create, update, query)

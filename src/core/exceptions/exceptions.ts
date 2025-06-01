@@ -1,5 +1,5 @@
 import { Application } from "../application";
-import { Core } from "../core.types";
+import { Core } from "../module/module";
 import { AppLogger } from "../helpers/logger";
 
 interface ErrorConstructor {

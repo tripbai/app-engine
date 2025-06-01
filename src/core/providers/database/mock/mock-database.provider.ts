@@ -1,4 +1,4 @@
-import { Core } from "../../../core.types";
+import { Core } from "../../../module/module";
 import { AbstractDatabaseProvider, DatabaseTransactionStep, FlatDatabaseRecord } from "../database.provider";
 
 export class MockDatabaseProvider implements AbstractDatabaseProvider {

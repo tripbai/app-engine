@@ -1,7 +1,7 @@
 import { BaseEntity } from "../entity/base-entity"
 import { DataIntegrityException } from "../../exceptions/exceptions"
 import { TimeStamp } from "../../helpers/timestamp"
-import { Core } from "../../core.types"
+import { Core } from "../../module/module"
 import { RepositoryServiceProviders } from "./types"
 
 export class CatalogRepository<TModel extends BaseEntity<TModel>> {

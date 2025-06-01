@@ -2,7 +2,7 @@ import { BaseEntity } from "../entity/base-entity";
 import { ArchivedRecordException, BadRequestException, DataIntegrityException, LogicException, RecordNotFoundException } from "../../exceptions/exceptions";
 import { thisJSON } from "../../helpers/thisjson";
 import { TimeStamp } from "../../helpers/timestamp";
-import { Core } from "../../core.types";
+import { Core } from "../../module/module";
 import { RepositoryGetOptions, RepositoryServiceProviders, WithReservedFields } from "./types";
 import { EntityToolkit } from "../entity/entity-toolkit";
 import { inject, injectable } from "inversify";

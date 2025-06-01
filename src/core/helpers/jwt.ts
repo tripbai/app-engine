@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-import { Core } from '../core.types'
+import { Core } from '../module/module'
 import { AppENV } from './env';
 
 /**

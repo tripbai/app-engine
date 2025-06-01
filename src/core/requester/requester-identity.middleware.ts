@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { Core } from "../core.types";
+import { Core } from "../module/module";
 import { RequesterIdentityFactory } from "./requester-identity.factory";
 
 @injectable()

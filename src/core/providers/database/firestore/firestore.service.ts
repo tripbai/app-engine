@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import { FirestoreHelper } from "./firestore.helper";
 import { FatalFirestoreConnectionError, GenericFirestoreException } from "./exceptions";
 import { AbstractDatabaseProvider, DatabaseTransactionStep, FlatDatabaseRecord } from "../database.provider";
-import { Core } from "../../../core.types";
+import { Core } from "../../../module/module";
 import { DocumentData } from "@google-cloud/firestore";
 import { FirebaseEnvBasedProjectService } from "../../../services/firebase/firebase-env-based-project.service";
 import { FirebaseProjectInterface } from "../../../services/firebase/firebase-project.interface";

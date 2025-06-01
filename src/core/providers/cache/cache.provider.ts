@@ -1,4 +1,4 @@
-import { Core } from "../../core.types"
+import { Core } from "../../module/module"
 
 /**
  * A single cached item. It is defined by its id and the collection

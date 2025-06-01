@@ -1,5 +1,5 @@
 import { Application } from "../application";
-import { Core } from "../core.types";
+import { Core } from "../module/module";
 
 export function post<T extends Core.Route.Endpoint.Schema & {request: {method: 'POST'}}>(path: T['request']['path']): any {
   return function(target,prop,descriptor){

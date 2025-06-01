@@ -1,4 +1,4 @@
-import { Core } from "../../core.types";
+import { Core } from "../../module/module";
 
 export abstract class AuthorizationProvider {
 

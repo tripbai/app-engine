@@ -1,7 +1,7 @@
 import { BaseEntity } from "../entity/base-entity"
 import { BadRequestException, DataIntegrityException, LogicException, RecordNotFoundException } from "../../exceptions/exceptions"
 import { TimeStamp } from "../../helpers/timestamp"
-import { Core } from "../../core.types"
+import { Core } from "../../module/module"
 import { RepositoryServiceProviders, WithReservedFields } from "./types"
 import { EntityToolkit } from "../entity/entity-toolkit"
 

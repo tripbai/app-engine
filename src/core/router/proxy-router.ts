@@ -1,5 +1,5 @@
 import { injectable } from "inversify"
-import { Core } from "../core.types"
+import { Core } from "../module/module"
 import { RequesterIdentityMiddleware } from "../requester/requester-identity.middleware"
 
 @injectable()

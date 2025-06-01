@@ -1,6 +1,6 @@
 import { describe, it } from "node:test"
 import { expect } from 'chai'
-import { Core } from "../../../core.types"
+import { Core } from "../../../module/module"
 import { Container } from "inversify"
 import { PermissionTokenValidator } from "../permission-token.validator"
 import { PermissionManager as PermissionManagerService } from "../permissions.manager"
