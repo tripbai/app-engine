@@ -37,7 +37,7 @@ export class MySqlTransactionHelper {
   generateUpdateTransactionStep(
     collection: string,
     data: FlatDatabaseRecord
-  ){
+  ): MySqlTransactionStep {
     
     let query = 'UPDATE ' + collection + ' SET '
 

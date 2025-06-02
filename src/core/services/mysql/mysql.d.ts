@@ -9,7 +9,7 @@ export type QueryCallback = (err: MySqlError | null, results?: any, fields?: any
 
 export interface MySqlPool {
   getConnection(callback: (err: MySqlError | null, connection: MySqlPoolConnection) => void): void
-  query(sql: string, values?: any[] | QueryCallback, callback?: QueryCallback): void
+  query(sql: string, values?: any[] | ({[key:string]: any}) | QueryCallback , callback?: QueryCallback): void
   end(callback?: (err: MySqlError | null) => void): void
   on(event: 'connection', callback: (conn: MySqlPoolConnection) => void): void
 }
