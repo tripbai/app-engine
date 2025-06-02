@@ -1,0 +1,137 @@
+import * as mysql from 'mysql' 
+import type { MySqlPool, MySqlError, PoolConfig, PoolNamespace } from './mysql.d.ts'
+import { AppLogger } from '../../helpers/logger.js'
+
+export class MySQLPoolManager {
+
+  private static pools: Map<PoolNamespace, MySqlPool> = new Map()
+
+  private static connecting: Map<string, Promise<void>> = new Map()
+
+  private static poolLastUsed: Map<string, number> = new Map()
+
+  /**
+   * Connect and initialize a pool for the given hostname.
+   */
+  public static async connect(
+    hostname: string,
+    config: Omit<PoolConfig, 'host'>
+  ): Promise<void> {
+
+    if (this.pools.has(hostname)) return
+
+    if (this.connecting.has(hostname)) {
+      return this.connecting.get(hostname)!
+    }
+
+    /**
+     * We are returning this Promise to anyone who tries to invoke this 
+     * connect method when we are still trying to create connection within
+     */
+    const connectPromise = new Promise<void>((resolve, reject) => {
+
+      const pool: MySqlPool = mysql.createPool({ host: hostname, ...config })
+
+      pool.on('connection', (conn) => {
+        conn.on('error', (error: MySqlError) => {
+          if (error.fatal) {
+            AppLogger.error({
+              severity: 1,
+              message: 'mysql connection fatal error',
+              data: { error: error }
+            })
+            return reject(error)
+          } else {
+            AppLogger.error({
+              severity: 1,
+              message: 'mysql connection non-fatal error',
+              data: { error: error }
+            })
+          }
+        })
+      })
+
+      /** Test connection */
+      pool.getConnection((error, connection) => {
+        if (error) {
+          AppLogger.error({
+            severity: 1,
+            message: 'mysql error on test connection',
+            data: { error: error }
+          })
+          return reject(error)
+        }
+        connection.release()
+        this.pools.set(hostname, pool)
+        this.poolLastUsed.set(hostname, Date.now())
+        return resolve()
+      })
+    })
+
+    this.connecting.set(hostname, connectPromise)
+    try {
+      await connectPromise
+    } finally {
+      this.connecting.delete(hostname)
+    }
+    return
+  }
+
+  /**
+   * Get an existing pool. Throws if not connected.
+   */
+  public static getPool(hostname: string): MySqlPool {
+    const pool = this.pools.get(hostname)
+    if (!pool) {
+      throw new Error(`MySQL pool for "${hostname}" has not been connected yet.`)
+    }
+    this.poolLastUsed.set(hostname, Date.now())
+    return pool
+  }
+
+  /**
+   * Gracefully close all pools.
+   */
+  public static async closeAllPools(): Promise<void> {
+    const closePromises = Array.from(this.pools.entries()).map(([hostname, pool]) => {
+      return new Promise<void>((resolve, reject) => {
+        pool.end((err) => {
+          if (err) {
+            console.error(`Error closing pool for ${hostname}`, err)
+            reject(err)
+          } else {
+            console.log(`Closed pool for ${hostname}`)
+            resolve()
+          }
+        })
+      })
+    })
+
+    await Promise.all(closePromises)
+    this.pools.clear()
+  }
+
+  /**
+   * Close unused pool
+   */
+  public static async closeUnusedPool(){
+    const now = Date.now()
+
+    for (const [hostname, pool] of this.pools) {
+      const lastUsed = this.poolLastUsed.get(hostname) ?? 0
+      const age = now - lastUsed
+
+      if (age > 5 * 60 * 1000) { // 5 minutes
+        await new Promise<void>((resolve, reject) => {
+          pool.end((err) => {
+            if (err) return reject(err)
+            AppLogger.info(`Closed idle pool: ${hostname}`)
+            resolve()
+          })
+        })
+        this.pools.delete(hostname)
+        this.poolLastUsed.delete(hostname)
+      }
+    }
+  }
+}
