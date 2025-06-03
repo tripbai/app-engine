@@ -208,5 +208,16 @@ export namespace Core {
         }
       }
     }
+    export type Info = {
+      request: {
+        method: 'GET'
+        path: '/core/application'
+      }
+      response: {
+        name: string,
+        environment: string,
+        build_time: string
+      }
+    }
   }
 }

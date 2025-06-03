@@ -1,5 +1,6 @@
 import { Container } from "inversify"
 import { ProxyRouter } from "./router/proxy-router"
+import { AppENV } from "./helpers/env"
 
 export namespace Application {
 
@@ -44,6 +45,14 @@ export namespace Application {
     if (config === null) return _x
     _x.push(config)
     return _x
+  }
+
+  export const name = () => {
+    return AppENV.get('APPLICATION_NAME')
+  }
+
+  export const build = () => {
+    return AppENV.get('APPLICATION_BUILD')
   }
 
 
