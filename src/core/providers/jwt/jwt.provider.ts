@@ -1,5 +1,5 @@
 
-export abstract class JWTProviderInterface {
+export abstract class AbstractJWTProvider {
 
   abstract parse(
     secretKey: string, 

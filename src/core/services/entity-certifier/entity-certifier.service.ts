@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Core } from "../../module/module";
-import { JWTProviderInterface } from "../../providers/jwt/jwt.provider";
+import { AbstractJWTProvider } from "../../providers/jwt/jwt.provider";
 import { JsonWebToken } from "../../providers/jwt/jsonwebtoken/json-web-token.service";
 import { AppENV } from "../../helpers/env";
 import { IsValid } from "../../helpers/isvalid";
@@ -15,7 +15,7 @@ import { EntityToolkit } from "../../orm/entity/entity-toolkit";
 export class EntityCertifier {
 
   constructor(
-    @inject(JsonWebToken) public readonly JWTProvider: JWTProviderInterface
+    @inject(AbstractJWTProvider) public readonly JWTProvider: AbstractJWTProvider
   ){}
 
   /**

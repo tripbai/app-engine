@@ -1,6 +1,6 @@
 import { Core } from "../../module/module";
 
-export abstract class AuthorizationProvider {
+export abstract class AbstractAuthorizationProvider {
 
   abstract canOperate(
     resourceObject: {[key:string]:any}, 

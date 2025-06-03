@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { AbstractMailProvider, SendMailParams } from "../mail.provider";
 import { Core } from "../../../module/module";
-import { JWTProviderInterface } from "../../jwt/jwt.provider";
+import { AbstractJWTProvider } from "../../jwt/jwt.provider";
 import { JsonWebToken } from "../../jwt/jsonwebtoken/json-web-token.service";
 import { AbstractTopicPublisherProvider } from "../../topics/topic-publisher.provider";
 import { AppENV } from "../../../helpers/env";
@@ -10,7 +10,7 @@ import { AppENV } from "../../../helpers/env";
 export class MailmanMail implements AbstractMailProvider {
 
   constructor(
-    @inject(JWTProviderInterface) public readonly jwtHelper: JWTProviderInterface,
+    @inject(AbstractJWTProvider) public readonly jwtHelper: AbstractJWTProvider,
     @inject(AbstractTopicPublisherProvider) public readonly topicPublisher: AbstractTopicPublisherProvider
   ){}
 

@@ -6,12 +6,13 @@ import { PublicRequester } from "../requester-public"
 import { RequesterTokenService } from "../requester-token.service"
 import { JsonWebToken } from "../../providers/jwt/jsonwebtoken/json-web-token.service"
 import { BaseRequester } from "../requester-base"
+import { AbstractJWTProvider } from "../../providers/jwt/jwt.provider"
 
 describe('RequesterFactory', () => {
   describe('create()', () => {
     it('should create public requester if the token is null', () => {
       const container = new Container()
-      container.bind(JsonWebToken).toSelf()
+      container.bind(AbstractJWTProvider).to(JsonWebToken)
       container.bind(RequesterTokenService).toSelf()
       container.bind(RequesterIdentityFactory).toSelf()
       const requesterFactory = container.get(RequesterIdentityFactory)

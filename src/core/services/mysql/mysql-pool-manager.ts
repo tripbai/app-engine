@@ -1,5 +1,5 @@
 import * as mysql from 'mysql' 
-import type { MySqlPool, MySqlError, PoolConfig, PoolNamespace } from './mysql.d.ts'
+import type { MySqlPool, MySqlError, PoolConfig, PoolNamespace } from './mysql'
 import { AppLogger } from '../../helpers/logger.js'
 
 export class MySQLPoolManager {

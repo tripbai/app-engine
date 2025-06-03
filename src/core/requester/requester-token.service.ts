@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify'
 import { ResourceAccessForbiddenException } from '../exceptions/exceptions'
 import { AppENV } from '../helpers/env'
 import { JsonWebToken } from '../providers/jwt/jsonwebtoken/json-web-token.service'
-import { JWTProviderInterface } from '../providers/jwt/jwt.provider'
+import { AbstractJWTProvider } from '../providers/jwt/jwt.provider'
 import { Core } from '../module/module'
 
 
@@ -13,7 +13,7 @@ export class RequesterTokenService {
   issuer = 'core/requester'
 
   constructor(
-    @inject(JsonWebToken) public readonly JWTProvider: JWTProviderInterface
+    @inject(AbstractJWTProvider) public readonly JWTProvider: AbstractJWTProvider
   ) {}
 
   parse(requesterToken: string): {iss: string, aud: string, data: unknown } {

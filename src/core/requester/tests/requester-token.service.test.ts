@@ -4,6 +4,7 @@ import { Container } from "inversify";
 import { JsonWebToken } from "../../providers/jwt/jsonwebtoken/json-web-token.service";
 import { RequesterTokenService } from "../requester-token.service";
 import { AppENV } from "../../helpers/env";
+import { AbstractJWTProvider } from "../../providers/jwt/jwt.provider";
 
 AppENV.set('JWT_SECRET', 'asdasd')
 
@@ -20,7 +21,7 @@ describe('RequesterTokenService', () => {
         }
       }
       const container = new Container()
-      container.bind(JsonWebToken).to(JWTProviderTest)
+      container.bind(AbstractJWTProvider).to(JWTProviderTest)
       container.bind(RequesterTokenService).toSelf()
       const requesterTokenService = container.get(RequesterTokenService)
       expect(requesterTokenService.parse('testtoken').iss).to.equal('core/requester')
@@ -33,7 +34,7 @@ describe('RequesterTokenService', () => {
         }
       }
       const container = new Container()
-      container.bind(JsonWebToken).to(JWTProviderTest)
+      container.bind(AbstractJWTProvider).to(JWTProviderTest)
       container.bind(RequesterTokenService).toSelf()
       const requesterTokenService = container.get(RequesterTokenService)
       expect(()=>{
