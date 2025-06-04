@@ -159,7 +159,7 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
    * Ingests data into the model
    * @param Data 
    */
-  private ingest(Model: TModel, Data: any){
+  ingest(Model: TModel, Data: any){
     for (const key in Data) {
       if (BaseRepository.isDateObject(Data[key])) {
         Model[key] = TimeStamp.normalize(Data[key])
