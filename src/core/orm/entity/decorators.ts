@@ -3,6 +3,8 @@ import { EntityToolkit } from './entity-toolkit';
 import { InvalidPropertyType } from './exceptions';
 import { TimeStamp } from '../../helpers/timestamp';
 import { thisJSON } from '../../helpers/thisjson';
+import { EntitySchemaRegistry } from './schema-registry';
+import { BaseEntity } from './base-entity';
 
 export const fixedMetaData = Symbol('fixed')
 export const nullableMetaData = Symbol('nullable')
@@ -23,9 +25,82 @@ export function fixed():any {
  */
 export function nullable(): any {
   return function(target,property,descriptor){
+    EntitySchemaRegistry.register.nullableField(target.constructor, property)
     Reflect.defineMetadata(nullableMetaData,true,target,property)
   }
 }
+
+export function collection(name: string): any {
+  return function(target,property,descriptor){
+    EntitySchemaRegistry.register.collection(target, name)
+  }
+}
+
+export function length(value: number): any {
+  return function(target,property,descriptor){
+    EntitySchemaRegistry.register.fieldLength(target.constructor, property, value)
+  }
+}
+
+export function references<T extends new (...args: any) => any>(value: T, field: keyof InstanceType<T>): any {
+  return function(target,property,descriptor){
+    EntitySchemaRegistry.register.asReferenceOf(target.constructor, property, value, field as string)
+  }
+}
+
+export function unique<T extends new (...args: any) => any>(): any {
+  return function(target,property,descriptor){
+    EntitySchemaRegistry.register.uniqueField(target.constructor, property)
+  }
+}
+
+
+export function EntityId():any{
+  return function(target,prop,descriptor){
+    EntitySchemaRegistry.register.fieldType(target.constructor, prop, 'char')
+    EntitySchemaRegistry.register.fieldLength(target.constructor, prop, 32)
+    return {
+      set: function (value: unknown) {
+
+        /**
+         * Checking whether a @fixed decorator has been applied to this 
+         * property. If so, we do not allow modifying this property
+         * after it has been first set 
+         */
+        let hasFixedMetaData = Reflect.getMetadata(fixedMetaData,target,prop)
+        if (hasFixedMetaData) return 
+
+        /**
+         * Checking whether a @nullable decorator has been applied to this 
+         * property. If so, we will just set the value as null and move on
+         */
+        let isNullableValue = Reflect.getMetadata(nullableMetaData,target,prop)
+        if (isNullableValue && value===null) {
+          this[EntityToolkit.PropAlias.create(prop)] = null
+          return
+        }
+
+        if (typeof value !== 'string') {
+          throw new InvalidPropertyType(prop,'string',value)
+        }
+
+        EntityToolkit.Assert.idIsValid(value)
+
+        const alias = EntityToolkit.PropAlias.create(prop)
+        this[alias] = value
+
+      },
+      get: function(){
+        const alias = EntityToolkit.PropAlias.create(prop)
+        return this[alias] ?? null
+      },
+      enumerable: true,
+      configurable: true
+    };
+  }
+}
+
+
 
 /**
  * An Entity property decorator. This decorator asserts that 
@@ -41,6 +116,7 @@ export function varchar(
   validator?: (value: string, params?: {[key:string]: any}) => void
 ):any{
   return function(target,prop,descriptor){
+    EntitySchemaRegistry.register.fieldType(target.constructor, prop, 'varchar')
     return {
       set: function (value: unknown) {
 
@@ -93,6 +169,7 @@ export function int(
   validator?: (value: number, params?: {[key:string]: any}) => void
 ): any {
   return function(target,prop,descriptor){
+    EntitySchemaRegistry.register.fieldType(target.constructor, prop, 'int')
     return {
       set: function (value:number) {
 
@@ -146,6 +223,7 @@ export function timestamp(
   validator?: (value: string, params?: {[key:string]: any}) => void
 ): any{
   return function(target,prop,descriptor){
+    EntitySchemaRegistry.register.fieldType(target.constructor, prop, 'timestamp')
     return {
       set: function (value: string) {
 
@@ -206,6 +284,7 @@ export function boolean(
   validator?: (value: boolean, params?: {[key:string]: any}) => void
 ):any{
   return function(target,prop,descriptor){
+    EntitySchemaRegistry.register.fieldType(target.constructor, prop, 'boolean')
     return {
       set: function (value:boolean) {
 
@@ -258,6 +337,7 @@ export function json<T extends {[key:string]: any}>(
   validator?: (value: T, params?: {[key:string]: any}) => void
 ):any{
   return function(target,prop,descriptor){
+    EntitySchemaRegistry.register.fieldType(target.constructor, prop, 'json')
     return {
       set: function (value: string) {
 
