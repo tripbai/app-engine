@@ -61,13 +61,15 @@ for (let i = 0; i < injectables.length; i++) {
   const filePath = injectable.filePath.replace('../src', '.')
   contents += `import { ${injectable.className} } from "${filePath}";\n`
 }
-contents += `import { Application } from "./core/application";`
+contents += `import { Container } from "inversify";`
 
 contents += `\n\n`
+contents += `export const bind = (container: Container) => {\n`
 for (let i = 0; i < injectables.length; i++) {
   const injectable = injectables[i]
-  contents += `Application.container().bind(${injectable.className}).toSelf();\n`
+  contents += `  container.bind(${injectable.className}).toSelf();\n`
 }
+contents += `}\n`
 
 fs.writeFileSync(`${srcDir}/bindings.ts`, contents)
 

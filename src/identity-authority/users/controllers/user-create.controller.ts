@@ -54,9 +54,11 @@ export class UserCreateController {
       email_address: params.data.email_address,
       password: password,
       type: params.data.type,
-      creation_content: params.data.context,
+      creation_context: params.data.context,
       role: params.data.role
     })
+
+    throw new Error()
     
   }
 

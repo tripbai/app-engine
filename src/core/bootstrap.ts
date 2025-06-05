@@ -80,10 +80,12 @@ for (const key in process.env) {
   AppENV.set(key, process.env[key] ?? '')
 }
 
-import '../bindings'
+import { bind } from '../bindings'
 import { ProxyRouter } from "./router/proxy-router"
 import { MySQLPoolManager } from "./services/mysql/mysql-pool-manager"
 import { AppLogger } from "./helpers/logger"
+
+bind(Application.container())
 
 /** Loads web framework */
 let framework = 'express'
