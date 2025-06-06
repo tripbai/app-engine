@@ -7,9 +7,10 @@
     "test": "tsc && mocha dist/**/*.test.js",
     "container:build": "node bin/container/build.js",
     "start:development": "node bin/container/build.js && tsc && node dist/core/bootstrap.js --env=development --port=5458",
-    "migrate:development:start": "node bin/migrations/mysql && node bin/migrations/umzug --env=development --action=up",
-    "migrate:development": "node bin/migrations/mysql && node bin/migrations/umzug --env=development --action=next",
-    "migrate:development:rollback": "node bin/migrations/mysql && node bin/migrations/umzug --env=development --action=down"
+    "migrate:mysql": "tsc && node bin/migrations/mysql",
+    "migrate:development:start": "node bin/migrations/umzug --env=development --action=up",
+    "migrate:development": "node bin/migrations/umzug --env=development --action=next",
+    "migrate:development:rollback": "node bin/migrations/umzug --env=development --action=down"
   },
   "repository": {
     "type": "git",

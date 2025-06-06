@@ -157,6 +157,68 @@ const generate_drop_table_query = (table_name) => {
   return `DROP TABLE ${table_name};`
 }
 
+export const get_field_changes = (
+  existing_field: EntitySchemaRegistry.FieldDefinition,
+  current_schema_fields: Array<EntitySchemaRegistry.FieldDefinition>
+): {
+  is_deleted: boolean,
+  is_new: boolean,
+  type: { has_changed: boolean, old_value: EntitySchemaRegistry.FieldDefinition['type'], new_value: EntitySchemaRegistry.FieldDefinition['type'] },
+  is_nullable: { has_changed: boolean, old_value: boolean, new_value: boolean },
+  length: { is_new: boolean, has_changed: boolean, old_value: number, new_value: number },
+  unique: { has_changed: boolean, old_value: boolean, new_value: boolean },
+  references_exist: { has_changed: boolean, old_value: boolean, new_value: boolean },
+  references_collection: { has_changed: boolean, old_value: string, new_value: string },
+  references_field: { has_changed: boolean, old_value: string, new_value: string }
+} => {
+  const result = {
+    is_deleted: false,
+    is_new: false,
+    type: { has_changed: false, old_value: 'varchar' as EntitySchemaRegistry.FieldDefinition['type'], new_value: 'varchar' as EntitySchemaRegistry.FieldDefinition['type']},
+    is_nullable: { has_changed: false, old_value: false, new_value: false },
+    length: { is_new: false, has_changed: false, old_value: 0, new_value: 0 },
+    unique: { has_changed: false, old_value: false, new_value: false },
+    references_exist: { has_changed: false, old_value: false, new_value: false },
+    references_collection: { has_changed: false, old_value: '', new_value: '' },
+    references_field: { has_changed: false, old_value: '', new_value: '' }
+  }
+  const existing_field_name = existing_field.name
+  const current_field = current_schema_fields.find(item => item.name === existing_field_name) 
+  if (current_field === undefined) {
+    result.is_deleted = true
+    return result
+  }
+
+  if (existing_field.type !== current_field.type) {
+    result.type.has_changed = true 
+    result.type.old_value = existing_field.type
+    result.type.new_value = current_field.type
+  }
+
+  if (existing_field.is_nullable !== current_field.is_nullable) {
+    result.is_nullable.has_changed = true 
+    result.is_nullable.old_value = existing_field.is_nullable
+    result.is_nullable.new_value = current_field.is_nullable
+  }
+
+  if (current_field.length !== undefined) {
+    if (existing_field.length !== undefined) {
+      if (existing_field.length !== current_field.length) {
+        result.length.has_changed = true 
+        result.length.old_value = existing_field.length
+        result.length.new_value = current_field.length
+      }
+    } else {
+      result.length.is_new = true
+      result.length.has_changed = true 
+      result.length.new_value = current_field.length
+    }
+  }
+
+
+  return result
+}
+
 export const run = (params: {
   rootdir: string
 }) => {
@@ -192,11 +254,12 @@ export const run = (params: {
 
     /** If there are updates since the last schema generation */
     if (HAS_UPDATES) {
-      const pretty_json = JSON.stringify(existing_schema, null, 2)
-      fs.writeFileSync(schema_path, pretty_json, 'utf8')
-      fs.writeFileSync(`${params.rootdir}/migrations/up/${migration_v}.sql`, up_queries.join("\n\n"), 'utf8')
-      fs.writeFileSync(`${params.rootdir}/migrations/down/${migration_v}.sql`, down_queries.join("\n\n"), 'utf8')
+      
     } 
+    const pretty_json = JSON.stringify(existing_schema, null, 2)
+    fs.writeFileSync(schema_path, pretty_json, 'utf8')
+    fs.writeFileSync(`${params.rootdir}/migrations/up/${migration_v}.sql`, up_queries.join("\n\n"), 'utf8')
+    fs.writeFileSync(`${params.rootdir}/migrations/down/${migration_v}.sql`, down_queries.join("\n\n"), 'utf8')
 
   } catch (error) {
     console.log(error)
