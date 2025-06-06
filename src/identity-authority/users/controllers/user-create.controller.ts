@@ -46,7 +46,7 @@ export class UserCreateController {
       })
     }
     
-    const response = this.userCreateService.createUser({
+    const response = await this.userCreateService.createUser({
       provider: params.data.provider,
       first_name: params.data.first_name,
       last_name: params.data.last_name,
@@ -58,7 +58,19 @@ export class UserCreateController {
       role: params.data.role
     })
 
-    throw new Error()
+    return {
+      type: 'concrete',
+      context: 'external',
+      provider: 'iauth',
+      role: 'user',
+      user_id: response.user_id,
+      first_name: params.data.first_name,
+      last_name: params.data.last_name,
+      username: response.username,
+      email_address: response.email_address,
+      status: response.status,
+      iauth_token: response.iauth_token
+    }
     
   }
 

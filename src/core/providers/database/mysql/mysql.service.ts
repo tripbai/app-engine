@@ -90,7 +90,9 @@ export class MySqlService implements AbstractDatabaseProvider {
               message: 'unable to begin mysql transaction',
               data: { transaction_steps: transactionSteps, error: error }
             }))
+            return
           }
+          resolve()
         })
       })
 

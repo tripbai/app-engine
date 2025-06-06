@@ -17,7 +17,9 @@ export namespace ProfileValidator {
   }
 
   export const about = (value: string) => {
-
+    if (value.length > 512) {
+      throw new Error('user notes must be not more than 512 characters')
+    }
   }
 
 }

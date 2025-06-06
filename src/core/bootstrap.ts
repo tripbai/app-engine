@@ -84,8 +84,10 @@ import { bind } from '../bindings'
 import { ProxyRouter } from "./router/proxy-router"
 import { MySQLPoolManager } from "./services/mysql/mysql-pool-manager"
 import { AppLogger } from "./helpers/logger"
+import { providers } from "../providers"
 
 bind(Application.container())
+providers(Application.container())
 
 /** Loads web framework */
 let framework = 'express'
@@ -133,14 +135,12 @@ if (framework === 'express') {
 }
 
 process.on('SIGINT', async () => {
-  const MySqlPoolManager = Application.container().get(MySQLPoolManager)
   await MySQLPoolManager.closeAllPools()
   AppLogger.info('Successfully closed all mysql pool')
   process.exit()
 })
 
 setInterval(async () => {
-  const MySqlPoolManager = Application.container().get(MySQLPoolManager)
   await MySQLPoolManager.closeUnusedPool()
 }, 60 * 2000)
 
