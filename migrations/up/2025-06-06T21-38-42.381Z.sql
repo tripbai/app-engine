@@ -1,0 +1,51 @@
+CREATE TABLE IF NOT EXISTS users (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `entity_id` CHAR(32) NOT NULL UNIQUE,
+  `identity_provider` VARCHAR(12) NOT NULL,
+  `email_address` VARCHAR(64) NOT NULL UNIQUE,
+  `username` VARCHAR(32) NOT NULL UNIQUE,
+  `is_email_verified` BOOLEAN NOT NULL,
+  `verified_since` TIMESTAMP NULL,
+  `suspended_until` TIMESTAMP NULL,
+  `creation_context` VARCHAR(12) NOT NULL,
+  `role` VARCHAR(12) NOT NULL,
+  `password_hash` VARCHAR(512),
+  `status` VARCHAR(12) NOT NULL,
+  `type` VARCHAR(12) NOT NULL,
+  `otp_secret` VARCHAR(64) NOT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `archived_at` TIMESTAMP NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS profiles (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `entity_id` CHAR(32) NOT NULL UNIQUE,
+  `first_name` VARCHAR(32) NOT NULL,
+  `last_name` VARCHAR(32) NOT NULL,
+  `profile_photo` VARCHAR(384),
+  `cover_photo` VARCHAR(384),
+  `about` VARCHAR(512),
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `archived_at` TIMESTAMP NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS teams (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `entity_id` CHAR(32) NOT NULL UNIQUE,
+  `tenant_id` CHAR(32) NOT NULL,
+  `user_id` CHAR(32) NOT NULL,
+  `role_id` CHAR(32),
+  `is_active` BOOLEAN NOT NULL,
+  `is_owner` BOOLEAN NOT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `archived_at` TIMESTAMP NULL,
+  FOREIGN KEY (user_id) REFERENCES users(entity_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  PRIMARY KEY (id)
+);

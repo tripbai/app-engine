@@ -66,11 +66,17 @@ export class MySQLPoolManager {
         this.poolLastUsed.set(hostname, Date.now())
         return resolve()
       })
+      
     })
 
-    this.connecting.set(hostname, connectPromise)
+    const connectWithTimeout = Promise.race([
+      connectPromise,
+      new Promise<void>((_, reject) => setTimeout(() => reject(new Error(`Connection to ${hostname} timed out after 10s`)), 10_000))
+    ])
+
+    this.connecting.set(hostname, connectWithTimeout)
     try {
-      await connectPromise
+      await connectWithTimeout
     } finally {
       this.connecting.delete(hostname)
     }

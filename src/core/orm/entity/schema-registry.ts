@@ -1,5 +1,5 @@
 export namespace EntitySchemaRegistry {
-  type FieldDefinition = {
+  export type FieldDefinition = {
     name: string
     type: 'char' | 'varchar' | 'int' | 'timestamp' | 'boolean' | 'json' 
     is_nullable: boolean
@@ -92,12 +92,16 @@ export namespace EntitySchemaRegistry {
   }
   export const get = () => {
     const exports: Array<{
+      created_at: string | null
+      updated_at: string | null
       collection: string
       fields: Array<FieldDefinition>
     }> = []
     for (const [key, value] of entities) {
       exports.push({
         collection: value.collection,
+        created_at: null,
+        updated_at: null,
         fields: value.fields
       })
     }

@@ -1,0 +1,156 @@
+[
+  {
+    "collection": "users",
+    "created_at": "2025-06-06T21:38:42.384Z",
+    "updated_at": "2025-06-06T21:38:42.384Z",
+    "fields": [
+      {
+        "name": "identity_provider",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 12
+      },
+      {
+        "name": "email_address",
+        "type": "varchar",
+        "is_nullable": false,
+        "unique": true,
+        "length": 64
+      },
+      {
+        "name": "username",
+        "type": "varchar",
+        "is_nullable": false,
+        "unique": true,
+        "length": 32
+      },
+      {
+        "name": "is_email_verified",
+        "type": "boolean",
+        "is_nullable": false
+      },
+      {
+        "name": "verified_since",
+        "type": "timestamp",
+        "is_nullable": true
+      },
+      {
+        "name": "suspended_until",
+        "type": "timestamp",
+        "is_nullable": true
+      },
+      {
+        "name": "creation_context",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 12
+      },
+      {
+        "name": "role",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 12
+      },
+      {
+        "name": "password_hash",
+        "type": "varchar",
+        "is_nullable": true,
+        "length": 512
+      },
+      {
+        "name": "status",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 12
+      },
+      {
+        "name": "type",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 12
+      },
+      {
+        "name": "otp_secret",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 64
+      }
+    ]
+  },
+  {
+    "collection": "profiles",
+    "created_at": "2025-06-06T21:38:42.384Z",
+    "updated_at": "2025-06-06T21:38:42.384Z",
+    "fields": [
+      {
+        "name": "first_name",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 32
+      },
+      {
+        "name": "last_name",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 32
+      },
+      {
+        "name": "profile_photo",
+        "type": "varchar",
+        "is_nullable": true,
+        "length": 384
+      },
+      {
+        "name": "cover_photo",
+        "type": "varchar",
+        "is_nullable": true,
+        "length": 384
+      },
+      {
+        "name": "about",
+        "type": "varchar",
+        "is_nullable": true,
+        "length": 512
+      }
+    ]
+  },
+  {
+    "collection": "teams",
+    "created_at": "2025-06-06T21:38:42.384Z",
+    "updated_at": "2025-06-06T21:38:42.384Z",
+    "fields": [
+      {
+        "name": "tenant_id",
+        "type": "char",
+        "is_nullable": false,
+        "length": 32
+      },
+      {
+        "name": "user_id",
+        "type": "char",
+        "is_nullable": false,
+        "length": 32,
+        "references": {
+          "collection": "users",
+          "field": "entity_id"
+        }
+      },
+      {
+        "name": "role_id",
+        "type": "char",
+        "is_nullable": true,
+        "length": 32
+      },
+      {
+        "name": "is_active",
+        "type": "boolean",
+        "is_nullable": false
+      },
+      {
+        "name": "is_owner",
+        "type": "boolean",
+        "is_nullable": false
+      }
+    ]
+  }
+]

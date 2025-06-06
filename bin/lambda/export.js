@@ -28,6 +28,7 @@ const options = yargs
       'node_modules/express',
       'node_modules/express-fileupload',
       'node_modules/express-useragent',
+      'node_modules/umzug',
     ].map(p => path.resolve(p))
   
     const isExcluded = (filePath) => {
