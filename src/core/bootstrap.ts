@@ -141,6 +141,7 @@ process.on('SIGINT', async () => {
 })
 
 setInterval(async () => {
+  AppLogger.info('Closing all unused pool')
   await MySQLPoolManager.closeUnusedPool()
 }, 60 * 2000)
 

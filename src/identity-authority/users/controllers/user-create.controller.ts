@@ -19,7 +19,7 @@ export class UserCreateController {
     @inject(ProfileAssertions) public readonly profileAssertions: ProfileAssertions
   ){}
 
-  @post<IdentityAuthority.Users.Endpoints.Create>('/identity-authority/user')
+  @post<IdentityAuthority.Users.Endpoints.Create>('/identity-authority/users')
   async create<T extends IdentityAuthority.Users.Endpoints.Create>(params: Core.Route.ControllerDTO<T>): Promise<T['response']>{
 
     let password: IdentityAuthority.Users.Fields.RawPassword | null = null

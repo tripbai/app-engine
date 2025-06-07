@@ -9,4 +9,18 @@ export class UserPasswordService {
     return await bcrypt.hash(password, 10)
   }
 
+  async verifyPassword(
+    raw: IdentityAuthority.Users.Fields.RawPassword, 
+    hashed: IdentityAuthority.Users.Fields.HashedPassword | null
+  ): Promise<boolean> {
+    if (hashed === null) return false
+    return await new Promise((resolve, reject) => {
+      bcrypt.compare(raw,hashed,(error, result)=>{
+        if (result) return resolve(true)
+        if (error) return resolve(false)
+        resolve(false)
+      })
+    })
+  }
+
 }

@@ -29,7 +29,7 @@ export namespace IdentityAuthority {
       export type Limited = Status.Pick<'deactivated' | 'archived'>
       /** User status that are PROHIBITED to communicate with your application */
       export type Prohibited = Status.Pick<'banned' | 'suspended'>
-      export type Response = {
+      export type Report = {
         is_user_registered: true,
         user_status: Allowed,
         token: string
@@ -77,7 +77,7 @@ export namespace IdentityAuthority {
     export namespace Endpoints {
       export type Create = {
         request: {
-          path: '/identity-authority/user',
+          path: '/identity-authority/users',
           method: 'POST',
           data: {
             type: 'concrete'
@@ -104,6 +104,18 @@ export namespace IdentityAuthority {
           status: Status.Pick<'unverified'>,
           iauth_token: string
         }
+      }
+      export type AccessReport = {
+        request: {
+          method: 'POST',
+          path: '/identity-authority/access-report',
+          data: {
+            provider: 'iauth'
+            email_address: Users.Fields.EmailAddress
+            password: Users.Fields.RawPassword
+          }
+        }
+        response: ApplicationAccess.Report
       }
     }
   }
