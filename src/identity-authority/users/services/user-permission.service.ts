@@ -1,9 +1,14 @@
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { UserModel } from "../user.model";
 import { Core } from "../../../core/module/module";
+import { AbstractAuthorizationProvider } from "../../../core/providers/authorization/authorization.provider";
 
 @injectable()
 export class UserPermissionService {
+
+  constructor(
+    @inject(AbstractAuthorizationProvider) public readonly abstractAuthorizationProvider: AbstractAuthorizationProvider
+  ){}
   
   addPermissionsByRole(
     permissions: Array<Core.Authorization.ConcreteToken>,
@@ -13,33 +18,75 @@ export class UserPermissionService {
     switch (role) {
       case 'webadmin': 
         permissions.push(
-          this.getWebAdmin()
+          this.getWebAdminPermission()
         )
         break;
       case 'moderator': 
         permissions.push(
-          this.getModerator()
+          this.getModeratorPermission()
         )
         break;
       default: 
         permissions.push(
-          this.getBasicUser(userId)
+          this.getBasicUserPermission(userId)
         )
         break;
     }
     return permissions
   }
 
-  getWebAdmin(){
-    return 'iauth:*' as Core.Authorization.ConcreteToken
+  getWebAdminPermission(){
+    return this.abstractAuthorizationProvider.createPermission(
+      {domain: '*'},
+      this.getWebAdminLikePermission()
+    )
   }
 
-  getModerator(){
-    return 'iauth:users:*:moderate' as Core.Authorization.ConcreteToken
+  getWebAdminLikePermission(){
+    return 'iauth:{domain}' as Core.Authorization.AbstractToken
   }
 
-  getBasicUser(userId: Core.Entity.Id){
-    return `iauth:users:${userId}` as Core.Authorization.ConcreteToken
+  getModeratorPermission(){
+    return this.abstractAuthorizationProvider.createPermission(
+      {user_id: '*'},
+      this.getModeratorLikePermission()
+    )
+  }
+
+  getModeratorLikePermission(){
+    return 'iauth:users:{user_id}:moderate' as Core.Authorization.AbstractToken
+  }
+
+  getBasicUserPermission(userId: Core.Entity.Id){
+    return this.abstractAuthorizationProvider.createPermission(
+      {user_id: userId},
+      this.getBasicUserLikePermission()
+    )
+  }
+
+  getBasicUserLikePermission(){
+    return 'iauth:users:{user_id}' as Core.Authorization.AbstractToken
+  }
+
+  isOneOfThePermissionsBasicUserLike(
+    grantedPermissions: Array<Core.Authorization.ConcreteToken>,
+    forUserId: Core.Entity.Id
+  ){
+    return this.abstractAuthorizationProvider.canOperate(
+      { user_id: forUserId },
+      this.getBasicUserLikePermission(),
+      grantedPermissions
+    )
+  }
+
+  isOneOfThePermissionsAdminLike(
+    grantedPermissions: Array<Core.Authorization.ConcreteToken>,
+  ){
+    return this.abstractAuthorizationProvider.canOperate(
+      {domain: '*'},
+      this.getWebAdminLikePermission(),
+      grantedPermissions
+    )
   }
 
 }

@@ -23,13 +23,11 @@ export class NativeRBACService implements AbstractAuthorizationProvider {
       )
   }
 
-  grantPermission(
-    requester: Core.Authorization.Requester,
+  createPermission(
     resourceObject: {[key:string]:any},
     permissionToken: Core.Authorization.AbstractToken
-  ): void {
-    const resolvedRequiredPermission = this.PermissionManager.populate(permissionToken, resourceObject)
-    requester.permissions.push(resolvedRequiredPermission)
+  ): Core.Authorization.ConcreteToken {
+    return this.PermissionManager.populate(permissionToken, resourceObject)
   }
 
 } 

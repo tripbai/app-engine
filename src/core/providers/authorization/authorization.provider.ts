@@ -8,10 +8,9 @@ export abstract class AbstractAuthorizationProvider {
     grantedPermissions: Array<Core.Authorization.ConcreteToken>
   ): boolean
 
-  abstract grantPermission(
-    requester: Core.Authorization.Requester,
+  abstract createPermission(
     resourceObject: {[key:string]:any},
     permissionToken: Core.Authorization.AbstractToken
-  ): void
+  ): Core.Authorization.ConcreteToken
 
 }

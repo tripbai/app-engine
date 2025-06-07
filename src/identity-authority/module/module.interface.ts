@@ -117,6 +117,27 @@ export namespace IdentityAuthority {
         }
         response: ApplicationAccess.Report
       }
+      export type GetSelf = {
+        request: {
+          method: 'GET'
+          path: 'identity-authority/user/me'
+        }
+        response: {
+          entity_id: Core.Entity.Id
+          first_name: Profile.Fields.FirstName
+          last_name: Profile.Fields.LastName
+          profile_photo: Profile.Fields.Image | null
+          cover_photo: Profile.Fields.Image | null
+          about: string | null
+          username: Fields.UniqueUsername
+          email_address: Fields.UniqueEmailAddress
+          is_email_verified: boolean
+          user_type: Users.Type
+          status: Status.Type
+          verified_since: string | null
+          role: 'webadmin' | 'user' | 'moderator'
+        }
+      }
     }
   }
   export namespace Profile {
