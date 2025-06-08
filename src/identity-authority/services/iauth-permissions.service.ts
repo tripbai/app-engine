@@ -104,6 +104,25 @@ export class IAuthPermissionsService {
     }
   }
 
+  canRequesterOperateThisUser(
+    requester: Core.Authorization.Requester & {user: {entity_id: Core.Entity.Id, status: IdentityAuthority.Users.ApplicationAccess.Allowed}},
+    userId: Core.Entity.Id
+  ){
+    try {
+      if (!this.userPermissionService.caOneOfThePermissionsOperateUser(
+        requester.permissions,
+        userId
+      )) {
+        throw new Error()
+      }
+    } catch (error) {
+      throw new ResourceAccessForbiddenException({
+        message: 'requester has no permission to operate on this user',
+        data: {requester: requester}
+      })
+    }
+  }
+
   
 
 }

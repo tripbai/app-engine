@@ -163,4 +163,141 @@ describe('IAuthPermissionService', () => {
 
     })
   })
+
+  describe('canRequesterOperateThisUser()', () => {
+    it('should throw an error if the requester is public', () => {
+      const userIdToOperate = Pseudorandom.alphanum32()
+      const testRequester = new PublicRequester({
+        ipAddress: '',
+        userAgent: ''
+      })
+      const container = new Container()
+      bind(container)
+      bind_provider(container)
+      const iAuthPermissionService: IAuthPermissionsService = container.get(IAuthPermissionsService)
+      try {
+        /** @ts-expect-error */
+        iAuthPermissionService.canRequesterOperateThisUser(testRequester, userIdToOperate)
+        throw new Error('the above code did not throw an error')
+      } catch (error) {
+        expect(error.message).to.equal('requester has no permission to operate on this user')
+      }
+    })
+
+    it('should throw an error if the user id is different', () => {
+      const userIdToOperate = Pseudorandom.alphanum32()
+      const userIdInRequester = Pseudorandom.alphanum32()
+      const container = new Container()
+      bind(container)
+      bind_provider(container)
+      const userPermissionService = container.get(UserPermissionService)
+      const userPermissions: Array<Core.Authorization.ConcreteToken> = []
+      userPermissionService.addPermissionsByRole(
+        userPermissions, userIdInRequester, 'user'
+      )
+      const testRequester = new BaseRequester(
+        {
+          user: { entity_id: userIdInRequester, status: 'active' },
+          permissions: userPermissions,
+          ipAddress: '',
+          userAgent: ''
+        }
+      )
+      const iAuthPermissionService: IAuthPermissionsService = container.get(IAuthPermissionsService)
+      try {
+        /** @ts-expect-error */
+        iAuthPermissionService.canRequesterOperateThisUser(testRequester, userIdToOperate)
+        throw new Error('the above code did not throw an error')
+      } catch (error) {
+        expect(error.message).to.equal('requester has no permission to operate on this user')
+      }
+    })
+
+    it('should allow user to operate himself', () => {
+      const userIdToOperate = Pseudorandom.alphanum32()
+      const userIdInRequester = userIdToOperate
+      const container = new Container()
+      bind(container)
+      bind_provider(container)
+      const userPermissionService = container.get(UserPermissionService)
+      const userPermissions: Array<Core.Authorization.ConcreteToken> = []
+      userPermissionService.addPermissionsByRole(
+        userPermissions, userIdInRequester, 'user'
+      )
+      const testRequester = new BaseRequester(
+        {
+          user: { entity_id: userIdInRequester, status: 'active' },
+          permissions: userPermissions,
+          ipAddress: '',
+          userAgent: ''
+        }
+      )
+      const iAuthPermissionService: IAuthPermissionsService = container.get(IAuthPermissionsService)
+      try {
+        /** @ts-expect-error */
+        iAuthPermissionService.canRequesterOperateThisUser(testRequester, userIdToOperate)
+        throw new Error('the above code did not throw an error')
+      } catch (error) {
+        expect(error.message).to.equal('the above code did not throw an error')
+      }
+    })
+
+    it('should not allow users with moderator access to operate other users', () => {
+      const userIdToOperate = Pseudorandom.alphanum32()
+      const userIdInRequester = Pseudorandom.alphanum32()
+      const container = new Container()
+      bind(container)
+      bind_provider(container)
+      const userPermissionService = container.get(UserPermissionService)
+      const userPermissions: Array<Core.Authorization.ConcreteToken> = []
+      userPermissionService.addPermissionsByRole(
+        userPermissions, userIdInRequester, 'moderator'
+      )
+      const testRequester = new BaseRequester(
+        {
+          user: { entity_id: userIdInRequester, status: 'active' },
+          permissions: userPermissions,
+          ipAddress: '',
+          userAgent: ''
+        }
+      )
+      const iAuthPermissionService: IAuthPermissionsService = container.get(IAuthPermissionsService)
+      try {
+        /** @ts-expect-error */
+        iAuthPermissionService.canRequesterOperateThisUser(testRequester, userIdToOperate)
+        throw new Error('the above code did not throw an error')
+      } catch (error) {
+        expect(error.message).to.equal('requester has no permission to operate on this user')
+      }
+    })
+
+    it('should allow different user id, but has webadmin access', () => {
+      const userIdToOperate = Pseudorandom.alphanum32()
+      const userIdInRequester = Pseudorandom.alphanum32()
+      const container = new Container()
+      bind(container)
+      bind_provider(container)
+      const userPermissionService = container.get(UserPermissionService)
+      const userPermissions: Array<Core.Authorization.ConcreteToken> = []
+      userPermissionService.addPermissionsByRole(
+        userPermissions, userIdInRequester, 'webadmin'
+      )
+      const testRequester = new BaseRequester(
+        {
+          user: { entity_id: userIdInRequester, status: 'active' },
+          permissions: userPermissions,
+          ipAddress: '',
+          userAgent: ''
+        }
+      )
+      const iAuthPermissionService: IAuthPermissionsService = container.get(IAuthPermissionsService)
+      try {
+        /** @ts-expect-error */
+        iAuthPermissionService.canRequesterOperateThisUser(testRequester, userIdToOperate)
+        throw new Error('the above code did not throw an error')
+      } catch (error) {
+        expect(error.message).to.equal('the above code did not throw an error')
+      }
+    })
+  })
 })

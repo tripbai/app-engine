@@ -138,6 +138,24 @@ export namespace IdentityAuthority {
           role: 'webadmin' | 'user' | 'moderator'
         }
       }
+      export type GetModel = {
+        request: {
+          method: 'GET'
+          path: 'identity-authority/users/:user_id'
+        }
+        response: {
+          identity_provider: IdentityAuthority.Providers.Identity
+          email_address: IdentityAuthority.Users.Fields.UniqueEmailAddress 
+          username: IdentityAuthority.Users.Fields.UniqueUsername 
+          is_email_verified: boolean
+          verified_since: string | null
+          suspended_until: string | null
+          creation_context: 'external' | 'internal'
+          role: 'webadmin' | 'user' | 'moderator'
+          status: IdentityAuthority.Users.Status.Type
+          type: IdentityAuthority.Users.Type
+        }
+      }
     }
   }
   export namespace Profile {

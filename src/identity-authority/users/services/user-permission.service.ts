@@ -89,4 +89,15 @@ export class UserPermissionService {
     )
   }
 
+  caOneOfThePermissionsOperateUser(
+    grantedPermissions: Array<Core.Authorization.ConcreteToken>,
+    userIdToOperate: Core.Entity.Id
+  ){
+    return this.abstractAuthorizationProvider.canOperate(
+      {user_id: userIdToOperate},
+      this.getBasicUserLikePermission(),
+      grantedPermissions
+    )
+  }
+
 }
