@@ -42,7 +42,7 @@ export class AppAuthService {
       {access: '*'}
     )
     return this.RequesterTokenService.generate({
-      user: {id: 'application', status: 'active'},
+      user: {id: 'kernel', status: 'active'},
       permissions: [concretePermission]
     })
   }

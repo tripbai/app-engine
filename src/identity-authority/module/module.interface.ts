@@ -84,6 +84,7 @@ export namespace IdentityAuthority {
             context: 'external'
             provider: 'iauth'
             role: 'user'
+            status: Status.Pick<'unverified'>
             first_name: Profile.Fields.FirstName
             last_name: Profile.Fields.LastName
             username: Fields.Username
@@ -155,6 +156,16 @@ export namespace IdentityAuthority {
           status: IdentityAuthority.Users.Status.Type
           type: IdentityAuthority.Users.Type
         }
+      }
+      export type UpdateUsername = {
+        request: {
+          method: 'PATCH',
+          path: 'identity-authority/users/:user_id/username',
+          data: {
+            username: Fields.UniqueUsername 
+          }
+        }
+        response: {}
       }
     }
   }

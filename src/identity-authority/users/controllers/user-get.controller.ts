@@ -3,27 +3,32 @@ import { get } from "../../../core/router/decorators";
 import { IdentityAuthority } from "../../module/module.interface";
 import { Core } from "../../../core/module/module";
 import { UserPermissionService } from "../services/user-permission.service";
-import { IAuthPermissionsService } from "../../services/iauth-permissions.service";
 import { UserRepository } from "../user.repository";
 import { ProfileRepository } from "../../profiles/profile.repository";
-import { BadRequestException } from "../../../core/exceptions/exceptions";
+import { BadRequestException, ResourceAccessForbiddenException } from "../../../core/exceptions/exceptions";
 import { IsValid } from "../../../core/helpers/isvalid";
 import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
+import { IAuthRequesterFactory } from "../../requester/iauth-requester.factory";
+import { IAuthForbiddenAccessException } from "../../requester/iauth-requester.exceptions";
 
 @injectable()
 export class UserGetController {
 
   constructor(
-    @inject(IAuthPermissionsService) public readonly iAuthPermissionService: IAuthPermissionsService,
+    @inject(IAuthRequesterFactory) public readonly iAuthRequesterFactory: IAuthRequesterFactory,
     @inject(UserRepository) public readonly userRepository: UserRepository,
     @inject(ProfileRepository) public readonly profileRepository: ProfileRepository
   ){}
 
   @get<IdentityAuthority.Users.Endpoints.GetSelf>('identity-authority/user/me')
   async me<T extends IdentityAuthority.Users.Endpoints.GetSelf>(params: Core.Route.ControllerDTO<T>): Promise<T['response']>{
-    this.iAuthPermissionService.isRequesterHasBasicUserPermission(params.requester)
-    const userModel = await this.userRepository.getById(params.requester.user.entity_id)
-    const profileModel = await this.profileRepository.getById(params.requester.user.entity_id)
+    const iAuthRequester = this.iAuthRequesterFactory.create(params.requester)
+    if (!iAuthRequester.isRegularUser()) {
+      throw new IAuthForbiddenAccessException(params.requester)
+    }
+    const userId = iAuthRequester.get().user.entity_id
+    const userModel = await this.userRepository.getById(userId)
+    const profileModel = await this.profileRepository.getById(userId)
     return {
       entity_id: userModel.entity_id,
       first_name: profileModel.first_name,
@@ -52,9 +57,15 @@ export class UserGetController {
         data: {user_id: params.data.user_id}
       })
     }
-    this.iAuthPermissionService.isRequesterHasBasicUserPermission(params.requester)
-    this.iAuthPermissionService.canRequesterOperateThisUser(params.requester, params.data.user_id)
-    const userModel = await this.userRepository.getById(params.requester.user.entity_id)
+    const iAuthRequester = this.iAuthRequesterFactory.create(params.requester)
+    if (!iAuthRequester.hasAllowedAccess()) 
+      throw new IAuthForbiddenAccessException(params.requester)
+    if (!iAuthRequester.isRegularUser()) 
+      throw new IAuthForbiddenAccessException(params.requester)
+    if (!iAuthRequester.canOperateThisUser(params.data.user_id)) 
+      throw new IAuthForbiddenAccessException(params.requester)
+    const userIdToRetrieve = params.data.user_id
+    const userModel = await this.userRepository.getById(userIdToRetrieve)
     return {
       identity_provider: userModel.identity_provider,
       email_address: userModel.email_address,

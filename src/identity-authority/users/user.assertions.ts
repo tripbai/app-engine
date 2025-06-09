@@ -47,6 +47,11 @@ export class UserAssertions {
     UserValidator.role(value)
   }
 
+  isStatus(value: unknown): asserts value is IdentityAuthority.Users.Status.Type {
+    IsValid.NonEmptyString(value)
+    UserValidator.status(value)
+  }
+
   async isUniqueUsername(value: unknown): Promise<IdentityAuthority.Users.Fields.UniqueUsername> {
     this.isUsername(value)
     if (await this.userRepository.getByUsername(value) !== null) {

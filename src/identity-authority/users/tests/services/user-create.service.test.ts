@@ -48,10 +48,16 @@ describe('UserCreateService', () => {
       rebound.to(TestUserAssertion)
       const userCreateService = localContainer.get(UserCreateService)
       try {
-        await userCreateService.createUser({
-          // @ts-expect-error
-          email_address: 'test@test.com'
-        })
+        await userCreateService.createIAuthUser(
+          'iauth',
+          'external',
+          'user',
+          'concrete',
+          'sampleusername' as IdentityAuthority.Users.Fields.Username,
+          'sampleemail@gmail.com'  as IdentityAuthority.Users.Fields.EmailAddress,
+          'helloworld' as IdentityAuthority.Users.Fields.RawPassword,
+          'active'
+        )
         throw new Error('the above code did not throw an error')
       } catch (error) {
         expect(error.message).to.equal('user already exists with the same email address')
@@ -79,10 +85,16 @@ describe('UserCreateService', () => {
       rebound.to(TestUserAssertion)
       const userCreateService = container.get(UserCreateService)
       try {
-        await userCreateService.createUser({
-          // @ts-expect-error
-          username: 'test143'
-        })
+        await userCreateService.createIAuthUser(
+          'iauth',
+          'external',
+          'user',
+          'concrete',
+          'sampleusername' as IdentityAuthority.Users.Fields.Username,
+          'sampleemail@gmail.com'  as IdentityAuthority.Users.Fields.EmailAddress,
+          'helloworld' as IdentityAuthority.Users.Fields.RawPassword,
+          'active'
+        )
         throw new Error('the above code did not throw an error')
       } catch (error) {
         expect(error.message).to.equal('user already exists with the same username')
