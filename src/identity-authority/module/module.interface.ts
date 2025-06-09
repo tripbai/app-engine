@@ -157,14 +157,54 @@ export namespace IdentityAuthority {
           type: IdentityAuthority.Users.Type
         }
       }
-      export type UpdateUsername = {
+      export type UpdateUser = {
         request: {
           method: 'PATCH',
-          path: 'identity-authority/users/:user_id/username',
+          path: 'identity-authority/users/:user_id',
           data: {
-            username: Fields.UniqueUsername 
+            identity_provider?: Providers.Identity
+            first_name?: Profile.Fields.FirstName
+            last_name?: Profile.Fields.LastName
+            about?: string
+            profile_photo?: {
+              upload_token: string
+            }
+            cover_photo?: {
+              upload_token: string
+            }
+            password?: {
+              reset_confirmation_token?: string
+              current_password: Fields.RawPassword
+              new_password: Fields.RawPassword
+            }
+            username?: Fields.Username 
+            email_address?: {
+              update_confirmation_token: string
+            }
+            is_email_verified?: {
+              verification_confirmation_token: string
+            }
+            role?: 'webadmin' | 'user' | 'moderator'
+            type?: Type
           }
         }
+        response: {}
+      }
+      export type SendAccountVerificationEmail = {
+        request: {
+          method: 'POST',
+          path: 'identity-authority/user/send-account-verification-email'
+        },
+        response: {}
+      }
+      export type SendPasswordResetEmail = {
+        request: {
+          method: 'POST',
+          path: 'identity-authority/user/send-password-reset-email',
+          data: {
+            email_address: Fields.EmailAddress
+          }
+        },
         response: {}
       }
     }
