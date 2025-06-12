@@ -17,4 +17,8 @@ export class AWSEnvCredentials implements AbstractAWSCredentials {
     return AppENV.get('AWS_SECRET_KEY')
   }
 
+  getS3BucketName(): string {
+    return AppENV.get('AWS_S3_BUCKET_NAME')  
+  }
+
 }

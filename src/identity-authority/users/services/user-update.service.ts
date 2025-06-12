@@ -7,72 +7,153 @@ import { ResourceAccessForbiddenException } from "../../../core/exceptions/excep
 import { UnitOfWork } from "../../../core/workflow/unit-of-work";
 import { UserModel } from "../user.model";
 import { UserPasswordService } from "./user-password.service";
+import { TimeStamp } from "../../../core/helpers/timestamp";
+import { UserActionTokenService } from "./user-action-token.service";
+import { IAuthRequester } from "../../requester/iauth-requester";
 
 @injectable()
 export class UserUpdateService {
 
   constructor(
     @inject(UserAssertions) public readonly userAssertions: UserAssertions,
-    @inject(UserPasswordService) public readonly userPasswordService: UserPasswordService
+    @inject(UserPasswordService) public readonly userPasswordService: UserPasswordService,
+    @inject(UserActionTokenService) public readonly userActionTokenService: UserActionTokenService,
+    @inject(UserRepository) public readonly userRepository: UserRepository
   ){}
 
   async updateUsername(
     userModel: UserModel,
     username: IdentityAuthority.Users.Fields.Username
   ): Promise<void> {
-
-    const uniqueUsername = await this.userAssertions.isUniqueUsername(username)
     if (userModel.status !== 'active' && userModel.status !== 'unverified') {
       throw new ResourceAccessForbiddenException({
         message: 'cannot update user when user is not active or unverified',
         data: { user_id: userModel.entity_id, status: userModel.status }
       })
     }
+    const uniqueUsername = await this.userAssertions.isUniqueUsername(username)
     userModel.username = uniqueUsername  
   }
 
-  async generateUpdateEmailToken(
-    userModel: UserModel
-  ): Promise<void> {
-    
-  }
-
-  async updateEmailUsingToken(
+  async updatePasswordUsingResetToken(
     userModel: UserModel,
-    token: string
-  ): Promise<void> {
-    
+    resetToken: string,
+    password: IdentityAuthority.Users.Fields.RawPassword
+  ){
+    if (userModel.status === 'archived' || userModel.status === 'banned' || userModel.status === 'suspended') {
+      throw new ResourceAccessForbiddenException({
+        message: 'unable to reset password due to user status',
+        data: { user_id: userModel.entity_id, status: userModel.status }
+      })
+    }
+    const tokenPayload = this.userActionTokenService.parse(userModel.entity_id, resetToken)
+    if (tokenPayload.user_id !== userModel.entity_id) {
+      throw new ResourceAccessForbiddenException({
+        message: 'user id mismatch in token payload',
+        data: { token_payload: tokenPayload, user_id: userModel.entity_id }
+      })
+    }
+    if (tokenPayload.action !== 'password:reset_confirmation') {
+      throw new ResourceAccessForbiddenException({
+        message: 'action type mismatch in token payload',
+        data: { token_payload: tokenPayload, action_type: 'password:reset_confirmation' }
+      })
+    }
+    const hashedPassword = await this.userPasswordService.hashPassword(password)
+    userModel.password_hash = hashedPassword
   }
 
   async updatePasswordUsingCurrentPassword(
     userModel: UserModel,
-    newPassword: IdentityAuthority.Users.Fields.RawPassword,
-    currentPassword: IdentityAuthority.Users.Fields.RawPassword
-  ): Promise<void> {
-    if (!this.userPasswordService.verifyPassword(
-      currentPassword, 
-      userModel.password_hash
-    )) {
+    currentPassword: IdentityAuthority.Users.Fields.RawPassword,
+    newPassword: IdentityAuthority.Users.Fields.RawPassword
+  ){
+    if (userModel.status === 'archived' || userModel.status === 'banned' || userModel.status === 'suspended') {
       throw new ResourceAccessForbiddenException({
-        message: 'invalid credentials when trying to update password',
+        message: 'unable to update password due to user status',
+        data: { user_id: userModel.entity_id, status: userModel.status }
+      })
+    }
+    const isVerifiedPassword = await this.userPasswordService.verifyPassword(
+      currentPassword, userModel.password_hash
+    )
+    if (!isVerifiedPassword) {
+      throw new ResourceAccessForbiddenException({
+        message: 'unable to update password due to password mismatch',
         data: {user_id: userModel.entity_id}
       })
     }
-    const newPasswordHash = await this.userPasswordService.hashPassword(newPassword)
-    userModel.password_hash = newPasswordHash
+    const hashedPassword 
+      = await this.userPasswordService.hashPassword(
+        newPassword
+      )
+    userModel.password_hash = hashedPassword
   }
 
-  async generateUpdatePasswordToken(
+  async updateEmailUsingConfirmationToken(
     userModel: UserModel,
+    confirmationToken: string
+  ){
+    if (userModel.status === 'archived' || userModel.status === 'banned' || userModel.status === 'suspended') {
+      throw new ResourceAccessForbiddenException({
+        message: 'unable to update email address due to user status',
+        data: { user_id: userModel.entity_id, status: userModel.status }
+      })
+    }
+    const tokenPayload = this.userActionTokenService.parse(userModel.entity_id, confirmationToken)
+    if (tokenPayload.user_id !== userModel.entity_id) {
+      throw new ResourceAccessForbiddenException({
+        message: 'user id mismatch in token payload',
+        data: { token_payload: tokenPayload, user_id: userModel.entity_id }
+      })
+    }
+    if (tokenPayload.action !== 'email_address:confirmation_token') {
+      throw new ResourceAccessForbiddenException({
+        message: 'action type mismatch in token payload',
+        data: { token_payload: tokenPayload, action_type: 'email_address:confirmation_token' }
+      })
+    }
+    const newEmailAddress = tokenPayload.new_email_address
+    const uniqueEmailAddress = await this.userAssertions.isUniqueEmailAddress(newEmailAddress)
+    userModel.email_address = uniqueEmailAddress
+    this.setUserAsVerified(userModel)
+  }
+
+  async setUserAsVerifiedUsingVerificationToken(
+    userModel: UserModel,
+    verificationToken: string
+  ){
+    const tokenPayload = this.userActionTokenService.parse(
+      userModel.entity_id, 
+      verificationToken
+    )
+    if (tokenPayload.user_id !== userModel.entity_id) {
+      throw new ResourceAccessForbiddenException({
+        message: 'user id mismatch in token payload',
+        data: { token_payload: tokenPayload, user_id: userModel.entity_id }
+      })
+    }
+    if (tokenPayload.action !== 'account:verification_token') {
+      throw new ResourceAccessForbiddenException({
+        message: 'action type mismatch in token payload',
+        data: { token_payload: tokenPayload, action_type: 'account:verification_token' }
+      })
+    }
+    this.setUserAsVerified(userModel)
+  }
+
+  private async setUserAsVerified(
+    userModel: UserModel
+  ){
+    userModel.is_email_verified = true
+    userModel.verified_since = TimeStamp.now()
+    userModel.status = 'active'
+  }
+
+  async setRoleAsUser(
+    userModel: UserModel
   ){
     
-  }
-
-  async updatePasswordUsingToken(
-    userModel: UserModel,
-    token: string
-  ){
-
   }
 
 

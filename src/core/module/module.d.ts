@@ -195,6 +195,10 @@ export namespace Core {
     };
   }
 
+  export namespace File {
+    export type UploadPath = string & { format: 'files/{full_year}/{month}/{file_name}.{file_extension}' }
+  }
+
   export namespace Endpoints {
     export namespace Auth {
       export type WithAppAndSecretKey = {

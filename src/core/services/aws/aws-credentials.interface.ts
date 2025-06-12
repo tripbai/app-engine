@@ -6,4 +6,6 @@ export abstract class AbstractAWSCredentials {
 
   abstract getSecretAccessKey(): string
 
+  abstract getS3BucketName(): string
+
 }

@@ -174,7 +174,7 @@ export namespace IdentityAuthority {
             }
             password?: {
               reset_confirmation_token?: string
-              current_password: Fields.RawPassword
+              current_password?: Fields.RawPassword
               new_password: Fields.RawPassword
             }
             username?: Fields.Username 
@@ -215,7 +215,10 @@ export namespace IdentityAuthority {
       export type FirstName = string & {minLen:2,maxLen:32,key:'first_name'}
       /** The type of User last name */
       export type LastName  = string & {minLen:2,maxLen:32,key:'last_name'}
-      export type Image = string & {type: 'profile_image_rel_path'}
+      export type Image = Core.File.UploadPath
     }
+  }
+  export namespace Images {
+    export type SupportedExtensions = 'jpeg' | 'jpg' | 'webp' | 'png'
   }
 }

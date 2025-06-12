@@ -10,7 +10,7 @@ export class AmazonSNSService {
   private static Client: SNSClient | null = null
 
   constructor(
-    @inject(AWSEnvCredentials) public readonly AWSEnvCredentials: AbstractAWSCredentials
+    @inject(AbstractAWSCredentials) public readonly abstractAWSCredentials: AbstractAWSCredentials
   ){
 
   }
@@ -19,10 +19,10 @@ export class AmazonSNSService {
     if (AmazonSNSService.Client !== null) 
       return AmazonSNSService.Client
     const options = {
-      region: this.AWSEnvCredentials.getRegion(),
+      region: this.abstractAWSCredentials.getRegion(),
       credentials: {
-        accessKeyId: this.AWSEnvCredentials.getAccessKeyId(),
-        secretAccessKey: this.AWSEnvCredentials.getSecretAccessKey(),
+        accessKeyId: this.abstractAWSCredentials.getAccessKeyId(),
+        secretAccessKey: this.abstractAWSCredentials.getSecretAccessKey(),
       },
     }
     AmazonSNSService.Client = new SNSClient(options)
