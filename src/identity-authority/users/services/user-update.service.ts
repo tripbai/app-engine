@@ -3,7 +3,7 @@ import { IdentityAuthority } from "../../module/module.interface";
 import { UserAssertions } from "../user.assertions";
 import { Core } from "../../../core/module/module";
 import { UserRepository } from "../user.repository";
-import { ResourceAccessForbiddenException } from "../../../core/exceptions/exceptions";
+import { LogicException, RecordAlreadyExistsException, ResourceAccessForbiddenException } from "../../../core/exceptions/exceptions";
 import { UnitOfWork } from "../../../core/workflow/unit-of-work";
 import { UserModel } from "../user.model";
 import { UserPasswordService } from "./user-password.service";
@@ -151,9 +151,111 @@ export class UserUpdateService {
   }
 
   async setRoleAsUser(
+    iAuthRequester: IAuthRequester,
     userModel: UserModel
   ){
+
+    if (userModel.status !== 'active' && userModel.status !== 'unverified') {
+      throw new ResourceAccessForbiddenException({
+        message: 'unable to update user role due to user status',
+        data: { user_id: userModel.entity_id, status: userModel.status }
+      })
+    }
+
+    if (iAuthRequester.isWebAdmin()) {
+      if (iAuthRequester.get().user.entity_id === userModel.entity_id) {
+        throw new ResourceAccessForbiddenException({
+          message: 'web admin cannot demote himself to regular user',
+          data: { requester: iAuthRequester.get() }
+        })
+      }
+      if (!iAuthRequester.canOperateThisUser(userModel.entity_id)) {
+        throw new LogicException({
+          message: 'must be an anomaly as requester with web admin permission can operate anyone',
+          data: { requester: iAuthRequester.get() }
+        })
+      }
+      if (userModel.role === 'user') {
+        throw new RecordAlreadyExistsException({
+          message: 'user already has user role',
+          data: { user_id: userModel.entity_id }
+        })
+      }
+      userModel.role = 'user'
+      return
+    }
+
+    if (iAuthRequester.hasCoreAppAccess()){
+      if (userModel.role !== 'webadmin') {
+        throw new RecordAlreadyExistsException({
+          message: 'core access can only demote webadmins to user',
+          data: { user_id: userModel.entity_id }
+        })
+      }
+      userModel.role = 'user'
+    }
+
+  }
+
+  async setRoleAsModerator(
+    iAuthRequester: IAuthRequester,
+    userModel: UserModel
+  ){
+
+    if (userModel.status !== 'active' && userModel.status !== 'unverified') {
+      throw new ResourceAccessForbiddenException({
+        message: 'unable to update user role due to user status',
+        data: { user_id: userModel.entity_id, status: userModel.status }
+      })
+    }
     
+    if (iAuthRequester.isWebAdmin()) {
+      if (iAuthRequester.get().user.entity_id === userModel.entity_id) {
+        throw new ResourceAccessForbiddenException({
+          message: 'web admin cannot demote himself as moderator',
+          data: { requester: iAuthRequester.get() }
+        })
+      }
+      if (!iAuthRequester.canOperateThisUser(userModel.entity_id)) {
+        throw new LogicException({
+          message: 'must be an anomaly as requester with web admin permission can operate anyone',
+          data: { requester: iAuthRequester.get() }
+        })
+      }
+      if (userModel.role === 'moderator') {
+        throw new RecordAlreadyExistsException({
+          message: 'user already has moderator role',
+          data: { user_id: userModel.entity_id }
+        })
+      }
+      userModel.role = 'moderator'
+      return
+    }
+
+  }
+
+  async setRoleAsWebadmin(
+    iAuthRequester: IAuthRequester,
+    userModel: UserModel
+  ){
+
+    if (userModel.status !== 'active' && userModel.status !== 'unverified') {
+      throw new ResourceAccessForbiddenException({
+        message: 'unable to update user role due to user status',
+        data: { user_id: userModel.entity_id, status: userModel.status }
+      })
+    }
+    
+    if (iAuthRequester.hasCoreAppAccess()){
+      if (userModel.role === 'webadmin') {
+        throw new RecordAlreadyExistsException({
+          message: 'user is already web admin',
+          data: { user_id: userModel.entity_id }
+        })
+      }
+      userModel.role = 'webadmin'
+    }
+
   }
 
 

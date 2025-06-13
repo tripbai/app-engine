@@ -100,4 +100,12 @@ export class UserPermissionService {
     )
   }
 
+  hasModeratorPermission(
+    grantedPermissions: Array<Core.Authorization.ConcreteToken>
+  ){
+    return grantedPermissions.includes(
+      this.getModeratorPermission()
+    )
+  }
+
 }

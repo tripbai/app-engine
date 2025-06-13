@@ -1,3 +1,4 @@
+import { AppAuthService } from "../../core/auth/services/app-auth-service";
 import { ResourceAccessForbiddenException, UnauthorizedAccessException } from "../../core/exceptions/exceptions";
 import { Core } from "../../core/module/module";
 import { EntityToolkit } from "../../core/orm/entity/entity-toolkit";
@@ -12,7 +13,8 @@ export class IAuthRequester {
 
   constructor(
     public readonly requester: Core.Authorization.Requester,
-    public readonly userPermissionService: UserPermissionService
+    public readonly userPermissionService: UserPermissionService,
+    public readonly appAuthService: AppAuthService
   ){}
 
   private static assertIAuthValidRequester(requester: Core.Authorization.Requester): asserts requester is IAuthValidRequester {
@@ -91,6 +93,17 @@ export class IAuthRequester {
     )
   }
 
+  hasCoreAppAccess(){
+    try {
+      this.appAuthService.hasHighestPermission(
+        this.requester
+      )
+      return true
+    } catch (error) {
+      return false
+    }
+  }
+
   canOperateThisUser(userId: Core.Entity.Id): boolean {
     try {
       IAuthRequester.assertIAuthValidRequester(this.requester)
@@ -100,6 +113,18 @@ export class IAuthRequester {
     return this.userPermissionService.caOneOfThePermissionsOperateUser(
       this.requester.permissions,
       userId
+    )
+  }
+
+  isAModerator(): boolean {
+    try {
+      IAuthRequester.assertIAuthValidRequester(this.requester)
+    } catch (error) {
+      return false
+    }
+    if (this.isWebAdmin()) return true 
+    return this.userPermissionService.hasModeratorPermission(
+      this.requester.permissions
     )
   }
 

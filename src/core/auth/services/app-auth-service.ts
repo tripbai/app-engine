@@ -10,6 +10,8 @@ import { Core } from "../../module/module";
 @injectable()
 export class AppAuthService {
 
+  private kernelPermission = 'kernel:{access}'
+
   constructor(
     @inject(RequesterTokenService) public readonly RequesterTokenService: RequesterTokenService,
     @inject(PermissionManager) public readonly PermissionManager: PermissionManager,
@@ -35,10 +37,9 @@ export class AppAuthService {
   }
 
   generateApplicationToken(){
-    const abstractPermission = `kernel:{access}`
-    this.PermissionTokenValidator.isAbstract(abstractPermission)
+    this.PermissionTokenValidator.isAbstract(this.kernelPermission)
     const concretePermission = this.PermissionManager.populate(
-      abstractPermission, 
+      this.kernelPermission, 
       {access: '*'}
     )
     return this.RequesterTokenService.generate({
