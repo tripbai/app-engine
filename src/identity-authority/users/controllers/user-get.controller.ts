@@ -20,7 +20,7 @@ export class UserGetController {
     @inject(ProfileRepository) public readonly profileRepository: ProfileRepository
   ){}
 
-  @get<IdentityAuthority.Users.Endpoints.GetSelf>('identity-authority/user/me')
+  @get<IdentityAuthority.Users.Endpoints.GetSelf>('/identity-authority/user/me')
   async me<T extends IdentityAuthority.Users.Endpoints.GetSelf>(params: Core.Route.ControllerDTO<T>): Promise<T['response']>{
     const iAuthRequester = this.iAuthRequesterFactory.create(params.requester)
     if (!iAuthRequester.isRegularUser()) {
@@ -46,7 +46,7 @@ export class UserGetController {
     }
   }
 
-  @get<IdentityAuthority.Users.Endpoints.GetModel>('identity-authority/users/:user_id')
+  @get<IdentityAuthority.Users.Endpoints.GetModel>('/identity-authority/users/:user_id')
   async getUserModel<T extends IdentityAuthority.Users.Endpoints.GetModel>(params: Core.Route.ControllerDTO<T>): Promise<T['response']>{
     try {
       IsValid.NonEmptyString(params.data.user_id)

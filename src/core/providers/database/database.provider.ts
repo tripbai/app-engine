@@ -67,6 +67,8 @@ export abstract class AbstractDatabaseProvider {
   abstract useQuery(
     transactionableAction: DatabaseTransactionStep
   ): Promise<Array<{ [key: string]: any }>>
+
+  
 }
 
 /**

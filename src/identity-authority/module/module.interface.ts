@@ -121,7 +121,7 @@ export namespace IdentityAuthority {
       export type GetSelf = {
         request: {
           method: 'GET'
-          path: 'identity-authority/user/me'
+          path: '/identity-authority/user/me'
         }
         response: {
           entity_id: Core.Entity.Id
@@ -142,7 +142,7 @@ export namespace IdentityAuthority {
       export type GetModel = {
         request: {
           method: 'GET'
-          path: 'identity-authority/users/:user_id'
+          path: '/identity-authority/users/:user_id'
         }
         response: {
           identity_provider: IdentityAuthority.Providers.Identity
@@ -157,10 +157,17 @@ export namespace IdentityAuthority {
           type: IdentityAuthority.Users.Type
         }
       }
+      export type GetByEmailOrUsername = {
+        request: {
+          path: '/identity-authority/user/get/snippet?type=:type&value=:value',
+          method: 'GET'
+        }
+        response: Snippet
+      }
       export type UpdateUser = {
         request: {
           method: 'PATCH',
-          path: 'identity-authority/users/:user_id',
+          path: '/identity-authority/users/:user_id',
           data: {
             identity_provider?: Providers.Identity
             first_name?: Profile.Fields.FirstName
@@ -184,28 +191,74 @@ export namespace IdentityAuthority {
             is_email_verified?: {
               verification_confirmation_token: string
             }
-            role?: 'webadmin' | 'user' | 'moderator'
             type?: Type
           }
         }
         response: {}
       }
-      export type SendAccountVerificationEmail = {
+      export type UpdateUserStatus = {
         request: {
           method: 'POST',
-          path: 'identity-authority/user/send-account-verification-email'
-        },
+          path: '/identity-authority/user/moderate/status',
+          data: {
+            user_id: Core.Entity.Id
+            status: IdentityAuthority.Users.Status.Disregard<'suspended'>
+          } | {
+            user_id: Core.Entity.Id
+            status: IdentityAuthority.Users.Status.Pick<'suspended'>
+            suspend_until: string
+          }
+        }
         response: {}
       }
-      export type SendPasswordResetEmail = {
+      export type UpdateUserRole = {
+        request: {
+          method: 'POST'
+          path: '/identity-authority/user/delegate/role'
+          data: {
+            user_id: Core.Entity.Id
+            role: 'webadmin' | 'moderator' | 'user'
+          }
+        }
+        response: {}
+      }
+      export type SendEmailForAccountVerification = {
         request: {
           method: 'POST',
-          path: 'identity-authority/user/send-password-reset-email',
+          path: '/identity-authority/user/send-account-verification-email'
+        }
+        response: {}
+      }
+      export type SendEmailForPasswordReset = {
+        request: {
+          method: 'POST',
+          path: '/identity-authority/user/send-password-reset-email',
           data: {
             email_address: Fields.EmailAddress
           }
-        },
+        }
         response: {}
+      }
+      export type SendEmailForNewEmailConfirmation = {
+        request: {
+          method: 'POST',
+          path: '/identity-authority/user/send-new-email-confirmation',
+          data: {
+            email_address: Fields.EmailAddress
+          }
+        }
+        response: {}
+      }
+      export type MFAValidateOTP = {
+        request: {
+          path: '/identity-authority/users/mfa/otp/validate',
+          method: 'POST',
+          data: {
+            user_id: Core.Entity.Id
+            otp: string
+          }
+        },
+        response: ApplicationAccess.Report
       }
     }
   }
@@ -220,5 +273,157 @@ export namespace IdentityAuthority {
   }
   export namespace Images {
     export type SupportedExtensions = 'jpeg' | 'jpg' | 'webp' | 'png'
+    export namespace Endpoints {
+      export type Upload = {
+        request: {
+          path: '/identity-authority/images/upload'
+          method: 'POST',
+          data: {
+            audience: string
+            file: File
+            uploadedForEntityId: string
+          }
+        }
+        response: {
+          relativePath: Core.File.UploadPath
+          image_token: string
+        }
+      }
+    }
+  }
+  export namespace EmailTemplatesRegistry {
+    export namespace Fields {
+      export type EmailType 
+        = 'password_reset_template' |
+          'account_verification_template' | 
+          'email_confirmation_template' | 
+          'login_link_template'
+    }
+    export namespace Endpoints {
+      export type Create = {
+        request: {
+          path: '/identity-authority/registry/email-templates'
+          method: 'POST'
+          data: {
+            key: Fields.EmailType
+            template_id: Core.Entity.Id
+            description?: string
+          }
+        }
+        response: {
+          entity_id: Core.Entity.Id
+          key: Fields.EmailType
+          template_id: Core.Entity.Id
+          description: string | null
+        }
+      }
+      export type GetAll = {
+        request: {
+          path: '/identity-authority/registry/email-templates'
+          method: 'GET'
+        }
+        response: Array<{
+          entity_id: Core.Entity.Id
+          key: Fields.EmailType
+          template_id: Core.Entity.Id
+          description: string | null
+          created_at: string
+          updated_at: string
+        }>
+      }
+      export type Update = {
+        request: {
+          path: '/identity-authority/registry/email-templates/:template_id'
+          method: 'PATCH'
+          data: {
+            description: string
+          }
+        }
+        response: {}
+      }
+    }
+  }
+  export namespace Tenants {
+    export namespace Endpoints {
+      export type CreateTenant = {
+        request: {
+          path: '/identity-authority/tenants',
+          method: 'POST',
+          data: {
+            name: string
+          }
+        }
+        response: {
+          entity_id: Core.Entity.Id
+          secret_key?: string
+          name: string
+          profile_photo: string | null
+          cover_photo: string | null
+          created_at: string
+          updated_at: string
+        }
+      }
+      export type AssociateUser = {
+        request: {
+          path: '/identity-authority/tenants/:tenant_id/users'
+          method: 'POST',
+          data: {
+            user_id: string
+          }
+        }
+        response: {
+          tenant_id: string
+        }
+      }
+      export type GetTenant = {
+        request: {
+          path: '/identity-authority/tenants/:tenant_id',
+          method: 'GET',
+          data: {}
+        }
+        response: {
+          entity_id: Core.Entity.Id
+          name: string
+          profile_photo: string | null
+          cover_photo: string | null
+        }
+      }
+      export type GetTenantUsers = {
+        request: {
+          path: '/identity-authority/tenants/:tenant_id/users'
+          method: 'GET'
+        }
+        response: {
+          entity_id: Core.Entity.Id
+          name: string
+          profile_photo: string | null
+          cover_photo: string | null
+        }
+      }
+      export type CertifyAccess = {
+        request: {
+          path: '/identity-authority/tenants/:tenant_id/certify-access'
+          method: 'POST'
+          data: {
+            audience: string
+          }
+        }
+        response: {
+          access_certification_token: string
+        }
+      }
+      export type CertifyUser = {
+        request: {
+          path: '/identity-authority/tenants/:tenant_id/certify-user'
+          method: 'POST',
+          data: {
+            user_id: string
+          }
+        }
+        response: {
+          team_entity_id: string
+        }
+      }
+    }
   }
 }

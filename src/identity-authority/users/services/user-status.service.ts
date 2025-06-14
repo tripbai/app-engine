@@ -2,6 +2,7 @@ import { inject, injectable } from "inversify";
 import { IAuthRequester } from "../../requester/iauth-requester";
 import { UserModel } from "../user.model";
 import { RecordAlreadyExistsException, ResourceAccessForbiddenException } from "../../../core/exceptions/exceptions";
+import { TimeStamp } from "../../../core/helpers/timestamp";
 
 @injectable()
 export class UserStatusService {
@@ -39,6 +40,9 @@ export class UserStatusService {
         data: { user_id: userModel.entity_id }
       })
     }
+
+    /** @TODO timestamp validation that it's more than X hours */
+
     userModel.suspended_until = suspendedUntil
     userModel.status = 'suspended'
   }
@@ -153,6 +157,39 @@ export class UserStatusService {
     }
 
     const never: never = userModel.status
+
+  }
+
+  archiveUser(
+    iAuthRequester: IAuthRequester,
+    userModel: UserModel,
+  ){
+
+    if (userModel.status === 'banned' || userModel.status === 'suspended') {
+      throw new ResourceAccessForbiddenException({
+        message: 'banned and suspended users cannot be reactivated',
+        data: { user_id: userModel.entity_id }
+      })
+    }
+
+    if (userModel.status === 'archived') {
+      throw new RecordAlreadyExistsException({
+        message: 'user has already been archived',
+        data: { user_id: userModel.entity_id }
+      })
+    }
+
+    if (!iAuthRequester.isWebAdmin()) {
+      if (iAuthRequester.get().user.entity_id !== userModel.entity_id) {
+        throw new ResourceAccessForbiddenException({
+          message: 'only users can archive themselves',
+          data: { user_id: userModel.entity_id }
+        })
+      }
+    } 
+
+    userModel.status = 'archived'
+    userModel.archived_at = TimeStamp.now()
 
   }
 

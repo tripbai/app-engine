@@ -50,7 +50,6 @@ export class UpdateUserCommand {
       is_email_verified?: {
         verification_confirmation_token: string
       }
-      role?: 'webadmin' | 'user' | 'moderator'
       type?: IdentityAuthority.Users.Type
     }
   ): Promise<void> {
@@ -165,6 +164,13 @@ export class UpdateUserCommand {
         userModel, params.username
       )
     }
+
+    unitOfWork.addTransactionStep(
+      await this.userRepository.update(userModel)
+    )
+    unitOfWork.addTransactionStep(
+      await this.profileRepository.update(profileModel)
+    )
 
     await unitOfWork.commit()
     return 
