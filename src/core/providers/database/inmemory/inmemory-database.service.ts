@@ -1,9 +1,9 @@
 import { Core } from "../../../module/module"
 import { AbstractDatabaseProvider, FlatDatabaseRecord, DatabaseTransactionStep } from "../database.provider"
 
-export class InMemoryDatabaseService extends AbstractDatabaseProvider {
+const db: Map<string, Map<Core.Entity.Id, FlatDatabaseRecord>> = new Map()
 
-  private db: Map<string, Map<Core.Entity.Id, FlatDatabaseRecord>> = new Map()
+export class InMemoryDatabaseService extends AbstractDatabaseProvider {
 
   async connect(): Promise<boolean> {
     return true
@@ -20,11 +20,11 @@ export class InMemoryDatabaseService extends AbstractDatabaseProvider {
 
     const recordCopy = { ...record }
 
-    if (!this.db.has(collectionName)) {
-      this.db.set(collectionName, new Map())
+    if (!db.has(collectionName)) {
+      db.set(collectionName, new Map())
     }
 
-    const collection = this.db.get(collectionName)!
+    const collection = db.get(collectionName)!
     collection.set(entityId, recordCopy)
 
     return {
@@ -48,7 +48,7 @@ export class InMemoryDatabaseService extends AbstractDatabaseProvider {
     fieldName: string,
     value: string | number | boolean | null
   ): Promise<FlatDatabaseRecord[]> {
-    const collection = this.db.get(collectionName)
+    const collection = db.get(collectionName)
     if (!collection) return []
 
     return Array.from(collection.values())
@@ -60,7 +60,7 @@ export class InMemoryDatabaseService extends AbstractDatabaseProvider {
     collectionName: string,
     id: Core.Entity.Id
   ): Promise<FlatDatabaseRecord[]> {
-    const collection = this.db.get(collectionName)
+    const collection = db.get(collectionName)
     const record = collection?.get(id)
     return record ? [{ ...record }] : []
   }
@@ -69,7 +69,7 @@ export class InMemoryDatabaseService extends AbstractDatabaseProvider {
     collectionName: string,
     ids: Array<Core.Entity.Id>
   ): Promise<FlatDatabaseRecord[]> {
-    const collection = this.db.get(collectionName)
+    const collection = db.get(collectionName)
     if (!collection) return []
 
     return ids
@@ -87,7 +87,7 @@ export class InMemoryDatabaseService extends AbstractDatabaseProvider {
       throw new Error("Record must have a string 'entity_id' field.")
     }
 
-    const collection = this.db.get(collectionName)
+    const collection = db.get(collectionName)
     if (!collection || !collection.has(entityId)) {
       throw new Error("Cannot update non-existent record.")
     }
@@ -119,7 +119,7 @@ export class InMemoryDatabaseService extends AbstractDatabaseProvider {
       case "read":
         return this.getRecordById(namespace, entityId)
       case "delete":
-        const collection = this.db.get(namespace)
+        const collection = db.get(namespace)
         if (collection?.has(entityId)) {
           collection.delete(entityId)
           return [{ ...data }]
