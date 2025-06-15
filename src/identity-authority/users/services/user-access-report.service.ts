@@ -27,10 +27,9 @@ export class UserAccessReportService {
 
     const userModel = await this.userRepository.getByEmailAddress(params.email_address)
     if (userModel === null) {
-      throw new RecordNotFoundException({
-        message: 'user not found using email address',
-        data: { email_address: params.email_address }
-      })
+      return {
+        is_user_registered: false
+      }
     }
 
     /** Asserts that the identity provider is correct */
@@ -39,7 +38,7 @@ export class UserAccessReportService {
     )
 
     if (userModel.identity_provider === 'iauth') {
-      this.userAuthService.authenticateIAuthUser(
+      await this.userAuthService.authenticateIAuthUser(
         userModel, params.password
       )
     } else if (userModel.identity_provider === 'fireauth') {

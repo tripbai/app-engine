@@ -16,8 +16,8 @@ export class UserPasswordService {
     if (hashed === null) return false
     return await new Promise((resolve, reject) => {
       bcrypt.compare(raw,hashed,(error, result)=>{
-        if (result) return resolve(true)
         if (error) return resolve(false)
+        if (result) return resolve(true)
         resolve(false)
       })
     })

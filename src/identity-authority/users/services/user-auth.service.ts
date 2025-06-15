@@ -18,7 +18,7 @@ export class UserAuthService {
     providedPassword: IdentityAuthority.Users.Fields.RawPassword
   ){
     this.assertAssignedIdentityProvider(userModel, 'iauth')
-    if (await this.userPasswordService.verifyPassword(
+    if (!await this.userPasswordService.verifyPassword(
       providedPassword,
       userModel.password_hash
     )) {
