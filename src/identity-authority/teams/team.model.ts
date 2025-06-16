@@ -1,11 +1,13 @@
 import { Core } from "../../core/module/module";
 import { BaseEntity } from "../../core/orm/entity/base-entity";
 import { EntityId, boolean, collection, length, nullable, references, varchar } from "../../core/orm/entity/decorators";
+import { TenantModel } from "../tenants/tenant.model";
 import { UserModel } from "../users/user.model";
 
 @collection('teams')
 export class TeamModel extends BaseEntity<TeamModel> {
 
+  @references(TenantModel, 'entity_id')
   @EntityId()
   tenant_id: Core.Entity.Id
 

@@ -152,5 +152,61 @@
         "is_nullable": false
       }
     ]
+  },
+  {
+    "collection": "tenants",
+    "created_at": "2025-06-16T15:14:16.542Z",
+    "updated_at": "2025-06-16T15:14:16.542Z",
+    "fields": [
+      {
+        "name": "name",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 64
+      },
+      {
+        "name": "secret_key",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 32
+      },
+      {
+        "name": "profile_photo",
+        "type": "varchar",
+        "is_nullable": true,
+        "length": 384
+      },
+      {
+        "name": "cover_photo",
+        "type": "varchar",
+        "is_nullable": true,
+        "length": 384
+      }
+    ]
+  },
+  {
+    "collection": "email_templates",
+    "created_at": "2025-06-16T15:24:54.197Z",
+    "updated_at": "2025-06-16T15:24:54.197Z",
+    "fields": [
+      {
+        "name": "template_type",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 12
+      },
+      {
+        "name": "template_id",
+        "type": "char",
+        "is_nullable": false,
+        "length": 32
+      },
+      {
+        "name": "description",
+        "type": "varchar",
+        "is_nullable": true,
+        "length": 150
+      }
+    ]
   }
 ]

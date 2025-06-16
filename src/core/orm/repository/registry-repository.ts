@@ -4,6 +4,9 @@ import { TimeStamp } from "../../helpers/timestamp"
 import { Core } from "../../module/module"
 import { RepositoryServiceProviders, WithReservedFields } from "./types"
 import { EntityToolkit } from "../entity/entity-toolkit"
+import { inject } from "inversify"
+import { AbstractCacheProvider } from "../../providers/cache/cache.provider"
+import { AbstractDatabaseProvider } from "../../providers/database/database.provider"
 
 /**
  * A registry is an abstract structure or collection of related data 
@@ -23,50 +26,39 @@ import { EntityToolkit } from "../entity/entity-toolkit"
  */
 export class RegistryRepository<TModel extends BaseEntity<TModel>> {
 
-  /**
-   * In NoSQL databases, the collection refers to the database collection itself. 
-   * For relational databases, this collection value refers
-   * to the name of the database table
-   */
-  protected readonly collection: string
+   /**
+     * In NoSQL databases, the collection refers to the database collection itself. 
+     * For relational databases, this collection value refers
+     * to the name of the database table
+     */
+   protected readonly collection: string
+
+   /**
+    * The name of the foreign key field that relates the 
+    * records together
+    */
+   protected readonly reference: string
+
+   /** The model instance */
+   protected readonly modelInstance: TModel
 
   /**
    * Binds service providers to a Registry instance
    */
   protected readonly providers: Omit<RepositoryServiceProviders,'cache'>
 
-  /**
-   * Refers to the entity_id of the foriegn key
-   */
-  protected foreignKeyEntityId: Core.Entity.Id
-
-  /**
-   * The name of the foreign key field that relates the 
-   * records together
-   */
-  protected reference: string
-
-  /**
-   * An array of the TModel
-   */
-  protected readonly model: TModel
-
-  /**
-   * Indicates whether the TModels have already initialized.
-   * Please know that this will set as true even if the
-   * query that retrieves the data returns empty.
-   */
-  protected hasFetchedOnce: boolean
-
-  /**
-   * The TModel itself
-   */
-  protected readonly models: Array<Readonly<TModel>>
-
-  constructor(foreignKeyEntityId: Core.Entity.Id){
-    this.foreignKeyEntityId = foreignKeyEntityId
-    this.hasFetchedOnce = false
-    this.models = []
+  constructor(params: {
+    collection: string,
+    reference: string,
+    modelInstance: TModel,
+    databaseProvider: AbstractDatabaseProvider
+  }){
+    this.collection = params.collection
+    this.reference = params.reference
+    this.modelInstance = params.modelInstance
+    this.providers = {
+      database: params.databaseProvider
+    }
   }
 
 
@@ -87,20 +79,18 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
    * @throws LogicException
    * @throws DataIntegrityException
    */
-  private async initializeData(): Promise<void>{
-    /** Simply returns if data has been fetched previously */
-    if (this.hasFetchedOnce) {
-      return 
-    }
+  private async retrieveData(
+    foreignKeyEntityId: Core.Entity.Id
+  ): Promise<Array<TModel>>{
+    const models: Array<TModel> = []
     /** Initiates a connection to the providers */
     await this.connectProviders()
     /** Retrieves data from the database */
     const results 
       = await this.providers.database
-          .whereFieldHasValue(this.collection, this.reference, this.foreignKeyEntityId)
-    this.hasFetchedOnce = true
+          .whereFieldHasValue(this.collection, this.reference, foreignKeyEntityId)
     if (results.length === 0) {
-      return
+      return models
     }
     for (let i = 0; i < results.length; i++) {
       const data = results[i]
@@ -108,13 +98,14 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
         throw new LogicException({
           message: 'foreign reference key missing in data',
           data: {
-            foreign_key: this.foreignKeyEntityId,
+            foreign_key: foreignKeyEntityId,
             reference_key: this.reference,
             collection: this.collection
           }
         })
-      } 
-      const Registry: TModel = Object.create(this.model)
+      }
+
+      const Registry: TModel = Object.create(this.modelInstance)
       try {
         for (const key in data) {
           if (RegistryRepository.isDateObject(data[key])) {
@@ -128,15 +119,16 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
         throw new DataIntegrityException({
           message: 'one of registry records contains invalid data',
           data: {
-            foreign_key: this.foreignKeyEntityId,
+            foreign_key: foreignKeyEntityId,
             reference_key: this.reference,
             collection: this.collection,
             error: error
           }
         })
       }
-      this.models.push(Registry)
+      models.push(Registry)
     }
+    return models
   }
 
   /**
@@ -144,15 +136,18 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
    * @param entityId 
    * @returns 
    */
-  async get(entityId: Core.Entity.Id): Promise<WithReservedFields<TModel, 'entity_id' | 'created_at' | 'updated_at'>>{
-    await this.initializeData()
-    const filtered = this.models.filter(model=>{
-      return model.entity_id === entityId
+  async get(params: {
+    foreignKeyValue: Core.Entity.Id,
+    entityId: Core.Entity.Id
+  }): Promise<WithReservedFields<TModel, 'entity_id' | 'created_at' | 'updated_at'>>{
+    const models = await this.retrieveData(params.foreignKeyValue)
+    const filtered = models.filter(model=>{
+      return model.entity_id === params.entityId
     })
     if (filtered.length === 0) {
       throw new RecordNotFoundException({
         message: 'record not found from registry',
-        data: {entity_id: entityId, collection: this.collection}
+        data: {entity_id: params.entityId, collection: this.collection}
       })
     }
     return EntityToolkit.serialize(filtered[0])
@@ -162,9 +157,11 @@ export class RegistryRepository<TModel extends BaseEntity<TModel>> {
    * Retrieves all records in the Registry
    * @returns 
    */
-  async getAll(): Promise<Array<WithReservedFields<TModel, 'entity_id' | 'created_at' | 'updated_at'>>>{
-    await this.initializeData()
-    return this.models.map(model => EntityToolkit.serialize(model))
+  async getAll(params: {
+    foreignKeyValue: Core.Entity.Id
+  }): Promise<Array<WithReservedFields<TModel, 'entity_id' | 'created_at' | 'updated_at'>>>{
+    const models = await this.retrieveData(params.foreignKeyValue)
+    return models.map(model => EntityToolkit.serialize(model))
   }
 
   private static isDateObject(value: unknown) {

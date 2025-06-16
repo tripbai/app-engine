@@ -61,7 +61,7 @@ export class UpdateUserStatusCommand {
       )
     }
 
-    await unitOfWork.addTransactionStep(
+    unitOfWork.addTransactionStep(
       await this.userRepository.update(userModel)
     )
     await unitOfWork.commit()

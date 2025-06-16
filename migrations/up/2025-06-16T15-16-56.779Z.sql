@@ -1,0 +1,5 @@
+ALTER TABLE teams
+ADD CONSTRAINT fk_teams_tenant
+FOREIGN KEY (tenant_id) REFERENCES tenants(entity_id)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE;

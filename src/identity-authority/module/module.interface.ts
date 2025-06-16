@@ -305,14 +305,14 @@ export namespace IdentityAuthority {
           path: '/identity-authority/registry/email-templates'
           method: 'POST'
           data: {
-            key: Fields.EmailType
+            template_type: Fields.EmailType
             template_id: Core.Entity.Id
             description?: string
           }
         }
         response: {
           entity_id: Core.Entity.Id
-          key: Fields.EmailType
+          template_type: Fields.EmailType
           template_id: Core.Entity.Id
           description: string | null
         }
@@ -344,6 +344,15 @@ export namespace IdentityAuthority {
     }
   }
   export namespace Tenants {
+    export namespace CertificationTokenData {
+      export type Issuer = 'identity-authority:tenant-access-certifier'
+      export type Data = {
+        tenant_id: Core.Entity.Id
+        user_id: Core.Entity.Id
+        is_owner: boolean
+        tenant_permissions: Array<Core.Authorization.ConcreteToken>
+      }
+    }
     export namespace Endpoints {
       export type CreateTenant = {
         request: {
@@ -380,18 +389,6 @@ export namespace IdentityAuthority {
           path: '/identity-authority/tenants/:tenant_id',
           method: 'GET',
           data: {}
-        }
-        response: {
-          entity_id: Core.Entity.Id
-          name: string
-          profile_photo: string | null
-          cover_photo: string | null
-        }
-      }
-      export type GetTenantUsers = {
-        request: {
-          path: '/identity-authority/tenants/:tenant_id/users'
-          method: 'GET'
         }
         response: {
           entity_id: Core.Entity.Id
