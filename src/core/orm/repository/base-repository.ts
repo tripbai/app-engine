@@ -246,7 +246,7 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
     return false
   }
 
-  private static isDateObject(value: unknown) {
+  protected static isDateObject(value: unknown) {
     if (typeof value !== 'object') return false
     return value instanceof Date
   }

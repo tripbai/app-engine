@@ -324,7 +324,7 @@ export namespace IdentityAuthority {
         }
         response: Array<{
           entity_id: Core.Entity.Id
-          key: Fields.EmailType
+          template_type: Fields.EmailType
           template_id: Core.Entity.Id
           description: string | null
           created_at: string
