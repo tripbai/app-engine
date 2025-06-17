@@ -10,7 +10,7 @@ import { AbstractEventManagerProvider } from "../../../core/providers/event/even
 import { TenantTeamAccessEvent } from "../tenant.events";
 
 @injectable()
-export class AddTenantUserCommand {
+export class RemoveTenantUserCommand {
 
   constructor(
     @inject(UnitOfWorkFactory) public readonly unitOfWorkFactory: UnitOfWorkFactory,
@@ -34,16 +34,16 @@ export class AddTenantUserCommand {
         data: params.requester
       })
     }
-    const userModelToAdd 
+    const userModelToRemove 
       = await this.userRepository.getById(params.userId)
     const tenantModel 
       = await this.tenantRepository.getById(params.tenantId) 
-    await this.teamUsersService.addUserToTenantTeamIfNotExist(
-      iAuthRequester, unitOfWork, userModelToAdd, tenantModel
+    await this.teamUsersService.removeUserFromTenantTeam(
+      iAuthRequester, userModelToRemove, tenantModel
     )
     await unitOfWork.commit()
     await this.eventManager.dispatch(
-      new TenantTeamAccessEvent, 'add:user', userModelToAdd, tenantModel
+      new TenantTeamAccessEvent, 'remove:user', userModelToRemove, tenantModel
     )
     return
   }

@@ -4,7 +4,8 @@ import { UserCreateEvent, UserUpdateEvent } from "../users/user.events";
 import { UserSnippetIndexer } from "../users/event-listeners/user-snippet-indexer";
 import { AccountVerificationEmailSender } from "../users/event-listeners/send-account-verification-email";
 import { TenantSnippetIndexer } from "../tenants/event-listeners/tenant-snippet-indexer";
-import { TenantCreateEvent, TenantUpdateEvent } from "../tenants/tenant.events";
+import { TenantCreateEvent, TenantTeamAccessEvent, TenantUpdateEvent } from "../tenants/tenant.events";
+import { TenantTeamAccessIndexer } from "../tenants/event-listeners/tenant-team-indexer";
 
 export const IdentityAuthorityEvents = (
   container: Container
@@ -14,6 +15,7 @@ export const IdentityAuthorityEvents = (
   const userSnippetIndexer   = container.get(UserSnippetIndexer)
   const accountVerificationEmailSender = container.get(AccountVerificationEmailSender)
   const tenantSnippetIndexer = container.get(TenantSnippetIndexer)
+  const tenantTeamIndexer = container.get(TenantTeamAccessIndexer)
 
   // Index user snippet for newly created or updated users
   abstractEventManager.listen(new UserCreateEvent,userSnippetIndexer.execute)
@@ -26,5 +28,7 @@ export const IdentityAuthorityEvents = (
   abstractEventManager.listen(new TenantCreateEvent, tenantSnippetIndexer.execute)
   abstractEventManager.listen(new TenantUpdateEvent, tenantSnippetIndexer.execute)
 
-
+  // Index tenant team access for user actions
+  abstractEventManager.listen(new TenantTeamAccessEvent, tenantTeamIndexer.execute)
+  
 }

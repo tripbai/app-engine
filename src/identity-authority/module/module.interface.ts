@@ -468,6 +468,24 @@ export namespace IdentityAuthority {
           upload_token: string
         }
       }
+      export type AddUserToTeam = {
+        request: {
+          path: '/identity-authority/tenants/:tenant_id/team/users'
+          method: 'POST',
+          data: {
+            user_id: Core.Entity.Id
+          }
+        }
+        response: {}
+      }
+      export type RemoveUserFromTeam = {
+        request: {
+          path: '/identity-authority/tenants/:tenant_id/team/users/:user_id'
+          method: 'DELETE',
+          data: {}
+        }
+        response: {}
+      }
     }
   }
 }

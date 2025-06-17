@@ -59,10 +59,11 @@ export class TeamUsersService {
 
       let shouldUserOwnTenant = true
 
-      /** 
-       * Tells whether the tenant have existing records in the teams registry.
-       * When this is true, it means that it isn't the first user of the tenant,
-       * and that means, the user shouldn't be an admin.
+      /**
+       * Tells if the tenant has teams registry or not. 
+       * If it does, then the user cannot be the owner of the tenant 
+       * because there can only be one owner of the tenant, and that 
+       * the tenant owner themselves.
        */
       if (await this.tenantUsersRegistry.doesTenantHaveTeamsRegistry(tenantId)) {
 
@@ -120,6 +121,64 @@ export class TeamUsersService {
       )
     }
     
+  }
+
+  async removeUserFromTenantTeam(
+    iAuthRequester: IAuthRequester,
+    userModel: UserModel,
+    tenantModel: TenantModel
+  ) {
+
+    if (tenantModel.archived_at !== null) {
+      throw new ResourceAccessForbiddenException({
+        message: 'unable to remove user from tenant team due to tenant status status',
+        data: { user_id: userModel.entity_id, tenant_id: tenantModel.entity_id }
+      })
+    }
+
+    const userId = userModel.entity_id
+    const tenantId = tenantModel.entity_id
+
+    const isRequesterTheOwnerOfTenant = this.userAccessRegistry.isUserOwnerOfTenant({
+      userId: iAuthRequester.get().user.entity_id,
+      tenantId: tenantModel.entity_id
+    })
+
+    /**
+     * The tenant owner has all the rights to remove any user from the tenant team,
+     * however if the requester is not the owner of the tenant, then they can only
+     * remove themselves from the tenant team.
+     */
+    if (!isRequesterTheOwnerOfTenant && 
+        userId !== iAuthRequester.get().user.entity_id) {
+      throw new ResourceAccessForbiddenException({
+        message: 'only tenant owner or the user themselves can remove user from tenant team',
+        data: { user_id: userId, tenant_id: tenantId }
+      })
+    }
+
+    const teamModel 
+      = await this.userAccessRegistry.getTeamModelOfUserAccessToTenant({
+        userId: userId,
+        tenantId: tenantId
+      })
+    
+    if (teamModel === null) {
+      throw new ResourceAccessForbiddenException({
+        message: 'user is not a member of the tenant team',
+        data: { user_id: userId, tenant_id: tenantId }
+      })
+    }
+
+    if (teamModel.is_owner) {
+      throw new ResourceAccessForbiddenException({
+        message: 'unable to remove tenant owner from tenant team',
+        data: { user_id: userId, tenant_id: tenantId }
+      })
+    }
+
+    teamModel.is_active = false
+
   }
 
 }
