@@ -10,6 +10,8 @@ import { RequesterTokenService } from "../../../core/requester/requester-token.s
 import { UserPermissionService } from "../services/user-permission.service";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
 import { UserAssertions } from "../user.assertions";
+import { AbstractEventManagerProvider } from "../../../core/providers/event/event-manager.provider";
+import { UserCreateEvent } from "../user.events";
 
 @injectable()
 export class CreateUserCommand {
@@ -22,7 +24,8 @@ export class CreateUserCommand {
     @inject(UnitOfWorkFactory) public readonly unitOfWorkFactory: UnitOfWorkFactory,
     @inject(RequesterTokenService) public readonly requesterTokenService: RequesterTokenService,
     @inject(UserPermissionService) public readonly userPermissionService: UserPermissionService,
-    @inject(UserAssertions) public readonly userAssertions: UserAssertions
+    @inject(UserAssertions) public readonly userAssertions: UserAssertions,
+    @inject(AbstractEventManagerProvider) public readonly abstractEventManagerProvider: AbstractEventManagerProvider
   ){}
 
   async execute(
@@ -118,6 +121,9 @@ export class CreateUserCommand {
     
 
     await unitOfWork.commit()
+    await this.abstractEventManagerProvider.dispatch(
+      new UserCreateEvent, userModel, profileModel
+    )
 
     const token = this.requesterTokenService.generate({
       user: { id: userModel.entity_id, status: userModel.status },

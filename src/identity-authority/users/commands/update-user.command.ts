@@ -11,6 +11,8 @@ import { IAuthImageTokenService } from "../../services/image-token.service";
 import { UserActionTokenService } from "../services/user-action-token.service";
 import { UserUpdateService } from "../services/user-update.service";
 import { UnitOfWorkFactory } from "../../../core/workflow/unit-of-work.factory";
+import { AbstractEventManagerProvider } from "../../../core/providers/event/event-manager.provider";
+import { UserUpdateEvent } from "../user.events";
 
 @injectable()
 export class UpdateUserCommand {
@@ -21,7 +23,8 @@ export class UpdateUserCommand {
     @inject(IAuthRequesterFactory) public readonly iAuthRequesterFactory: IAuthRequesterFactory,
     @inject(ProfileUpdateService) public readonly profileUpdateService: ProfileUpdateService,
     @inject(UserUpdateService) public readonly userUpdateService: UserUpdateService,
-    @inject(UnitOfWorkFactory) public readonly unitOfWorkFactory: UnitOfWorkFactory
+    @inject(UnitOfWorkFactory) public readonly unitOfWorkFactory: UnitOfWorkFactory,
+    @inject(AbstractEventManagerProvider) public readonly abstractEventManagerProvider: AbstractEventManagerProvider
   ){}
 
   async execute(
@@ -173,6 +176,9 @@ export class UpdateUserCommand {
     )
 
     await unitOfWork.commit()
+    await this.abstractEventManagerProvider.dispatch(
+      new UserUpdateEvent, userModel, profileModel
+    )
     return 
 
   }

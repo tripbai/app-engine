@@ -8,7 +8,7 @@ import { IsValid } from "../../core/helpers/isvalid";
 
 export type IAuthImageTokenPayload = {
   type: 'profile_photo' | 'cover_photo'
-  user_id: Core.Entity.Id
+  upload_for_entity_id: Core.Entity.Id
   image_path: Core.File.UploadPath
 }
 
@@ -26,17 +26,17 @@ export class IAuthImageTokenService {
 
   generate(
     type: 'profile_photo' | 'cover_photo',
-    userId: Core.Entity.Id,
+    forEntityId: Core.Entity.Id,
     imagePath: Core.File.UploadPath
   ): string {
     const payload: IAuthImageTokenPayload = {
       type: type,
-      user_id: userId,
+      upload_for_entity_id: forEntityId,
       image_path: imagePath
     }
     return this.abstractJwtProvider.generate<IAuthImageTokenPayload>({
       issuer: this.issuer,
-      audience: payload.user_id,
+      audience: payload.upload_for_entity_id,
       data: payload,
       untilMinutes: this.tokenExpiryInMinutes,
       secret: AppENV.get('SECRET_KEY')
@@ -44,7 +44,7 @@ export class IAuthImageTokenService {
   }
 
   parse(
-    userId: Core.Entity.Id, 
+    forEntityId: Core.Entity.Id, 
     token: string
   ): IAuthImageTokenPayload {
     const parsedToken = this.abstractJwtProvider.parse(
@@ -52,22 +52,22 @@ export class IAuthImageTokenService {
       token
     )
     if (typeof parsedToken.iss !== 'string') {
-      throw new Error('invalid user image token: missing issuer')
+      throw new Error('invalid image token: missing issuer')
     }
     if (parsedToken.iss !== this.issuer) {
-      throw new Error('invalid user image token: issuer mismatch')
+      throw new Error('invalid image token: issuer mismatch')
     }
     if (typeof parsedToken.aud !== 'string') {
-      throw new Error('invalid user image token: missing audience')
+      throw new Error('invalid image token: missing audience')
     }
-    if (typeof parsedToken.aud !== userId) {
-      throw new Error('invalid user image token: audience mismatch')
+    if (typeof parsedToken.aud !== forEntityId) {
+      throw new Error('invalid image token: audience mismatch')
     }
     if (typeof parsedToken.data !== 'object') {
-      throw new Error('invalid user image token: missing data')
+      throw new Error('invalid image token: missing data')
     }
     if (parsedToken.data === null) {
-      throw new Error('invalid user image token: missing data')
+      throw new Error('invalid image token: missing data')
     }
     const payload = parsedToken.data
     if (!('type' in payload)) {
@@ -76,13 +76,13 @@ export class IAuthImageTokenService {
     if (payload.type !== 'profile_photo' && payload.type !== 'cover_photo') {
       throw new Error('invalid user image token: invalid payload type')
     }
-    if ('user_id' in payload && 'image_path' in payload) {
-      EntityToolkit.Assert.idIsValid(payload.user_id)
+    if ('upload_for_entity_id' in payload && 'image_path' in payload) {
+      EntityToolkit.Assert.idIsValid(payload.upload_for_entity_id)
       IsValid.NonEmptyString(payload.image_path)
       FileUploadPath.assert(payload.image_path)
       return {
         type: payload.type,
-        user_id: payload.user_id,
+        upload_for_entity_id: payload.upload_for_entity_id,
         image_path: payload.image_path
       }
     }

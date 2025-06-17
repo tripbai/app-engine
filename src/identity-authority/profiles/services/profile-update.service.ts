@@ -51,7 +51,10 @@ export class ProfileUpdateService {
         data: { token_payload: tokenPayload }
       })
     }
-    if (tokenPayload.user_id !== userModel.entity_id) {
+    /**
+     * Ensures that the image token is for the user
+     */
+    if (tokenPayload.upload_for_entity_id !== userModel.entity_id) {
       throw new ResourceAccessForbiddenException({
         message: 'image token user_id mismatch',
         data: { token_payload: tokenPayload, user_id: userModel.entity_id }
@@ -76,7 +79,10 @@ export class ProfileUpdateService {
         data: { token_payload: tokenPayload }
       })
     }
-    if (tokenPayload.user_id !== userModel.entity_id) {
+    /**
+     * Ensures that the image token is for the user
+     */
+    if (tokenPayload.upload_for_entity_id !== userModel.entity_id) {
       throw new ResourceAccessForbiddenException({
         message: 'image token user_id mismatch',
         data: { token_payload: tokenPayload, user_id: userModel.entity_id }

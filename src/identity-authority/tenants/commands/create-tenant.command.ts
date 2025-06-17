@@ -7,6 +7,8 @@ import { IAuthRequesterFactory } from "../../requester/iauth-requester.factory";
 import { ResourceAccessForbiddenException } from "../../../core/exceptions/exceptions";
 import { TeamUsersService } from "../../teams/services/team-users.service";
 import { UserRepository } from "../../users/user.repository";
+import { AbstractEventManagerProvider } from "../../../core/providers/event/event-manager.provider";
+import { TenantCreateEvent } from "../tenant.events";
 
 @injectable()
 export class CreateTenantCommand {
@@ -17,7 +19,8 @@ export class CreateTenantCommand {
     @inject(TenantRepository) public readonly tenantRepository: TenantRepository,
     @inject(IAuthRequesterFactory) public readonly iAuthRequesterFactory: IAuthRequesterFactory,
     @inject(TeamUsersService) public readonly teamUsersService: TeamUsersService,
-    @inject(UserRepository) public readonly userRepository: UserRepository
+    @inject(UserRepository) public readonly userRepository: UserRepository,
+    @inject(AbstractEventManagerProvider) public readonly abstractEventManager: AbstractEventManagerProvider
   ){}
 
   async execute(
@@ -50,6 +53,9 @@ export class CreateTenantCommand {
     )
     unitOfWork.addTransactionStep(transaction)
     await unitOfWork.commit()
+    await this.abstractEventManager.dispatch(
+      new TenantCreateEvent, tenantModel
+    )
     return {}
   }
 

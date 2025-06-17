@@ -62,16 +62,19 @@ export namespace IdentityAuthority {
       export type RawPassword = string & {minLen:8,maxLen:64,key:'raw_password'}
       export type HashedPassword = string & {minLen:8,maxLen:64,key:'hashed_password'}
     }
+    /**
+     * A lightweight representation of a user
+     */
     export type Snippet = {
-      id: Core.Entity.Id,
-      first_name: Profile.Fields.FirstName,
-      last_name: Profile.Fields.LastName,
-      username: Fields.Username,
-      email_address: Fields.EmailAddress,
+      id: Core.Entity.Id
+      first_name: Profile.Fields.FirstName
+      last_name: Profile.Fields.LastName
+      username: Fields.UniqueUsername
+      email_address: Fields.UniqueEmailAddress
       is_email_verified: boolean
       user_type: Type
       status: Status.Type,
-      profile_photo: Profile.Fields.Image | null,
+      profile_photo: Profile.Fields.Image | null
       cover_photo: Profile.Fields.Image | null
     }
     export namespace Endpoints {
@@ -260,6 +263,20 @@ export namespace IdentityAuthority {
         },
         response: ApplicationAccess.Report
       }
+      export type UploadImage = {
+        request: {
+          path: '/identity-authority/users/:user_id/images/upload',
+          method: 'POST',
+          data: {
+            file: File,
+            type: 'profile_photo' | 'cover_photo'
+          }
+        }
+        response: {
+          relative_path: Core.File.UploadPath
+          upload_token: string
+        }
+      }
     }
   }
   export namespace Profile {
@@ -419,6 +436,36 @@ export namespace IdentityAuthority {
         }
         response: {
           team_entity_id: string
+        }
+      }
+      export type UpdateTenant = {
+        request: {
+          path: '/identity-authority/tenants/:tenant_id',
+          method: 'PATCH',
+          data: {
+            name?: string
+            profile_photo?: {
+              upload_token: string
+            }
+            cover_photo?: {
+              upload_token: string
+            }
+          }
+        }
+        response: {}
+      }
+      export type UploadImage = {
+        request: {
+          path: '/identity-authority/tenants/:tenant_id/images/upload',
+          method: 'POST',
+          data: {
+            file: File,
+            type: 'profile_photo' | 'cover_photo'
+          }
+        }
+        response: {
+          relative_path: Core.File.UploadPath
+          upload_token: string
         }
       }
     }

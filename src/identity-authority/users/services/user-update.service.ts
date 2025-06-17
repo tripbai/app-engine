@@ -40,7 +40,7 @@ export class UserUpdateService {
     resetToken: string,
     password: IdentityAuthority.Users.Fields.RawPassword
   ){
-    if (userModel.status === 'archived' || userModel.status === 'banned' || userModel.status === 'suspended') {
+    if (!this.isStatusAllowedForPasswordUpdate(userModel)) {
       throw new ResourceAccessForbiddenException({
         message: 'unable to reset password due to user status',
         data: { user_id: userModel.entity_id, status: userModel.status }
@@ -63,12 +63,25 @@ export class UserUpdateService {
     userModel.password_hash = hashedPassword
   }
 
+  /**
+   * Determines if the user status allows for password update.
+   * The user can update their password even if they are deactivated because 
+   * they may need to reset their password to reactivate their account.
+   * @param userModel 
+   * @returns 
+   */
+  isStatusAllowedForPasswordUpdate(
+    userModel: UserModel
+  ){
+    return userModel.status === 'active' || userModel.status === 'unverified' || userModel.status === 'deactivated'
+  }
+
   async updatePasswordUsingCurrentPassword(
     userModel: UserModel,
     currentPassword: IdentityAuthority.Users.Fields.RawPassword,
     newPassword: IdentityAuthority.Users.Fields.RawPassword
   ){
-    if (userModel.status === 'archived' || userModel.status === 'banned' || userModel.status === 'suspended') {
+    if (!this.isStatusAllowedForPasswordUpdate(userModel)) {
       throw new ResourceAccessForbiddenException({
         message: 'unable to update password due to user status',
         data: { user_id: userModel.entity_id, status: userModel.status }
@@ -90,11 +103,22 @@ export class UserUpdateService {
     userModel.password_hash = hashedPassword
   }
 
+  /**
+   * Determines if the user status allows for email update.
+   * @param userModel 
+   * @returns 
+   */
+  isStatusAllowedForEmailUpdate(
+    userModel: UserModel
+  ){
+    return userModel.status === 'active' || userModel.status === 'unverified'
+  }
+
   async updateEmailUsingConfirmationToken(
     userModel: UserModel,
     confirmationToken: string
   ){
-    if (userModel.status === 'archived' || userModel.status === 'banned' || userModel.status === 'suspended') {
+    if (!this.isStatusAllowedForEmailUpdate(userModel)) {
       throw new ResourceAccessForbiddenException({
         message: 'unable to update email address due to user status',
         data: { user_id: userModel.entity_id, status: userModel.status }

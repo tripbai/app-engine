@@ -13,7 +13,7 @@ export namespace IsValid {
    */
   export function NotUndefinedNorNull<T extends string | boolean | number | null>(value: T | null | undefined): asserts value is T {
     if (value === undefined || value === null) {
-      throw new Error('value should not be undefined nor null');
+      throw new Error('value should not be undefined nor null')
     }
   }
 
@@ -26,10 +26,10 @@ export namespace IsValid {
    */
   export function NonEmptyString(value: unknown): asserts value is string {
     if (typeof value !== 'string') {
-      throw new Error('value should be of type string');
+      throw new Error('value should be of type string')
     }
     if (value.trim() === '') {
-      throw new Error('value should not be empty');
+      throw new Error('value should not be empty')
     }
   }
 
@@ -42,7 +42,7 @@ export namespace IsValid {
    */
   export function BooleanValue(value: unknown): asserts value is boolean {
     if (typeof value !== 'boolean') {
-      throw new Error('value should be of type boolean');
+      throw new Error('value should be of type boolean')
     }
   }
 
@@ -55,10 +55,10 @@ export namespace IsValid {
    */
   export function AlphaNumeric(value: unknown): asserts value is string & { regex: '/^[a-zA-Z0-9]+$/' } {
     if (typeof value !== 'string') {
-      throw new Error('value should be of type string');
+      throw new Error('value should be of type string')
     }
     if (!(/^[a-zA-Z0-9]+$/.test(value))) {
-      throw new Error('value should be alphanumeric');
+      throw new Error('value should be alphanumeric')
     }
   }
 
@@ -72,7 +72,7 @@ export namespace IsValid {
   export function NonZeroInteger(value: unknown): asserts value is number {
     TypeOfInteger(value)
     if (value === 0 || value < 0) {
-      throw new Error('value must be greater than zero');
+      throw new Error('value must be greater than zero')
     }
   }
 
@@ -85,8 +85,61 @@ export namespace IsValid {
    */
   export function TypeOfInteger(value: unknown): asserts value is number {
     if (typeof value !== 'number') {
-      throw new Error('value should be of type number');
+      throw new Error('value should be of type number')
     }
   }
+
+  /**
+   * Asserts that the provided `params` object contains a valid file object,
+   * typically passed via JavaScript using express-fileupload.
+   * 
+   * @param params - The input to validate
+   * @throws Will throw an error if the validation fails
+   */
+  export function FileObject(
+    params: unknown
+  ): asserts params is {
+    data: {
+      file: {
+        name: string
+        data: Buffer
+        size: number
+        mimetype: string
+      }
+    }
+  } {
+    if (typeof params !== 'object' || params === null) {
+      throw new Error('Expected `params` to be a non-null object.')
+    }
+
+    const data = (params as any).data
+    if (typeof data !== 'object' || data === null) {
+      throw new Error('Expected `params.data` to be a non-null object.')
+    }
+
+    const file = (data as any).file
+    if (typeof file !== 'object' || file === null) {
+      throw new Error('Expected `params.data.file` to be a non-null object.')
+    }
+
+    const { name, data: fileData, size, mimetype } = file
+
+    if (typeof name !== 'string' || name.trim() === '') {
+      throw new Error('Invalid `file.name`: expected a non-empty string.')
+    }
+
+    if (!(fileData instanceof Buffer)) {
+      throw new Error('Invalid `file.data`: expected a Buffer instance.')
+    }
+
+    if (typeof size !== 'number' || size <= 0) {
+      throw new Error('Invalid `file.size`: expected a number greater than 0.')
+    }
+
+    if (typeof mimetype !== 'string' || mimetype.trim() === '') {
+      throw new Error('Invalid `file.mimetype`: expected a non-empty string.')
+    }
+  }
+
 
 }

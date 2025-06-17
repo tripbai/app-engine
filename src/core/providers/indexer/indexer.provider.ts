@@ -1,11 +1,20 @@
 import { Core } from "../../module/module"
 
+/**
+ * AbstractIndexerProvider is an abstract class that defines the 
+ * contract for indexer providers in the system. It requires the
+ * implementation of an `index` method that takes an array 
+ * of `IndexTaskItem` objects and returns a Promise.
+ * 
+ * We use this to pre-index entities in the system, such as users,
+ * profiles, and other entities that need to be indexed for 
+ * searching and retrieval purposes.
+ */
 export abstract class AbstractIndexerProvider {
   abstract index(tasks: Array<IndexTaskItem>): Promise<void>
 }
 
 /**
- * Task interface for Kryptolib indexer
  * @WARNING DO NOT USE fields that may produce different values at a
  * given time, such as `created_at`, `updated_at` or any `timestamp`
  * related fields. We are MD5 hashing these values that will serve
