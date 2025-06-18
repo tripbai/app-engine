@@ -12,8 +12,8 @@ export class UserToStoreAddController {
     @inject(AddUserToStoreCommand) public readonly addUserToStoreCommand: AddUserToStoreCommand
   ) {}
 
-  @post<TripBai.Access-library.Endpoints.AddUserToStore>('/tripbai/access-library/tenants/:tenant_id/add-to-stores')
-  async addUserToStore<T extends TripBai.Access-library.Endpoints.AddUserToStore>(
+  @post<TripBai.AccessLibrary.Endpoints.AddUserToStore>('/tripbai/access-library/tenants/:tenant_id/add-to-stores')
+  async addUserToStore<T extends TripBai.AccessLibrary.Endpoints.AddUserToStore>(
     params: Core.Route.ControllerDTO<T>
   ): Promise<T['response']> {
     const commandDTO: Parameters<AddUserToStoreCommand["execute"]>[0] = Object.create(null)

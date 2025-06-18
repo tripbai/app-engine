@@ -69,6 +69,17 @@ export class OrganizationRequester {
     return true
   }
 
+  isWebAdmin(): boolean {
+    try {
+      OrganizationRequester.assertIAuthValidRequester(this.requester)
+    } catch (error) {
+      return false
+    }
+    return this.organizationPermissionsService.isOneOfThePermissionsAdminLike(
+      this.requester.permissions
+    )
+  }
+
   isOrganizationAdminOf(organizationId: Core.Entity.Id): boolean {
     try {
       OrganizationRequester.assertIAuthValidRequester(this.requester)

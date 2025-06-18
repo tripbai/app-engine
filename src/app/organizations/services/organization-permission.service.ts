@@ -59,4 +59,25 @@ export class OrganizationPermissionService {
     )
   }
 
+  isOneOfThePermissionsAdminLike(
+    grantedPermissions: Array<Core.Authorization.ConcreteToken>,
+  ){
+    return this.abstractAuthorizationProvider.canOperate(
+      {domain: '*'},
+      this.getWebAdminLikePermission(),
+      grantedPermissions
+    )
+  }
+
+  getWebAdminPermission(){
+    return this.abstractAuthorizationProvider.createPermission(
+      {domain: '*'},
+      this.getWebAdminLikePermission()
+    )
+  }
+
+  getWebAdminLikePermission(){
+    return 'iauth:{domain}' as Core.Authorization.AbstractToken
+  }
+
 }

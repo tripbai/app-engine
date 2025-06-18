@@ -12,8 +12,8 @@ export class UserAccessLibraryGetController {
     @inject(GetUserAccessLibraryQuery) public readonly getUserAccessLibraryQuery: GetUserAccessLibraryQuery
   ) {}
 
-  @get<TripBai.Access-library.Endpoints.GetUserAccessLibrary>('/tripbai/access-library/users/:user_id')
-  async getUserAccessLibrary<T extends TripBai.Access-library.Endpoints.GetUserAccessLibrary>(
+  @get<TripBai.AccessLibrary.Endpoints.GetUserAccessLibrary>('/tripbai/access-library/users/:user_id')
+  async getUserAccessLibrary<T extends TripBai.AccessLibrary.Endpoints.GetUserAccessLibrary>(
     params: Core.Route.ControllerDTO<T>
   ): Promise<T['response']> {
     const commandDTO: Parameters<GetUserAccessLibraryQuery["execute"]>[0] = Object.create(null)

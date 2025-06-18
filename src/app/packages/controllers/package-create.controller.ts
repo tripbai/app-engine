@@ -4,6 +4,8 @@ import { del, patch, post, put, get } from "../../../core/router/decorators";
 import { TripBai } from "../../module/module.interface";
 import { Core } from "../../../core/module/module";
 import { BadRequestException, LogicException } from "../../../core/exceptions/exceptions";
+import { IsValid } from "../../../core/helpers/isvalid";
+import { PackageValidator } from "../package.validator";
 
 @injectable()
 export class PackageCreateController {
@@ -19,19 +21,19 @@ export class PackageCreateController {
     const commandDTO: Parameters<CreatePackageCommand["execute"]>[0] = Object.create(null)
     commandDTO.requester = params.requester
     try {
-    
+      IsValid.NonEmptyString(params.data.name)
+      PackageValidator.name(params.data.name)
+      commandDTO.name = params.data.name
     } catch (error) {
       throw new BadRequestException({
         message: 'request failed due to invalid params',
         data: { error }
       })
     }
-    throw new LogicException({
-      message: 'This controller is not implemented yet',
-      data: {
-        controller_name: 'PackageCreateController'
-      }
-    })
+    const data = await this.createPackageCommand.execute(commandDTO)
+    return {
+      entity_id: data.entityId
+    }
   }
 
 }

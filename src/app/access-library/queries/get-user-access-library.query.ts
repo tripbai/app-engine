@@ -4,8 +4,8 @@ import { Core } from "../../../core/module/module";
 import { LogicException } from "../../../core/exceptions/exceptions";
 import { AbstractEventManagerProvider } from "../../../core/providers/event/event-manager.provider";
 import { UnitOfWorkFactory } from "../../../core/workflow/unit-of-work.factory";
-import { Access-libraryGetService } from "../services/access-library-get.service";
-import { Access-libraryRepository } from "../access-library.repository";
+import { AccessLibraryGetService } from "../services/access-library-get.service";
+import { AccessLibraryRepository } from "../access-library.repository";
 
 @injectable()
 export class GetUserAccessLibraryQuery {
@@ -13,8 +13,8 @@ export class GetUserAccessLibraryQuery {
   constructor(
     @inject(OrganizationRequesterFactory) public readonly organizationRequesterFactory: OrganizationRequesterFactory,
     @inject(UnitOfWorkFactory) public readonly unitOfWorkFactory: UnitOfWorkFactory,
-    @inject(Access-libraryRepository) public readonly access-libraryRepository: Access-libraryRepository,
-    @inject(Access-libraryGetService) public readonly access-libraryGetService: Access-libraryGetService,
+    @inject(AccessLibraryRepository) public readonly AccessLibraryRepository: AccessLibraryRepository,
+    @inject(AccessLibraryGetService) public readonly AccessLibraryGetService: AccessLibraryGetService,
     @inject(AbstractEventManagerProvider) public readonly abstractEventManagerProvider: AbstractEventManagerProvider
   ) {}
 

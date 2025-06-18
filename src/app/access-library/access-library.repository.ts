@@ -2,19 +2,19 @@ import { inject, injectable } from "inversify";
 import { BaseRepository } from "../../core/orm/repository/base-repository";
 import { AbstractDatabaseProvider } from "../../core/providers/database/database.provider";
 import { AbstractCacheProvider } from "../../core/providers/cache/cache.provider";
-import { Access-libraryModel } from "./access-library.model";
+import { AccessLibraryModel } from "./access-library.model";
 
 @injectable()
-export class Access-libraryRepository extends BaseRepository<Access-libraryModel> {
+export class AccessLibraryRepository extends BaseRepository<AccessLibraryModel> {
 
-protected collection: string = 'access-library'
+protected collection: string = 'access_library'
 
   constructor(
     @inject(AbstractDatabaseProvider) public readonly DatabaseProvider: AbstractDatabaseProvider,
     @inject(AbstractCacheProvider) public readonly CacheProvider: AbstractCacheProvider
   ){
     super(
-    Access-libraryModel,
+    AccessLibraryModel,
     DatabaseProvider,
     CacheProvider
     )

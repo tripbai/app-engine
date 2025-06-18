@@ -1,3 +1,3 @@
-export namespace Access-libraryValidator {
+export namespace AccessLibraryValidator {
 
 }

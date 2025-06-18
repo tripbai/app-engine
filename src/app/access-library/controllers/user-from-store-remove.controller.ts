@@ -12,8 +12,8 @@ export class UserFromStoreRemoveController {
     @inject(RemoveUserFromStoreCommand) public readonly removeUserFromStoreCommand: RemoveUserFromStoreCommand
   ) {}
 
-  @post<TripBai.Access-library.Endpoints.RemoveUserFromStore>('/tripbai/access-library/tenants/:tenant_id/remove-from-stores')
-  async removeUserFromStore<T extends TripBai.Access-library.Endpoints.RemoveUserFromStore>(
+  @post<TripBai.AccessLibrary.Endpoints.RemoveUserFromStore>('/tripbai/access-library/tenants/:tenant_id/remove-from-stores')
+  async removeUserFromStore<T extends TripBai.AccessLibrary.Endpoints.RemoveUserFromStore>(
     params: Core.Route.ControllerDTO<T>
   ): Promise<T['response']> {
     const commandDTO: Parameters<RemoveUserFromStoreCommand["execute"]>[0] = Object.create(null)

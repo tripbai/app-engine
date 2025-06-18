@@ -1,11 +1,11 @@
 import { inject, injectable } from "inversify";
-import { Access-libraryRepository } from "../access-library.repository";
+import { AccessLibraryRepository } from "../access-library.repository";
 
 @injectable()
-export class Access-libraryUpdateService {
+export class AccessLibraryUpdateService {
 
   constructor(
-    @inject(Access-libraryRepository) public readonly access-libraryRepository: Access-libraryRepository
+    @inject(AccessLibraryRepository) public readonly AccessLibraryRepository: AccessLibraryRepository
   ) {}
 
 }

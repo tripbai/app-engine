@@ -14,7 +14,7 @@ export namespace TripBai {
           }
         }
         response: {
-          entity_id: string
+          entity_id: Core.Entity.Id
         }
       }
       export type GetPackage = {
@@ -56,6 +56,7 @@ export namespace TripBai {
             is_default?: boolean
           }
         }
+        response: {}
       }
       export type DeletePackage = {
         request: {
@@ -136,6 +137,7 @@ export namespace TripBai {
             tenant_user_added_cert_token: string
           }
         }
+        response: {}
       }
       export type RemoveUserFromStore = {
         request: {
@@ -147,6 +149,7 @@ export namespace TripBai {
             tenant_user_removed_cert_token: string
           }
         }
+        response: {}
       }
     }
   }
@@ -271,6 +274,7 @@ export namespace TripBai {
             override_for_entity_type: 'organization' | 'store'
           }
         }
+        response: {}
       }
     }
   }
