@@ -23,12 +23,14 @@ export class GetPackagesQuery {
   }) {
     const unitOfWork = this.unitOfWorkFactory.create()
     const requester = this.organizationRequesterFactory.create(params.requester)
-    throw new LogicException({
-      message: 'This query is not implemented yet',
-      data: {
-        query_name: 'GetPackagesQuery'
-      }
-    })
+    if (!requester.isWebAdmin()) {
+      throw new LogicException({
+        message: 'You do not have permission to access this resource',
+        data: {}
+      })
+    }
+    const packages = await this.packageRepository.getAllNonArchivedPackages()
+    return packages
   }
 
 }

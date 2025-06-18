@@ -4,6 +4,8 @@ import { del, patch, post, put, get } from "../../../core/router/decorators";
 import { TripBai } from "../../module/module.interface";
 import { Core } from "../../../core/module/module";
 import { BadRequestException, LogicException } from "../../../core/exceptions/exceptions";
+import { IsValid } from "../../../core/helpers/isvalid";
+import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
 
 @injectable()
 export class PackageGetController {
@@ -19,19 +21,24 @@ export class PackageGetController {
     const commandDTO: Parameters<GetPackageQuery["execute"]>[0] = Object.create(null)
     commandDTO.requester = params.requester
     try {
-    
+      IsValid.NonEmptyString(params.data.package_id)
+      EntityToolkit.Assert.idIsValid(params.data.package_id)
+      commandDTO.packageId = params.data.package_id
     } catch (error) {
       throw new BadRequestException({
         message: 'request failed due to invalid params',
         data: { error }
       })
     }
-    throw new LogicException({
-      message: 'This controller is not implemented yet',
-      data: {
-        controller_name: 'PackageGetController'
-      }
-    })
+    const packageModel = await this.getPackageQuery.execute(commandDTO)
+    return {
+      entity_id: packageModel.entity_id,
+      name: packageModel.name,
+      created_at: packageModel.created_at,
+      updated_at: packageModel.updated_at,
+      is_active: packageModel.is_active,
+      is_default: packageModel.is_default
+    }
   }
 
 }

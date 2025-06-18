@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { OrganizationRequesterFactory } from "../../requester/organization-requester.factory";
 import { Core } from "../../../core/module/module";
-import { LogicException } from "../../../core/exceptions/exceptions";
+import { LogicException, ResourceAccessForbiddenException } from "../../../core/exceptions/exceptions";
 import { AbstractEventManagerProvider } from "../../../core/providers/event/event-manager.provider";
 import { UnitOfWorkFactory } from "../../../core/workflow/unit-of-work.factory";
 import { PackageGetService } from "../services/package-get.service";
@@ -20,15 +20,18 @@ export class GetPackageQuery {
 
   async execute(params: {
     requester: Core.Authorization.Requester
+    packageId: Core.Entity.Id
   }) {
     const unitOfWork = this.unitOfWorkFactory.create()
     const requester = this.organizationRequesterFactory.create(params.requester)
-    throw new LogicException({
-      message: 'This query is not implemented yet',
-      data: {
-        query_name: 'GetPackageQuery'
-      }
-    })
+    if (!requester.isWebAdmin()) {
+      throw new ResourceAccessForbiddenException({
+        message: 'You do not have permission to access this resource',
+        data: {}
+      })
+    }
+    const packageModel = await this.packageRepository.getById(params.packageId)
+    return packageModel
   }
 
 }

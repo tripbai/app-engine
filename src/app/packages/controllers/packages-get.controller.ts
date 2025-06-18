@@ -26,12 +26,15 @@ export class PackagesGetController {
         data: { error }
       })
     }
-    throw new LogicException({
-      message: 'This controller is not implemented yet',
-      data: {
-        controller_name: 'PackagesGetController'
-      }
-    })
+    const packages = await this.getPackagesQuery.execute(commandDTO)
+    return packages.map(pkg => ({
+      entity_id: pkg.entity_id,
+      name: pkg.name,
+      created_at: pkg.created_at,
+      updated_at: pkg.updated_at,
+      is_active: pkg.is_active,
+      is_default: pkg.is_default
+    }))
   }
 
 }
