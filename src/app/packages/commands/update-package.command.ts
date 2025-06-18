@@ -1,11 +1,12 @@
 import { inject, injectable } from "inversify";
 import { OrganizationRequesterFactory } from "../../requester/organization-requester.factory";
 import { Core } from "../../../core/module/module";
-import { LogicException } from "../../../core/exceptions/exceptions";
+import { LogicException, ResourceAccessForbiddenException } from "../../../core/exceptions/exceptions";
 import { AbstractEventManagerProvider } from "../../../core/providers/event/event-manager.provider";
 import { UnitOfWorkFactory } from "../../../core/workflow/unit-of-work.factory";
 import { PackageUpdateService } from "../services/package-update.service";
 import { PackageRepository } from "../package.repository";
+import { PackageUpdatedEvent } from "../package.events";
 
 @injectable()
 export class UpdatePackageCommand {
@@ -20,15 +21,28 @@ export class UpdatePackageCommand {
 
   async execute(params: {
     requester: Core.Authorization.Requester
+    packageId: Core.Entity.Id
+    name?: string
+    isActive?: boolean
+    isDefault?: boolean
   }) {
     const unitOfWork = this.unitOfWorkFactory.create()
     const requester = this.organizationRequesterFactory.create(params.requester)
-    throw new LogicException({
-      message: 'This command is not implemented yet',
-      data: {
-        command_name: 'UpdatePackageCommand'
-      }
-    })
+    if (!requester.isWebAdmin()) {
+      throw new ResourceAccessForbiddenException({
+        message: 'You do not have permission to update packages',
+        data: { }
+      })
+    }
+    const packageModel = await this.packageRepository.getById(params.packageId)
+    await this.packageUpdateService.updatePackage(
+      unitOfWork, packageModel, params
+    )
+    await unitOfWork.commit()
+    await this.abstractEventManagerProvider.dispatch(
+      new PackageUpdatedEvent, packageModel
+    )
+    return packageModel
   }
 
 }

@@ -8,7 +8,6 @@ import { EntityToolkit } from "../../core/orm/entity/entity-toolkit";
 /** A requester with status that is allowed, and an entity_id */
 type IAuthValidRequester = Core.Authorization.Requester & {user: {entity_id: Core.Entity.Id, status: IdentityAuthority.Users.Status.Type}}
 
-@injectable()
 export class OrganizationRequester {
 
   constructor(

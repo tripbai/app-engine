@@ -1,5 +1,5 @@
 import { BaseEntity } from "../entity/base-entity";
-import { ArchivedRecordException, BadRequestException, DataIntegrityException, LogicException, RecordNotFoundException } from "../../exceptions/exceptions";
+import { ArchivedRecordException, BadRequestException, DataIntegrityException, LogicException, RecordNotFoundException, ResourceAccessForbiddenException } from "../../exceptions/exceptions";
 import { thisJSON } from "../../helpers/thisjson";
 import { TimeStamp } from "../../helpers/timestamp";
 import { Core } from "../../module/module";
@@ -131,6 +131,27 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
           error: error
         }
       })
+    }
+
+    if (Model.archived_at !== null) {
+      if (options === undefined) {
+        throw new ResourceAccessForbiddenException({
+          message: 'archived record cannot be retrieved without deliberately allowing it',
+          data: {
+            entity_id: Model.entity_id,
+            collection: this.collection
+          }
+        })
+      }
+      if (!options.allow_archived_record) {
+        throw new ResourceAccessForbiddenException({
+          message: 'archived record cannot be retrieved without deliberately allowing it',
+          data: {
+            entity_id: Model.entity_id,
+            collection: this.collection
+          }
+        })
+      }
     }
 
     /** Saving data into cache */

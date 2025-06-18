@@ -4,6 +4,7 @@ import { AbstractDatabaseProvider } from "../../core/providers/database/database
 import { AbstractCacheProvider } from "../../core/providers/cache/cache.provider";
 import { PackageModel } from "./package.model";
 import { DataIntegrityException } from "../../core/exceptions/exceptions";
+import { TimeStamp } from "../../core/helpers/timestamp";
 
 @injectable()
 export class PackageRepository extends BaseRepository<PackageModel> {
@@ -53,6 +54,46 @@ protected collection: string = 'packages'
       models.push(Registry)
     }
     return models
+  }
+
+  async getCurrentDefaultPackage(): Promise<PackageModel> {
+    const results = await this.DatabaseProvider.whereFieldHasValue(
+      this.collection, 'is_default', true
+    )
+    if (results.length === 0) {
+      throw new DataIntegrityException({
+        message: 'no default package found, please set a default package',
+        data: {}
+      })
+    }
+    if (results.length > 1) {
+      throw new DataIntegrityException({
+        message: 'multiple default packages found, please ensure only one package is set as default',
+        data: {}
+      })
+    }
+    const data = results[0]
+    const model: PackageModel = new PackageModel
+    try {
+      for (const key in data) {
+        if (BaseRepository.isDateObject(data[key])) {
+          // @ts-expect-error the above check will determine if the value is Date object
+          const dateobj = new Date(data[key])
+          model[key] = TimeStamp.normalize(dateobj)
+        } else {
+          model[key] = data[key]
+        }
+      }
+    } catch (error) {
+      throw new DataIntegrityException({
+        message: 'one of package records contains invalid data',
+        data: {
+          email_template: data,
+          error: error
+        }
+      })
+    }
+    return model
   }
 
 }

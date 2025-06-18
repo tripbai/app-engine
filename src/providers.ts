@@ -21,6 +21,10 @@ import { AbstractMySqlConfig } from "./core/services/mysql/mysql-config.interfac
 import { MySqlEnvConfig } from "./core/services/mysql/mysql-env-config";
 import { AbstractMySqlPoolService } from "./core/services/mysql/mysql-pool-service.interface";
 import { MySqlPoolService } from "./core/services/mysql/mysql-pool-service";
+import { AbstractEventManagerProvider } from "./core/providers/event/event-manager.provider";
+import { SimpleNodeEmitter } from "./core/providers/event/node-emitter/node-emitter.service";
+import { AbstractNodeEmitterConfig } from "./core/services/events/node-emitter/node-emitter-config.interface";
+import { NodeEmitterEnvConfig } from "./core/services/events/node-emitter/node-emitter-env-config";
 
 export const providers = (container: Container) => {
 
@@ -29,6 +33,7 @@ export const providers = (container: Container) => {
   container.bind(AbstractKryptodocConfig).to(KryptodocEnvConfig)
   container.bind(AbstractMySqlConfig).to(MySqlEnvConfig)
   container.bind(AbstractMySqlPoolService).to(MySqlPoolService)
+  container.bind(AbstractNodeEmitterConfig).to(NodeEmitterEnvConfig)
 
   container.bind(AbstractCacheProvider).to(RedisCacheService)
   container.bind(AbstractDatabaseProvider).to(MySqlService)
@@ -37,4 +42,5 @@ export const providers = (container: Container) => {
   container.bind(AbstractAuthorizationProvider).to(NativeRBACService)
   container.bind(AbstractMailProvider).to(MailmanMail)
   container.bind(AbstractTopicPublisherProvider).to(AmazonSNSTopicPublisherService)
+  container.bind(AbstractEventManagerProvider).to(SimpleNodeEmitter)
 }

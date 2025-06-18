@@ -28,6 +28,8 @@ export class PackageCreateService {
       entity_id: packageId,
       name: name,
       is_active: true,
+      // Packages are always set as not default when created
+      // This is to ensure that there is always at least one default package
       is_default: false,
       created_at: TimeStamp.now(),
       updated_at: TimeStamp.now(),

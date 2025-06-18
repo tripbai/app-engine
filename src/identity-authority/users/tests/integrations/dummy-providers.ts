@@ -11,6 +11,8 @@ import { Core } from "../../../../core/module/module"
 import { InMemoryDatabaseService } from "../../../../core/providers/database/inmemory/inmemory-database.service"
 import { AbstractCacheProvider } from "../../../../core/providers/cache/cache.provider"
 import { InMemoryCacheService } from "../../../../core/providers/cache/inmemory/inmemory-cache.service"
+import { AbstractEventManagerProvider } from "../../../../core/providers/event/event-manager.provider"
+import { SimpleNodeEmitter } from "../../../../core/providers/event/node-emitter/node-emitter.service"
 
 export class DummyIndexerProvider implements AbstractIndexerProvider {
   hasIndexed = false
@@ -33,6 +35,14 @@ export class DummyTopicPublisherProvider implements AbstractTopicPublisherProvid
   }
 }
 
+export class DummyEventManagerProvider implements AbstractEventManagerProvider {
+  hasDispatchedEvent = false
+  listen(EventInterface, handler) {}
+  async dispatch(EventInterface, ...data: any) {
+    this.hasDispatchedEvent = true
+  }
+}
+
 export const bindDummyProviders = (container: Container) => {
   container.bind(AbstractJWTProvider).to(JsonWebToken)
   container.bind(AbstractIndexerProvider).to(DummyIndexerProvider)
@@ -41,4 +51,5 @@ export const bindDummyProviders = (container: Container) => {
   container.bind(AbstractTopicPublisherProvider).to(DummyTopicPublisherProvider)
   container.bind(AbstractDatabaseProvider).to(InMemoryDatabaseService)
   container.bind(AbstractCacheProvider).to(InMemoryCacheService)
+  container.bind(AbstractEventManagerProvider).to(DummyEventManagerProvider)
 }
