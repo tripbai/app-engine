@@ -4,11 +4,12 @@ import { TenantCreateService } from "../services/tenant-create.service";
 import { TenantRepository } from "../tenant.repository";
 import { Core } from "../../../core/module/module";
 import { IAuthRequesterFactory } from "../../requester/iauth-requester.factory";
-import { ResourceAccessForbiddenException } from "../../../core/exceptions/exceptions";
+import { LogicException, ResourceAccessForbiddenException } from "../../../core/exceptions/exceptions";
 import { TeamUsersService } from "../../teams/services/team-users.service";
 import { UserRepository } from "../../users/user.repository";
 import { AbstractEventManagerProvider } from "../../../core/providers/event/event-manager.provider";
 import { TenantCreateEvent } from "../tenant.events";
+import { UserAccessRegistry } from "../../teams/user-access.registry";
 
 @injectable()
 export class CreateTenantCommand {
@@ -20,7 +21,8 @@ export class CreateTenantCommand {
     @inject(IAuthRequesterFactory) public readonly iAuthRequesterFactory: IAuthRequesterFactory,
     @inject(TeamUsersService) public readonly teamUsersService: TeamUsersService,
     @inject(UserRepository) public readonly userRepository: UserRepository,
-    @inject(AbstractEventManagerProvider) public readonly abstractEventManager: AbstractEventManagerProvider
+    @inject(AbstractEventManagerProvider) public readonly abstractEventManager: AbstractEventManagerProvider,
+    @inject(UserAccessRegistry) public readonly userAccessRegistry: UserAccessRegistry
   ){}
 
   async execute(
@@ -42,7 +44,25 @@ export class CreateTenantCommand {
         userModel, name
       )
     if (!createTenantResult.isNew) {
-      return
+      const tenantId = await this.userAccessRegistry.getOwnedTenantIdOfUserId(
+        iAuthRequester.get().user.entity_id
+      )
+      if (tenantId === null) {
+        throw new LogicException({
+          message: 'should not happen, user should have a tenant if not new',
+          data: { user_id: userId, tenant_name: name }
+        })
+      }
+      const tenantModel = await this.tenantRepository.getById(tenantId)
+      return {
+        entity_id: tenantModel.entity_id,
+        secret_key: tenantModel.secret_key,
+        name: tenantModel.name,
+        profile_photo: tenantModel.profile_photo,
+        cover_photo: tenantModel.cover_photo,
+        created_at: tenantModel.created_at,
+        updated_at: tenantModel.updated_at
+      }
     }
     const tenantModel = createTenantResult.tenantModel
     await this.teamUsersService.addUserToTenantTeamIfNotExist(
@@ -56,7 +76,15 @@ export class CreateTenantCommand {
     await this.abstractEventManager.dispatch(
       new TenantCreateEvent, tenantModel
     )
-    return {}
+    return {
+      entity_id: tenantModel.entity_id,
+      secret_key: tenantModel.secret_key,
+      name: tenantModel.name,
+      profile_photo: tenantModel.profile_photo,
+      cover_photo: tenantModel.cover_photo,
+      created_at: tenantModel.created_at,
+      updated_at: tenantModel.updated_at
+    }
   }
 
 }

@@ -5,11 +5,12 @@ import { Core } from "../../../core/module/module";
 import { UserPermissionService } from "../services/user-permission.service";
 import { UserRepository } from "../user.repository";
 import { ProfileRepository } from "../../profiles/profile.repository";
-import { BadRequestException, ResourceAccessForbiddenException } from "../../../core/exceptions/exceptions";
+import { BadRequestException, RecordNotFoundException, ResourceAccessForbiddenException } from "../../../core/exceptions/exceptions";
 import { IsValid } from "../../../core/helpers/isvalid";
 import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
 import { IAuthRequesterFactory } from "../../requester/iauth-requester.factory";
 import { IAuthForbiddenAccessException } from "../../requester/iauth-requester.exceptions";
+import { UserAssertions } from "../user.assertions";
 
 @injectable()
 export class UserGetController {
@@ -17,7 +18,8 @@ export class UserGetController {
   constructor(
     @inject(IAuthRequesterFactory) public readonly iAuthRequesterFactory: IAuthRequesterFactory,
     @inject(UserRepository) public readonly userRepository: UserRepository,
-    @inject(ProfileRepository) public readonly profileRepository: ProfileRepository
+    @inject(ProfileRepository) public readonly profileRepository: ProfileRepository,
+    @inject(UserAssertions) public readonly userAssertions: UserAssertions
   ){}
 
   @get<IdentityAuthority.Users.Endpoints.GetSelf>('/identity-authority/user/me')
@@ -79,5 +81,79 @@ export class UserGetController {
       type: userModel.type,
     }
   } 
+
+  @get<IdentityAuthority.Users.Endpoints.GetByEmailOrUsername>('/identity-authority/user/get/snippet?type=:type&value=:value')
+  async getByEmailOrUsername<T extends IdentityAuthority.Users.Endpoints.GetByEmailOrUsername>(
+    params: Core.Route.ControllerDTO<T>
+  ): Promise<T['response']> {
+    try {
+      IsValid.NonEmptyString(params.data.type)
+      IsValid.NonEmptyString(params.data.value)
+      if (!['email_address', 'username'].includes(params.data.type)) {
+        throw new BadRequestException({
+          message: 'invalid type, must be email_address or username',
+          data: { type: params.data.type }
+        })
+      }
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'invalid get params',
+        data: {}
+      })
+    }
+
+    if (params.data.type === 'email_address') {
+      this.userAssertions.isEmailAddress(params.data.value)
+      const userModel = await this.userRepository.getByEmailAddress(params.data.value)
+      if (userModel === null) {
+        throw new RecordNotFoundException({
+          message: 'user not found',
+          data: { email_address: params.data.value }
+        })
+      }
+      const profileModel = await this.profileRepository.getById(userModel.entity_id)
+      return {
+        id: userModel.entity_id,
+        first_name: profileModel.first_name,
+        last_name:profileModel.last_name,
+        email_address: userModel.email_address,
+        username: userModel.username,
+        is_email_verified: userModel.is_email_verified,
+        status: userModel.status,
+        profile_photo: profileModel.profile_photo,
+        cover_photo: profileModel.cover_photo,
+        user_type: userModel.type
+      }
+    }
+
+    if (params.data.type === 'username') {
+      this.userAssertions.isUsername(params.data.value)
+      const userModel = await this.userRepository.getByUsername(params.data.value)
+      if (userModel === null) {
+        throw new RecordNotFoundException({
+          message: 'user not found',
+          data: { username: params.data.value }
+        })
+      }
+      const profileModel = await this.profileRepository.getById(userModel.entity_id)
+      return {
+        id: userModel.entity_id,
+        first_name: profileModel.first_name,
+        last_name: profileModel.last_name,
+        email_address: userModel.email_address,
+        username: userModel.username,
+        is_email_verified: userModel.is_email_verified,
+        status: userModel.status,
+        profile_photo: profileModel.profile_photo,
+        cover_photo: profileModel.cover_photo,
+        user_type: userModel.type
+      }
+    }
+
+    throw new BadRequestException({
+      message: 'invalid type, must be email_address or username',
+      data: { type: params.data.type }
+    })
+  }
 
 }

@@ -4,10 +4,11 @@ import { AWSLambdaEvent } from "./lambda.types"
 export class LambdaAdapter {
 
   /**
-   * Converts Lambda Event data such as queryStringParameters, body, and
-   * path parameters into key-value pair that can be injected into the
-   * data fields of a Flow Packet
-   * @param event - AWS Lambda Event 
+   * Transforms an AWS Lambda event into a flow data object. 
+   * This is useful to normalize the data for further processing. 
+   * The method extracts query parameters, body parameters, and path parameters from the event.
+   * @param event 
+   * @returns 
    */
   static eventToFlowData(event: AWSLambdaEvent){
     let normalized = {}
@@ -32,7 +33,9 @@ export class LambdaAdapter {
 
   /**
    * In an Lambda event, the resource path is referenced to the API Gateway. 
-   * This method "re-creates" the resource path
+   * This method "re-creates" the resource path 
+   * by replacing the path parameters with the correct format.
+   * This is useful to normalize the resource path for further processing.
    * @param method - HTTP Method
    * @param routePath - Route Path as referenced to AWS API Gateway
    * @returns 
@@ -50,7 +53,9 @@ export class LambdaAdapter {
   }
 
   /**
-   * Transforms an HTTP request into an event
+   * For mocking purposes, this method transforms a HTTP request into an AWS Lambda event.
+   * This is useful to simulate the behavior of an AWS Lambda function.
+   * It creates an event object that contains the HTTP method, resource path, path parameters, query parameters, and body.
    * @param method 
    * @param resourcePath 
    * @param path 

@@ -4,6 +4,10 @@ import { AbstractAWSCredentials } from "../aws-credentials.interface";
 import { AWSEnvCredentials } from "../aws-env-credentials";
 import { GenericServiceProviderException } from "../../../exceptions/exceptions";
 
+/**
+ * `AmazonSNSService` provides functionality for interacting with Amazon Simple Notification Service (Amazon SNS),
+ * a fully managed service that provides message delivery from publishers to subscribers.
+ */
 @injectable()
 export class AmazonSNSService {
 

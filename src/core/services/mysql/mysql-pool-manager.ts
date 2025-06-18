@@ -2,6 +2,12 @@ import * as mysql from 'mysql'
 import type { MySqlPool, MySqlError, PoolConfig, PoolNamespace } from './mysql'
 import { AppLogger } from '../../helpers/logger.js'
 
+/**
+ * MySQL Pool Manager - Manages MySQL connection pools. 
+ * Handles connection creation, retrieval, and cleanup.
+ * This class is a singleton and should be used to manage MySQL pools across the application.
+ * It ensures that only one connection pool is created per hostname and provides methods to connect, retrieve, and close pools.
+ */
 export class MySQLPoolManager {
 
   private static pools: Map<PoolNamespace, MySqlPool> = new Map()
@@ -11,7 +17,10 @@ export class MySQLPoolManager {
   private static poolLastUsed: Map<string, number> = new Map()
 
   /**
-   * Connect and initialize a pool for the given hostname.
+   * Connect to a MySQL database and create a connection pool.
+   * @param hostname 
+   * @param config 
+   * @returns 
    */
   public static async connect(
     hostname: string,

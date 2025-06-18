@@ -5,6 +5,10 @@ import { PoolConfig } from "./mysql"
 import { MySQLPoolManager } from "./mysql-pool-manager"
 import { AbstractMySqlPoolService } from "./mysql-pool-service.interface"
 
+/**
+ * MySQL Pool Service
+ * This service is responsible for creating and managing MySQL connection pools.
+ */
 @injectable()
 export class MySqlPoolService implements AbstractMySqlPoolService {
 

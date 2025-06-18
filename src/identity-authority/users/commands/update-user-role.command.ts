@@ -1,0 +1,61 @@
+import { inject, injectable } from "inversify";
+import { UserRepository } from "../user.repository";
+import { UnitOfWorkFactory } from "../../../core/workflow/unit-of-work.factory";
+import { IAuthRequesterFactory } from "../../requester/iauth-requester.factory";
+import { UserUpdateService } from "../services/user-update.service";
+import { Core } from "../../../core/module/module";
+import { IdentityAuthority } from "../../module/module.interface";
+import { BadRequestException } from "../../../core/exceptions/exceptions";
+
+@injectable()
+export class UpdateUserRoleCommand {
+
+  constructor(
+    @inject(UnitOfWorkFactory) public readonly unitOfWorkFactory: UnitOfWorkFactory,
+    @inject(IAuthRequesterFactory) public readonly iAuthRequesterFactory: IAuthRequesterFactory,
+    @inject(UserRepository) public readonly userRepository: UserRepository,
+    @inject(UserUpdateService) public readonly userUpdateService: UserUpdateService
+  ){}
+
+  async execute(
+    requester: Core.Authorization.Requester,
+    params: {
+      user_id: Core.Entity.Id;
+      newRole: 'webadmin' | 'user' | 'moderator'
+    }
+  ): Promise<void> {
+    const unitOfWork = this.unitOfWorkFactory.create()
+    const iAuthRequester = this.iAuthRequesterFactory.create(requester)
+    
+    const userModel = await this.userRepository.getById(params.user_id)
+
+    if (params.newRole === 'webadmin') {
+      await this.userUpdateService.setRoleAsWebadmin(
+        iAuthRequester, userModel
+      )
+    } else if (params.newRole === 'user') {
+      await this.userUpdateService.setRoleAsUser(
+        iAuthRequester, userModel
+      )
+    } else if (params.newRole === 'moderator') {
+      await this.userUpdateService.setRoleAsModerator(
+        iAuthRequester, userModel
+      )
+    } else { 
+      throw new BadRequestException({
+        message: 'Invalid role provided for user update',
+        data: { user_id: params.user_id, role: params.newRole }
+      })
+    }
+    
+    unitOfWork.addTransactionStep(
+      await this.userRepository.update(userModel)
+    )
+    
+    await unitOfWork.commit()
+    return
+  }
+
+
+
+}

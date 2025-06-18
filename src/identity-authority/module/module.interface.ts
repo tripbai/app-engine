@@ -350,10 +350,11 @@ export namespace IdentityAuthority {
       }
       export type Update = {
         request: {
-          path: '/identity-authority/registry/email-templates/:template_id'
+          path: '/identity-authority/registry/email-templates/:entity_id'
           method: 'PATCH'
           data: {
             description: string
+            template_id: Core.Entity.Id
           }
         }
         response: {}
@@ -389,18 +390,6 @@ export namespace IdentityAuthority {
           updated_at: string
         }
       }
-      export type AssociateUser = {
-        request: {
-          path: '/identity-authority/tenants/:tenant_id/users'
-          method: 'POST',
-          data: {
-            user_id: string
-          }
-        }
-        response: {
-          tenant_id: string
-        }
-      }
       export type GetTenant = {
         request: {
           path: '/identity-authority/tenants/:tenant_id',
@@ -426,6 +415,7 @@ export namespace IdentityAuthority {
           access_certification_token: string
         }
       }
+      /** @TODO */
       export type CertifyUser = {
         request: {
           path: '/identity-authority/tenants/:tenant_id/certify-user'

@@ -2,7 +2,10 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import { injectable } from 'inversify'
 
 /**
- * Just a wrapper class for axios 
+ * Just a wrapper class for axios. 
+ * It provides methods for making HTTP requests. 
+ * This class is used to make HTTP requests to external APIs or services.
+ * It is a simple wrapper around the axios library,
  */
 @injectable()
 export class AxiosService {

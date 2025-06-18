@@ -2,7 +2,8 @@ import { BaseRequester } from "./requester-base"
 
 /**
  * A Public Requester is a Requester that is not associated with any
- * user within a given application, but it must be associated to a Tenant
+ * user within a given application, but it must be associated to a Tenant.
+ * This is useful for public APIs that do not require authentication.
  */
 export class PublicRequester extends BaseRequester {
   constructor({ipAddress, userAgent}: {

@@ -8,6 +8,7 @@ import { AbstractAWSCredentials } from '../aws-credentials.interface'
 /**
  * `AmazonS3Service` provides functionality for interacting with Amazon Simple Storage Service (Amazon S3),
  * a scalable object storage service designed to store and retrieve any amount of data from anywhere on the web.
+ * It allows for uploading, retrieving, and deleting objects in S3 buckets.
  **/
 @injectable()
 export class AmazonS3Service {
