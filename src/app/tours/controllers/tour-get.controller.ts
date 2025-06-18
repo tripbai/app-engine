@@ -1,0 +1,37 @@
+import { inject, injectable } from "inversify";
+import { GetTourQuery } from "../queries/get-tour.query";
+import { del, patch, post, put, get } from "../../../core/router/decorators";
+import { TripBai } from "../../module/module.interface";
+import { Core } from "../../../core/module/module";
+import { BadRequestException, LogicException } from "../../../core/exceptions/exceptions";
+
+@injectable()
+export class TourGetController {
+
+  constructor(
+    @inject(GetTourQuery) public readonly getTourQuery: GetTourQuery
+  ) {}
+
+  @get<TripBai.Tours.Endpoints.GetTour>('/trip-engine/tours/:tour_id')
+  async getTour<T extends TripBai.Tours.Endpoints.GetTour>(
+    params: Core.Route.ControllerDTO<T>
+  ): Promise<T['response']> {
+    const commandDTO: Parameters<GetTourQuery["execute"]>[0] = Object.create(null)
+    commandDTO.requester = params.requester
+    try {
+    
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'request failed due to invalid params',
+        data: { error }
+      })
+    }
+    throw new LogicException({
+      message: 'This controller is not implemented yet',
+      data: {
+        controller_name: 'TourGetController'
+      }
+    })
+  }
+
+}
