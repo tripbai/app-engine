@@ -1,11 +1,13 @@
 import { inject, injectable } from "inversify";
 import { OrganizationRequesterFactory } from "../../requester/organization-requester.factory";
 import { Core } from "../../../core/module/module";
-import { LogicException } from "../../../core/exceptions/exceptions";
+import { LogicException, ResourceAccessForbiddenException } from "../../../core/exceptions/exceptions";
 import { AbstractEventManagerProvider } from "../../../core/providers/event/event-manager.provider";
 import { UnitOfWorkFactory } from "../../../core/workflow/unit-of-work.factory";
 import { PackageDeleteService } from "../services/package-delete.service";
 import { PackageRepository } from "../package.repository";
+import { TimeStamp } from "../../../core/helpers/timestamp";
+import { PackageDeletedEvent } from "../package.events";
 
 @injectable()
 export class DeletePackageCommand {
@@ -20,15 +22,26 @@ export class DeletePackageCommand {
 
   async execute(params: {
     requester: Core.Authorization.Requester
+    packageId: Core.Entity.Id
   }) {
     const unitOfWork = this.unitOfWorkFactory.create()
     const requester = this.organizationRequesterFactory.create(params.requester)
-    throw new LogicException({
-      message: 'This command is not implemented yet',
-      data: {
-        command_name: 'DeletePackageCommand'
-      }
-    })
+    if (!requester.isWebAdmin()) {
+      throw new ResourceAccessForbiddenException({
+        message: 'only web admin is allowed to perform this action',
+        data: {}
+      })
+    }
+    const packageModel = await this.packageRepository.getById(params.packageId)
+    packageModel.archived_at = TimeStamp.now()
+    unitOfWork.addTransactionStep(
+      await this.packageRepository.update(packageModel)
+    )
+    await unitOfWork.commit()
+    await this.abstractEventManagerProvider.dispatch(
+      new PackageDeletedEvent, packageModel
+    )
+    return {}
   }
 
 }

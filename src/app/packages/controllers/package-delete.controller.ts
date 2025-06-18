@@ -4,6 +4,8 @@ import { del, patch, post, put, get } from "../../../core/router/decorators";
 import { TripBai } from "../../module/module.interface";
 import { Core } from "../../../core/module/module";
 import { BadRequestException, LogicException } from "../../../core/exceptions/exceptions";
+import { IsValid } from "../../../core/helpers/isvalid";
+import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
 
 @injectable()
 export class PackageDeleteController {
@@ -19,19 +21,20 @@ export class PackageDeleteController {
     const commandDTO: Parameters<DeletePackageCommand["execute"]>[0] = Object.create(null)
     commandDTO.requester = params.requester
     try {
-    
+      IsValid.NonEmptyString(params.data.package_id)
+      EntityToolkit.Assert.idIsValid(params.data.package_id)
+      commandDTO.packageId = params.data.package_id
     } catch (error) {
       throw new BadRequestException({
         message: 'request failed due to invalid params',
         data: { error }
       })
     }
-    throw new LogicException({
-      message: 'This controller is not implemented yet',
-      data: {
-        controller_name: 'PackageDeleteController'
-      }
+    await this.deletePackageCommand.execute({
+      requester: params.requester,
+      packageId: params.data.package_id
     })
+    return {}
   }
 
 }
