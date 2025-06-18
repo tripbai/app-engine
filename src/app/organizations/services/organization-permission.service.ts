@@ -9,12 +9,12 @@ export class OrganizationPermissionService {
     @inject(AbstractAuthorizationProvider) public readonly abstractAuthorizationProvider: AbstractAuthorizationProvider
   ) {}
 
-  createStoreLevelPermission(
-    organizationId: Core.Entity.Id, 
-    storeId: Core.Entity.Id
-  ) {
+  createStoreLevelPermission(params: {
+    storeId: Core.Entity.Id,
+    organizationId: Core.Entity.Id
+  }) {
     return this.abstractAuthorizationProvider.createPermission(
-      { organization_id: organizationId, store_id: storeId },
+      { organization_id: params.organizationId, store_id: params.storeId },
       this.getStoreLevelLikePermission()
     )
   }
@@ -47,15 +47,15 @@ export class OrganizationPermissionService {
     )
   }
 
-  hasPermissionToOperateThisStore(
+  hasPermissionToOperateThisStore(params: {
     storeId: Core.Entity.Id,
     organizationId: Core.Entity.Id,
     requesterPermissions: Array<Core.Authorization.ConcreteToken>
-  ){
+  }){
     return this.abstractAuthorizationProvider.canOperate(
-      { organization_id: organizationId, store_id: storeId },
+      { organization_id: params.organizationId, store_id: params.storeId },
       this.getStoreLevelLikePermission(),
-      requesterPermissions
+      params.requesterPermissions
     )
   }
 

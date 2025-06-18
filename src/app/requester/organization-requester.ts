@@ -85,6 +85,10 @@ export class OrganizationRequester {
     } catch (error) {
       return false
     }
+    // if the requester is a web admin, they can operate any organization
+    if (this.isWebAdmin()) {
+      return true
+    }
     return this.organizationPermissionsService.hasPermissionToOperateThisOrganization(
       organizationId, this.requester.permissions
     )
@@ -99,11 +103,15 @@ export class OrganizationRequester {
     } catch (error) {
       return false
     }
-    return this.organizationPermissionsService.hasPermissionToOperateThisStore(
-      params.storeId, 
-      params.organizationId,
-      this.requester.permissions
-    )
+    // if the requester is a web admin, they can operate any store
+    if (this.isWebAdmin()) {
+      return true
+    }
+    return this.organizationPermissionsService.hasPermissionToOperateThisStore({
+      storeId: params.storeId, 
+      organizationId: params.organizationId, 
+      requesterPermissions: this.requester.permissions
+    })
   }
 
 
