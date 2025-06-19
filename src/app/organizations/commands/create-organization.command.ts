@@ -7,6 +7,7 @@ import { UnitOfWorkFactory } from "../../../core/workflow/unit-of-work.factory";
 import { OrganizationCreateService } from "../services/organization-create.service";
 import { OrganizationRepository } from "../organization.repository";
 import { PackageRepository } from "../../packages/package.repository";
+import { OrganizationCreatedEvent } from "../organization.events";
 
 @injectable()
 export class CreateOrganizationCommand {
@@ -35,12 +36,18 @@ export class CreateOrganizationCommand {
       })
     }
     const packageModel = await this.packageRepository.getById(params.packageId)
-    return await this.organizationCreateService.createOrganizationIfNotExist({
+    const organizationModel= await this.organizationCreateService.createOrganizationIfNotExist({
+      unitOfWork: unitOfWork,
       requester: requester,
       businessName: params.businessName,
       accessCertificationToken: params.accessCertificationToken,
       packageModel
     })
+    await unitOfWork.commit()
+    this.abstractEventManagerProvider.dispatch(
+      new OrganizationCreatedEvent, organizationModel
+    )
+    return organizationModel
   }
 
 }

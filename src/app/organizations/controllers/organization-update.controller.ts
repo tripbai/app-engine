@@ -4,12 +4,16 @@ import { del, patch, post, put, get } from "../../../core/router/decorators";
 import { TripBai } from "../../module/module.interface";
 import { Core } from "../../../core/module/module";
 import { BadRequestException, LogicException } from "../../../core/exceptions/exceptions";
+import { OrganizationAssertions } from "../organization.assertions";
+import { IsValid } from "../../../core/helpers/isvalid";
+import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
 
 @injectable()
 export class OrganizationUpdateController {
 
   constructor(
-    @inject(UpdateOrganizationCommand) public readonly updateOrganizationCommand: UpdateOrganizationCommand
+    @inject(UpdateOrganizationCommand) public readonly updateOrganizationCommand: UpdateOrganizationCommand,
+    @inject(OrganizationAssertions) public readonly organizationAssertions: OrganizationAssertions
   ) {}
 
   @patch<TripBai.Organizations.Endpoints.UpdateOrganization>('/tripbai/organizations/:organization_id')
@@ -19,19 +23,31 @@ export class OrganizationUpdateController {
     const commandDTO: Parameters<UpdateOrganizationCommand["execute"]>[0] = Object.create(null)
     commandDTO.requester = params.requester
     try {
-    
+      IsValid.NonEmptyString(params.data.organization_id)
+      EntityToolkit.Assert.idIsValid(params.data.organization_id)
+      commandDTO.organizationId = params.data.organization_id
+      if (params.data.status) {
+        IsValid.NonEmptyString(params.data.status)
+        this.organizationAssertions.assertOrganizationStatus(params.data.status)
+        commandDTO.status = params.data.status
+      }
+      if (params.data.business_name) {
+        IsValid.NonEmptyString(params.data.business_name)
+        commandDTO.businessName = params.data.business_name
+      }
+      if (params.data.package_id) {
+        IsValid.NonEmptyString(params.data.package_id)
+        EntityToolkit.Assert.idIsValid(params.data.package_id)
+        commandDTO.packageId = params.data.package_id
+      }
     } catch (error) {
       throw new BadRequestException({
         message: 'request failed due to invalid params',
         data: { error }
       })
     }
-    throw new LogicException({
-      message: 'This controller is not implemented yet',
-      data: {
-        controller_name: 'OrganizationUpdateController'
-      }
-    })
+    await this.updateOrganizationCommand.execute(commandDTO)
+    return {}
   }
 
 }

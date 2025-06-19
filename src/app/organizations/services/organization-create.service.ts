@@ -8,6 +8,7 @@ import { PackageModel } from "../../packages/package.model";
 import { TimeStamp } from "../../../core/helpers/timestamp";
 import { Core } from "../../../core/module/module";
 import { OrganizationRequester } from "../../requester/organization-requester";
+import { UnitOfWork } from "../../../core/workflow/unit-of-work";
 
 @injectable()
 export class OrganizationCreateService {
@@ -18,6 +19,7 @@ export class OrganizationCreateService {
   ) {}
 
   async createOrganizationIfNotExist(params: {
+    unitOfWork: UnitOfWork,
     requester: OrganizationRequester
     businessName: string
     accessCertificationToken: string
@@ -72,9 +74,10 @@ export class OrganizationCreateService {
       // organizationRepository.getById threw an error, which means the organization does not exist
       // we can proceed to create a new organization
     }
+    const secretKey = Pseudorandom.alphanum32()
     const organizationModel: OrganizationModel = {
       entity_id: tenantId,
-      secret_key: Pseudorandom.alphanum32(),
+      secret_key: secretKey,
       business_name: params.businessName,
       package_id: params.packageModel.entity_id,
       status: 'active',
@@ -82,6 +85,15 @@ export class OrganizationCreateService {
       updated_at: TimeStamp.now(),
       archived_at: null,
     }
+    params.unitOfWork.addTransactionStep(
+      this.organizationRepository.create(tenantId, {
+        secret_key: secretKey,
+        business_name: params.businessName,
+        package_id: params.packageModel.entity_id,
+        status: 'active',
+        archived_at: null
+      })
+    )
     return organizationModel
   }
 
