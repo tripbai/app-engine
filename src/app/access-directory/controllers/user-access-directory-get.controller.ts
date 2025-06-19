@@ -1,22 +1,22 @@
 import { inject, injectable } from "inversify";
-import { AddUserToStoreCommand } from "../commands/add-user-to-store.command";
+import { GetUserAccessDirectoryQuery } from "../queries/get-user-access-directory.query";
 import { del, patch, post, put, get } from "../../../core/router/decorators";
 import { TripBai } from "../../module/module.interface";
 import { Core } from "../../../core/module/module";
 import { BadRequestException, LogicException } from "../../../core/exceptions/exceptions";
 
 @injectable()
-export class UserToStoreAddController {
+export class UserAccessLibraryGetController {
 
   constructor(
-    @inject(AddUserToStoreCommand) public readonly addUserToStoreCommand: AddUserToStoreCommand
+    @inject(GetUserAccessDirectoryQuery) public readonly getUserAccessDirectoryQuery: GetUserAccessDirectoryQuery
   ) {}
 
-  @post<TripBai.AccessLibrary.Endpoints.AddUserToStore>('/tripbai/access-library/tenants/:tenant_id/add-to-stores')
-  async addUserToStore<T extends TripBai.AccessLibrary.Endpoints.AddUserToStore>(
+  @get<TripBai.AccessLibrary.Endpoints.GetUserAccessLibrary>('/tripbai/access-directory/users/:user_id')
+  async getUserAccessLibrary<T extends TripBai.AccessLibrary.Endpoints.GetUserAccessLibrary>(
     params: Core.Route.ControllerDTO<T>
   ): Promise<T['response']> {
-    const commandDTO: Parameters<AddUserToStoreCommand["execute"]>[0] = Object.create(null)
+    const commandDTO: Parameters<GetUserAccessDirectoryQuery["execute"]>[0] = Object.create(null)
     commandDTO.requester = params.requester
     try {
     
@@ -29,7 +29,7 @@ export class UserToStoreAddController {
     throw new LogicException({
       message: 'This controller is not implemented yet',
       data: {
-        controller_name: 'UserToStoreAddController'
+        controller_name: 'UserAccessLibraryGetController'
       }
     })
   }

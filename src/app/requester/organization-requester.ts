@@ -114,6 +114,16 @@ export class OrganizationRequester {
     })
   }
 
+  getUserId(){
+    OrganizationRequester.assertIAuthValidRequester(this.requester)
+    return this.requester.user.entity_id
+  }
+
+  getStatus(){
+    OrganizationRequester.assertIAuthValidRequester(this.requester)
+    return this.requester.user.status
+  }
+
 
 
 }

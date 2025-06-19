@@ -119,7 +119,7 @@ export namespace TripBai {
     export namespace Endpoints {
       export type GetUserAccessLibrary = {
         request: {
-          path: '/tripbai/access-library/users/:user_id'
+          path: '/tripbai/access-directory/users/:user_id'
           method: 'GET'
         }
         response: Array<{
@@ -129,7 +129,7 @@ export namespace TripBai {
       }
       export type AddUserToStore = {
         request: {
-          path: '/tripbai/access-library/tenants/:tenant_id/add-to-stores'
+          path: '/tripbai/access-directory/tenants/:tenant_id/add-to-stores'
           method: 'POST'
           data: {
             user_id: Core.Entity.Id
@@ -141,7 +141,7 @@ export namespace TripBai {
       }
       export type RemoveUserFromStore = {
         request: {
-          path: '/tripbai/access-library/tenants/:tenant_id/remove-from-stores'
+          path: '/tripbai/access-directory/tenants/:tenant_id/remove-from-stores'
           method: 'POST'
           data: {
             user_id: Core.Entity.Id

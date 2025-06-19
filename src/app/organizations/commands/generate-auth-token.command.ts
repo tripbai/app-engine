@@ -5,6 +5,7 @@ import { LogicException } from "../../../core/exceptions/exceptions";
 import { AbstractEventManagerProvider } from "../../../core/providers/event/event-manager.provider";
 import { UnitOfWorkFactory } from "../../../core/workflow/unit-of-work.factory";
 import { OrganizationRepository } from "../organization.repository";
+import { OrganizationAuthService } from "../services/organization-auth.service";
 
 @injectable()
 export class GenerateAuthTokenCommand {
@@ -13,20 +14,21 @@ export class GenerateAuthTokenCommand {
     @inject(OrganizationRequesterFactory) public readonly organizationRequesterFactory: OrganizationRequesterFactory,
     @inject(UnitOfWorkFactory) public readonly unitOfWorkFactory: UnitOfWorkFactory,
     @inject(OrganizationRepository) public readonly organizationRepository: OrganizationRepository,
-    @inject(AbstractEventManagerProvider) public readonly abstractEventManagerProvider: AbstractEventManagerProvider
+    @inject(AbstractEventManagerProvider) public readonly abstractEventManagerProvider: AbstractEventManagerProvider,
+    @inject(OrganizationAuthService) public readonly organizationAuthService: OrganizationAuthService
   ) {}
 
   async execute(params: {
-    requester: Core.Authorization.Requester
+    requester: Core.Authorization.Requester,
+    iAuthCertificationToken: string
   }) {
     const unitOfWork = this.unitOfWorkFactory.create()
     const requester = this.organizationRequesterFactory.create(params.requester)
-    throw new LogicException({
-      message: 'This command is not implemented yet',
-      data: {
-        command_name: 'GenerateAuthTokenCommand'
-      }
+    const token = await this.organizationAuthService.exchangeIAuthTokenToOrganizationToken({
+      organizationRequester: requester,
+      iAuthCertificationToken: params.iAuthCertificationToken
     })
+    return token
   }
 
 }

@@ -3,18 +3,11 @@
  * If you update this file, it will be overwritten.
  * @since 2025-06-18T22:03:17.919Z
  */
-import { AccessLibraryAssertions } from "./app/access-library/access-library.assertions";
-import { AccessLibraryRepository } from "./app/access-library/access-library.repository";
-import { AddUserToStoreCommand } from "./app/access-library/commands/add-user-to-store.command";
-import { RemoveUserFromStoreCommand } from "./app/access-library/commands/remove-user-from-store.command";
-import { UserAccessLibraryGetController } from "./app/access-library/controllers/user-access-library-get.controller";
-import { UserFromStoreRemoveController } from "./app/access-library/controllers/user-from-store-remove.controller";
-import { UserToStoreAddController } from "./app/access-library/controllers/user-to-store-add.controller";
-import { GetUserAccessLibraryQuery } from "./app/access-library/queries/get-user-access-library.query";
-import { AccessLibraryCreateService } from "./app/access-library/services/access-library-create.service";
-import { AccessLibraryDeleteService } from "./app/access-library/services/access-library-delete.service";
-import { AccessLibraryGetService } from "./app/access-library/services/access-library-get.service";
-import { AccessLibraryUpdateService } from "./app/access-library/services/access-library-update.service";
+import { AddUserToStoreCommand } from "./app/access-directory/commands/add-user-to-store.command";
+import { RemoveUserFromStoreCommand } from "./app/access-directory/commands/remove-user-from-store.command";
+import { UserAccessLibraryGetController } from "./app/access-directory/controllers/user-access-directory-get.controller";
+import { UserFromStoreRemoveController } from "./app/access-directory/controllers/user-from-store-remove.controller";
+import { UserToStoreAddController } from "./app/access-directory/controllers/user-to-store-add.controller";
 import { CreateFeatureOverrideCommand } from "./app/features/commands/create-feature-override.command";
 import { RegisterDefaultFeatureCommand } from "./app/features/commands/register-default-feature.command";
 import { DefaultFeatureRegisterController } from "./app/features/controllers/default-feature-register.controller";
@@ -205,18 +198,11 @@ import { UserRepository } from "./identity-authority/users/user.repository";
 import { Container } from "inversify";
 
 export const bind = (container: Container) => {
-  container.bind(AccessLibraryAssertions).toSelf();
-  container.bind(AccessLibraryRepository).toSelf();
   container.bind(AddUserToStoreCommand).toSelf();
   container.bind(RemoveUserFromStoreCommand).toSelf();
   container.bind(UserAccessLibraryGetController).toSelf();
   container.bind(UserFromStoreRemoveController).toSelf();
   container.bind(UserToStoreAddController).toSelf();
-  container.bind(GetUserAccessLibraryQuery).toSelf();
-  container.bind(AccessLibraryCreateService).toSelf();
-  container.bind(AccessLibraryDeleteService).toSelf();
-  container.bind(AccessLibraryGetService).toSelf();
-  container.bind(AccessLibraryUpdateService).toSelf();
   container.bind(CreateFeatureOverrideCommand).toSelf();
   container.bind(RegisterDefaultFeatureCommand).toSelf();
   container.bind(DefaultFeatureRegisterController).toSelf();

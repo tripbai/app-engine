@@ -1,11 +1,12 @@
 import { inject, injectable } from "inversify";
 import { OrganizationRequesterFactory } from "../../requester/organization-requester.factory";
 import { Core } from "../../../core/module/module";
-import { LogicException } from "../../../core/exceptions/exceptions";
+import { LogicException, ResourceAccessForbiddenException } from "../../../core/exceptions/exceptions";
 import { AbstractEventManagerProvider } from "../../../core/providers/event/event-manager.provider";
 import { UnitOfWorkFactory } from "../../../core/workflow/unit-of-work.factory";
 import { OrganizationCreateService } from "../services/organization-create.service";
 import { OrganizationRepository } from "../organization.repository";
+import { PackageRepository } from "../../packages/package.repository";
 
 @injectable()
 export class CreateOrganizationCommand {
@@ -15,19 +16,30 @@ export class CreateOrganizationCommand {
     @inject(UnitOfWorkFactory) public readonly unitOfWorkFactory: UnitOfWorkFactory,
     @inject(OrganizationRepository) public readonly organizationRepository: OrganizationRepository,
     @inject(OrganizationCreateService) public readonly organizationCreateService: OrganizationCreateService,
-    @inject(AbstractEventManagerProvider) public readonly abstractEventManagerProvider: AbstractEventManagerProvider
+    @inject(AbstractEventManagerProvider) public readonly abstractEventManagerProvider: AbstractEventManagerProvider,
+    @inject(PackageRepository) public readonly packageRepository: PackageRepository
   ) {}
 
   async execute(params: {
-    requester: Core.Authorization.Requester
+    requester: Core.Authorization.Requester,
+    accessCertificationToken: string,
+    businessName: string
+    packageId: Core.Entity.Id
   }) {
     const unitOfWork = this.unitOfWorkFactory.create()
     const requester = this.organizationRequesterFactory.create(params.requester)
-    throw new LogicException({
-      message: 'This command is not implemented yet',
-      data: {
-        command_name: 'CreateOrganizationCommand'
-      }
+    if (!requester.hasAllowedAccess()) {
+      throw new ResourceAccessForbiddenException({
+        message: 'Requester does not have access to create an organization',
+        data: { requester }
+      })
+    }
+    const packageModel = await this.packageRepository.getById(params.packageId)
+    return await this.organizationCreateService.createOrganizationIfNotExist({
+      requester: requester,
+      businessName: params.businessName,
+      accessCertificationToken: params.accessCertificationToken,
+      packageModel
     })
   }
 

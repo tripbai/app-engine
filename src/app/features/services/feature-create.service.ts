@@ -103,6 +103,12 @@ export class FeatureCreateService {
     // If the feature override is for store, check if
     // the requester has access or can operate the store
     if (params.featurableEntityType === 'store') {
+      if (params.storeModel.organization_id !== params.organizationModel.entity_id) {
+        throw new ResourceAccessForbiddenException({
+          message: 'store does not belong to the organization',
+          data: {store_id: params.storeModel.entity_id, organization_id: params.organizationModel.entity_id}
+        })
+      }
       featurableEntityId = params.storeModel.entity_id
       if (!params.organizationRequester.canOperateStore({
         storeId: featurableEntityId,

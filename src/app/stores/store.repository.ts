@@ -20,4 +20,8 @@ protected collection: string = 'stores'
     )
   }
 
+  async getStoresByOrganizationId(organizationId: string): Promise<StoreModel[]> {
+    throw new Error('Method not implemented.');
+  }
+
 }

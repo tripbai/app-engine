@@ -4,15 +4,15 @@ import { Core } from "../../../core/module/module";
 import { LogicException } from "../../../core/exceptions/exceptions";
 import { AbstractEventManagerProvider } from "../../../core/providers/event/event-manager.provider";
 import { UnitOfWorkFactory } from "../../../core/workflow/unit-of-work.factory";
-import { AccessLibraryRepository } from "../access-library.repository";
+import { AccessDirectoryRepository } from "../access-directory.repository";
 
 @injectable()
-export class AddUserToStoreCommand {
+export class RemoveUserFromStoreCommand {
 
   constructor(
     @inject(OrganizationRequesterFactory) public readonly organizationRequesterFactory: OrganizationRequesterFactory,
     @inject(UnitOfWorkFactory) public readonly unitOfWorkFactory: UnitOfWorkFactory,
-    @inject(AccessLibraryRepository) public readonly AccessLibraryRepository: AccessLibraryRepository,
+    @inject(AccessDirectoryRepository) public readonly accessDirectoryRepository: AccessDirectoryRepository,
     @inject(AbstractEventManagerProvider) public readonly abstractEventManagerProvider: AbstractEventManagerProvider
   ) {}
 
@@ -24,7 +24,7 @@ export class AddUserToStoreCommand {
     throw new LogicException({
       message: 'This command is not implemented yet',
       data: {
-        command_name: 'AddUserToStoreCommand'
+        command_name: 'RemoveUserFromStoreCommand'
       }
     })
   }

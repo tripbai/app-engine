@@ -12,7 +12,7 @@ export class UserFromStoreRemoveController {
     @inject(RemoveUserFromStoreCommand) public readonly removeUserFromStoreCommand: RemoveUserFromStoreCommand
   ) {}
 
-  @post<TripBai.AccessLibrary.Endpoints.RemoveUserFromStore>('/tripbai/access-library/tenants/:tenant_id/remove-from-stores')
+  @post<TripBai.AccessLibrary.Endpoints.RemoveUserFromStore>('/tripbai/access-directory/tenants/:tenant_id/remove-from-stores')
   async removeUserFromStore<T extends TripBai.AccessLibrary.Endpoints.RemoveUserFromStore>(
     params: Core.Route.ControllerDTO<T>
   ): Promise<T['response']> {
