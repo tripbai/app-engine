@@ -20,7 +20,6 @@ import { RegisterDefaultFeatureCommand } from "./app/features/commands/register-
 import { DefaultFeatureRegisterController } from "./app/features/controllers/default-feature-register.controller";
 import { FeatureOverrideCreateController } from "./app/features/controllers/feature-override-create.controller";
 import { FeatureAssertions } from "./app/features/feature.assertions";
-import { FeatureRepository } from "./app/features/feature.repository";
 import { FeatureCreateService } from "./app/features/services/feature-create.service";
 import { FeatureDeleteService } from "./app/features/services/feature-delete.service";
 import { FeatureGetService } from "./app/features/services/feature-get.service";
@@ -223,7 +222,6 @@ export const bind = (container: Container) => {
   container.bind(DefaultFeatureRegisterController).toSelf();
   container.bind(FeatureOverrideCreateController).toSelf();
   container.bind(FeatureAssertions).toSelf();
-  container.bind(FeatureRepository).toSelf();
   container.bind(FeatureCreateService).toSelf();
   container.bind(FeatureDeleteService).toSelf();
   container.bind(FeatureGetService).toSelf();
