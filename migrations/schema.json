@@ -231,57 +231,5 @@
         "is_nullable": false
       }
     ]
-  },
-  {
-    "collection": "features",
-    "created_at": "2025-06-18T23:59:52.494Z",
-    "updated_at": "2025-06-18T23:59:52.494Z",
-    "fields": [
-      {
-        "name": "key",
-        "type": "varchar",
-        "is_nullable": false,
-        "length": 32
-      },
-      {
-        "name": "value",
-        "type": "varchar",
-        "is_nullable": false,
-        "length": 64
-      },
-      {
-        "name": "category",
-        "type": "varchar",
-        "is_nullable": false,
-        "length": 64
-      },
-      {
-        "name": "package_id",
-        "type": "char",
-        "is_nullable": false,
-        "length": 32,
-        "references": {
-          "collection": "packages",
-          "field": "entity_id"
-        }
-      },
-      {
-        "name": "description",
-        "type": "varchar",
-        "is_nullable": true,
-        "length": 256
-      },
-      {
-        "name": "featurable_entity_id",
-        "type": "char",
-        "is_nullable": true,
-        "length": 32
-      },
-      {
-        "name": "org_mutable",
-        "type": "boolean",
-        "is_nullable": false
-      }
-    ]
   }
 ]
