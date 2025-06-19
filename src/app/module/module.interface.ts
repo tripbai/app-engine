@@ -270,6 +270,8 @@ export namespace TripBai {
           data: {
             key: string
             value: string
+            package_id: Core.Entity.Id
+            organization_id: Core.Entity.Id
             override_for_entity_id: Core.Entity.Id
             override_for_entity_type: 'organization' | 'store'
           }

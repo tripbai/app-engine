@@ -5,7 +5,6 @@ import { PackageModel } from "../packages/package.model";
 import { FeatureValidator } from "./feature.validator";
 import { FeaturesList } from "./features.list";
 
-@collection('features')
 export class FeatureModel extends BaseEntity<FeatureModel> {
 
   @length(32)
