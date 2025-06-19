@@ -6,6 +6,8 @@ import { AbstractEventManagerProvider } from "../../../core/providers/event/even
 import { UnitOfWorkFactory } from "../../../core/workflow/unit-of-work.factory";
 import { StoreCreateService } from "../services/store-create.service";
 import { StoreRepository } from "../store.repository";
+import { OrganizationRepository } from "../../organizations/organization.repository";
+import { StoreCreatedEvent } from "../store.events";
 
 @injectable()
 export class CreateStoreCommand {
@@ -15,20 +17,45 @@ export class CreateStoreCommand {
     @inject(UnitOfWorkFactory) public readonly unitOfWorkFactory: UnitOfWorkFactory,
     @inject(StoreRepository) public readonly storeRepository: StoreRepository,
     @inject(StoreCreateService) public readonly storeCreateService: StoreCreateService,
-    @inject(AbstractEventManagerProvider) public readonly abstractEventManagerProvider: AbstractEventManagerProvider
+    @inject(AbstractEventManagerProvider) public readonly abstractEventManagerProvider: AbstractEventManagerProvider,
+    @inject(OrganizationRepository) public readonly organizationRepository: OrganizationRepository,
   ) {}
 
   async execute(params: {
-    requester: Core.Authorization.Requester
+    requester: Core.Authorization.Requester,
+    organizationId: Core.Entity.Id,
+    name: string
   }) {
     const unitOfWork = this.unitOfWorkFactory.create()
     const requester = this.organizationRequesterFactory.create(params.requester)
-    throw new LogicException({
-      message: 'This command is not implemented yet',
-      data: {
-        command_name: 'CreateStoreCommand'
-      }
+    const organizationModel = await this.organizationRepository.getById(params.organizationId)
+    this.storeCreateService.assertRequesterCanCreateStore(requester, organizationModel)
+    this.storeCreateService.assertOrganizationCanCreateStore(organizationModel)
+    const storeModel = await this.storeCreateService.createStore({
+      requester,
+      organizationModel,
+      name: params.name
     })
+    unitOfWork.addTransactionStep(
+      this.storeRepository.create(storeModel.entity_id, {
+        name: storeModel.name,
+        organization_id: storeModel.organization_id,
+        package_id: storeModel.package_id,
+        about: storeModel.about,
+        profile_photo_src: storeModel.profile_photo_src,
+        cover_photo_src: storeModel.cover_photo_src,
+        location_id: storeModel.location_id,
+        secret_key: storeModel.secret_key,
+        status: storeModel.status,
+        archived_at: storeModel.archived_at,
+        language: storeModel.language
+      })
+    )
+    await unitOfWork.commit()
+    this.abstractEventManagerProvider.dispatch(
+      new StoreCreatedEvent, storeModel
+    )
+    return storeModel
   }
 
 }
