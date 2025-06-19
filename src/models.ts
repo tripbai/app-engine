@@ -5,6 +5,7 @@ import { TenantModel } from "./identity-authority/tenants/tenant.model";
 import { EmailTemplateModel } from "./identity-authority/email-templates/email-template.model";
 import { PackageModel } from "./app/packages/package.model";
 import { OrganizationModel } from "./app/organizations/organization.model";
+import { StoreModel } from "./app/stores/store.model";
 
 new UserModel
 new TeamModel
@@ -13,3 +14,4 @@ new TenantModel
 new EmailTemplateModel
 new PackageModel
 new OrganizationModel
+new StoreModel
