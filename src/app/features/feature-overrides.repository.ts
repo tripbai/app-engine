@@ -1,4 +1,4 @@
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 import { BaseRepository } from "../../core/orm/repository/base-repository";
 import { AbstractCacheProvider } from "../../core/providers/cache/cache.provider";
 import { AbstractDatabaseProvider } from "../../core/providers/database/database.provider";
@@ -8,6 +8,7 @@ import { Core } from "../../core/module/module";
 import { DataIntegrityException } from "../../core/exceptions/exceptions";
 import { Pseudorandom } from "../../core/helpers/pseudorandom";
 
+@injectable()
 export class FeaturesOverrideRepository extends BaseRepository<FeatureModel> {
 
   protected collection: string = 'feature_overrides'

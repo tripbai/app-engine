@@ -25,6 +25,8 @@ import { AbstractEventManagerProvider } from "./core/providers/event/event-manag
 import { SimpleNodeEmitter } from "./core/providers/event/node-emitter/node-emitter.service";
 import { AbstractNodeEmitterConfig } from "./core/services/events/node-emitter/node-emitter-config.interface";
 import { NodeEmitterEnvConfig } from "./core/services/events/node-emitter/node-emitter-env-config";
+import { AbstractObjectStorageProvider } from "./core/providers/storage/object-storage.provider";
+import { AmazonS3StorageService } from "./core/providers/storage/aws3/aws3-storage.service";
 
 export const providers = (container: Container) => {
 
@@ -43,4 +45,5 @@ export const providers = (container: Container) => {
   container.bind(AbstractMailProvider).to(MailmanMail)
   container.bind(AbstractTopicPublisherProvider).to(AmazonSNSTopicPublisherService)
   container.bind(AbstractEventManagerProvider).to(SimpleNodeEmitter)
+  container.bind(AbstractObjectStorageProvider).to(AmazonS3StorageService)
 }
