@@ -68,62 +68,54 @@ const seedDatabase = async () => {
   const GoogleUserUserModel = await getLucyFromGoogleUserModel()
 
   await database.useQuery({
-    namespace: 'users',
     type: 'create',
-    query: '',
+    query: 'users',
     // @ts-expect-error
     data: SuspendedUseruserModel
   })
   await database.useQuery({
-    namespace: 'profiles',
     type: 'create',
-    query: '',
+    query: 'profiles',
     // @ts-expect-error
     data: SuspendedUserProfileModel
   })
 
   await database.useQuery({
-    namespace: 'users',
     type: 'create',
-    query: '',
+    query: 'users',
     // @ts-expect-error
     data: ActiveUserUserModel
   })
   await database.useQuery({
-    namespace: 'profiles',
     type: 'create',
-    query: '',
+    query: 'profiles',
     // @ts-expect-error
     data: ActiveUserUserProfile
   })
 
   await database.useQuery({
-    namespace: 'users',
     type: 'create',
-    query: '',
+    query: 'users',
     // @ts-expect-error
     data: DeactivatedUserUserModel
   })
   await database.useQuery({
-    namespace: 'profiles',
     type: 'create',
-    query: '',
+    query: 'profiles',
     // @ts-expect-error
     data: DeactivatedUserProfileModel
   })
 
   await database.useQuery({
-    namespace: 'users',
     type: 'create',
-    query: '',
+    query: 'users',
     // @ts-expect-error
     data: FireAuthUserUserModel
   })
 
   await database.useQuery({
-    namespace: 'users',
     type: 'create',
-    query: '',
+    query: 'users',
     // @ts-expect-error
     data: GoogleUserUserModel
   })

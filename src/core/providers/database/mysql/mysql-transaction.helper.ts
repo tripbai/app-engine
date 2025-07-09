@@ -1,6 +1,7 @@
 import { injectable } from "inversify";
 import { FlatDatabaseRecord } from "../database.provider";
 import { MySqlTransactionStep } from "./mysql.service.d";
+import { MySqlService } from "./mysql.service";
 
 @injectable()
 export class MySqlTransactionHelper {
@@ -13,11 +14,12 @@ export class MySqlTransactionHelper {
    * @returns A MySqlTransactionStep with an `INSERT` command and normalized data.
    */
   generateInsertTransactionStep(
+    executor: MySqlService,
     collection: string,
     data: FlatDatabaseRecord
   ): MySqlTransactionStep {
     return {
-      namespace: 'MySqlService',
+      executor: executor,
       type: 'create',
       query: `INSERT INTO ${collection} SET ?`,
       data: data,
@@ -35,6 +37,7 @@ export class MySqlTransactionHelper {
    * @throws {InvalidArgumentException} If `entity_id` is missing from `data`.
    */
   generateUpdateTransactionStep(
+    executor: MySqlService,
     collection: string,
     data: FlatDatabaseRecord
   ): MySqlTransactionStep {
@@ -56,7 +59,7 @@ export class MySqlTransactionHelper {
     datalist.push(data['entity_id'])
 
     return {
-      namespace: 'MySqlService',
+      executor: executor,
       type: 'update',
       query: query + ' WHERE entity_id = ?',
       data: datalist,

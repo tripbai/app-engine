@@ -27,6 +27,8 @@ import { AbstractNodeEmitterConfig } from "./core/services/events/node-emitter/n
 import { NodeEmitterEnvConfig } from "./core/services/events/node-emitter/node-emitter-env-config";
 import { AbstractObjectStorageProvider } from "./core/providers/storage/object-storage.provider";
 import { AmazonS3StorageService } from "./core/providers/storage/aws3/aws3-storage.service";
+import { IAuthDatabaseProvider } from "./identity-authority/providers/iauth-database.provider";
+import { JSONFileDB } from "./core/providers/database/jsonfiledb/jsonfile-database.service";
 
 export const providers = (container: Container) => {
 
@@ -46,4 +48,5 @@ export const providers = (container: Container) => {
   container.bind(AbstractTopicPublisherProvider).to(AmazonSNSTopicPublisherService)
   container.bind(AbstractEventManagerProvider).to(SimpleNodeEmitter)
   container.bind(AbstractObjectStorageProvider).to(AmazonS3StorageService)
+  container.bind(IAuthDatabaseProvider).to(JSONFileDB)
 }

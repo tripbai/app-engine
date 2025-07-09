@@ -7,6 +7,7 @@ import { IdentityAuthority } from "../module/module.interface";
 import { DataIntegrityException } from "../../core/exceptions/exceptions";
 import { RegistryRepository } from "../../core/orm/repository/registry-repository";
 import { TimeStamp } from "../../core/helpers/timestamp";
+import { IAuthDatabaseProvider } from "../providers/iauth-database.provider";
 
 @injectable()
 export class EmailTemplateRepository extends BaseRepository<EmailTemplateModel> {
@@ -14,7 +15,7 @@ export class EmailTemplateRepository extends BaseRepository<EmailTemplateModel> 
   protected collection: string = 'email_templates'
 
   constructor(
-    @inject(AbstractDatabaseProvider) public readonly DatabaseProvider: AbstractDatabaseProvider,
+    @inject(IAuthDatabaseProvider) public readonly DatabaseProvider: AbstractDatabaseProvider,
     @inject(AbstractCacheProvider) public readonly CacheProvider: AbstractCacheProvider
   ){
     super(

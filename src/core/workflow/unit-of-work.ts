@@ -26,11 +26,24 @@ export class UnitOfWork {
   }
 
   /**
-   * Commits the transaction steps in the unit of work.
+   * Commits the transaction steps in the unit of work. 
+   * This method groups the transaction steps by their executor and calls the `beginTransaction` method on each executor with the grouped steps.
    * @returns 
    */
   async commit(){
-    return await this.abstractDatabaseProvider.beginTransaction(this.transactionSteps)
+    const grouped = new Map<AbstractDatabaseProvider, DatabaseTransactionStep[]>()
+    for (const step of this.transactionSteps) {
+      if (!grouped.has(step.executor)) {
+        grouped.set(step.executor, [])
+      }
+      grouped.get(step.executor)!.push(step)
+    }
+    // Execute beginTransaction for each executor group
+    for (const [executor, steps] of grouped.entries()) {
+      await executor.beginTransaction(steps)
+    }
+    this.transactionSteps = [] // Clear the transaction steps after committing
+    return
   }
 
 }

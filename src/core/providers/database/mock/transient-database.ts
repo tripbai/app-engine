@@ -28,9 +28,9 @@ export class TransientMockDatabase extends AbstractDatabaseProvider {
     collection.set(entityId, recordCopy)
 
     return {
-      namespace: collectionName,
+      executor: this,
       type: "create",
-      query: `INSERT INTO ${collectionName} VALUES ...`,
+      query: collectionName,
       data: recordCopy,
     }
   }
@@ -96,9 +96,9 @@ export class TransientMockDatabase extends AbstractDatabaseProvider {
     collection.set(entityId, recordCopy)
 
     return {
-      namespace: collectionName,
+      executor: this,
       type: "update",
-      query: `UPDATE ${collectionName} SET ... WHERE entity_id = ?`,
+      query: collectionName,
       data: recordCopy,
     }
   }
@@ -106,7 +106,8 @@ export class TransientMockDatabase extends AbstractDatabaseProvider {
   async useQuery(
     transactionableAction: DatabaseTransactionStep
   ): Promise<Array<{ [key: string]: any }>> {
-    const { namespace, type, data } = transactionableAction
+    const { query, type, data } = transactionableAction
+    const namespace = query
     const entityId = data["entity_id"] as Core.Entity.Id
 
     switch (type) {

@@ -278,7 +278,7 @@ describe('BaseRepository', () => {
       class TestDatabase extends MockDatabaseProvider {
         createRecord(collectionName: string, record: FlatDatabaseRecord): DatabaseTransactionStep {
             return {
-              namespace: 'TestDatabase',
+              executor: this,
               type: 'create',
               query: '',
               data: record
@@ -366,7 +366,7 @@ describe('BaseRepository', () => {
         }
         updateRecord(collectionName: string, record: FlatDatabaseRecord): DatabaseTransactionStep {
           return {
-            namespace: 'TestDatabase',
+            executor: this,
             type: 'create',
             query: '',
             data: record

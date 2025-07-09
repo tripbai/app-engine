@@ -1,4 +1,4 @@
-import { FlatDatabaseRecord } from "../database.provider"
+import { AbstractDatabaseProvider, FlatDatabaseRecord } from "../database.provider"
 
 /**
  * Overrides the DatabaseTransactionStep
@@ -6,9 +6,9 @@ import { FlatDatabaseRecord } from "../database.provider"
 export type MySqlTransactionStep = {
 
   /**
-   * The namespace of the transaction
+   * The object or service, which implements this interface, that will execute the step.
    */
-  namespace: string
+  executor: AbstractDatabaseProvider
   
   /**
    * The type of step

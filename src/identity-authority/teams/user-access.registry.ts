@@ -4,12 +4,13 @@ import { TeamModel } from "./team.model";
 import { AbstractDatabaseProvider } from "../../core/providers/database/database.provider";
 import { Core } from "../../core/module/module";
 import { DataIntegrityException } from "../../core/exceptions/exceptions";
+import { IAuthDatabaseProvider } from "../providers/iauth-database.provider";
 
 @injectable()
 export class UserAccessRegistry extends RegistryRepository<TeamModel> {
 
   constructor(
-    @inject(AbstractDatabaseProvider) public readonly abstractDatabaseProvider: AbstractDatabaseProvider
+    @inject(IAuthDatabaseProvider) public readonly abstractDatabaseProvider: AbstractDatabaseProvider
   ){
     super({
       collection: 'teams',

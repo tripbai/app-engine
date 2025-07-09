@@ -81,10 +81,11 @@ export type FlatDatabaseRecord = { [key: string]: string | number | boolean | nu
  * Represents a single database operation, potentially within a transaction.
  */
 export type DatabaseTransactionStep = {
+  
   /**
-   * The namespace of the transaction
+   * The object or service, which implements this interface, that will execute the step.
    */
-  namespace: string
+  executor: AbstractDatabaseProvider
   /**
    * The type of step
    */

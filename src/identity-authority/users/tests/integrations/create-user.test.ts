@@ -19,9 +19,8 @@ const seedDatabase = async () => {
   const database = container.get(AbstractDatabaseProvider)
   const John = await getJohnUserModel()
   await database.useQuery({
-    namespace: 'users',
     type: 'create',
-    query: '',
+    query: 'users',
     // @ts-expect-error
     data: John
   })

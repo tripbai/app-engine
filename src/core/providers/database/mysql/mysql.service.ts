@@ -28,7 +28,7 @@ export class MySqlService implements AbstractDatabaseProvider {
     record: FlatDatabaseRecord
   ): Readonly<DatabaseTransactionStep> {
 
-    const insertTransactionStep = this.MySqlTransactionHelper.generateInsertTransactionStep(collection, record)
+    const insertTransactionStep = this.MySqlTransactionHelper.generateInsertTransactionStep(this, collection, record)
 
     /** Shouldn't be used for multiple inserts */
     if (Array.isArray(insertTransactionStep.data)) {
@@ -219,7 +219,7 @@ export class MySqlService implements AbstractDatabaseProvider {
   }
 
   updateRecord(collection: string, record: FlatDatabaseRecord): Readonly<DatabaseTransactionStep> {
-    const updateTransactionStep = this.MySqlTransactionHelper.generateUpdateTransactionStep(collection, record)
+    const updateTransactionStep = this.MySqlTransactionHelper.generateUpdateTransactionStep(this, collection, record)
     return updateTransactionStep as DatabaseTransactionStep
   }
 

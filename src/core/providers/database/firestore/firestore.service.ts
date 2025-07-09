@@ -35,7 +35,7 @@ export class FirestoreService implements AbstractDatabaseProvider {
   
   createRecord(collectionName: string, record: FlatDatabaseRecord): DatabaseTransactionStep {
     return this.FirestoreHelper.createTransactionStep(
-      'document.create', collectionName, record
+      this, 'document.create', collectionName, record
     )
   }
 
@@ -147,7 +147,8 @@ export class FirestoreService implements AbstractDatabaseProvider {
 
   updateRecord(collection: string, record: FlatDatabaseRecord): DatabaseTransactionStep {
     return this.FirestoreHelper.createTransactionStep(
-      'document.update', collection, record)
+      this, 'document.update', collection, record
+    )
   }
 
   async useQuery(transactionableAction: DatabaseTransactionStep): Promise<{ [key: string]: any; }[]> {

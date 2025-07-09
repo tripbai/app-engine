@@ -5,6 +5,7 @@ import { AbstractDatabaseProvider } from "../../core/providers/database/database
 import { AbstractCacheProvider } from "../../core/providers/cache/cache.provider";
 import { IdentityAuthority } from "../module/module.interface";
 import { DataIntegrityException } from "../../core/exceptions/exceptions";
+import { IAuthDatabaseProvider } from "../providers/iauth-database.provider";
 
 @injectable()
 export class UserRepository extends BaseRepository<UserModel> {
@@ -12,7 +13,7 @@ export class UserRepository extends BaseRepository<UserModel> {
   protected collection: string = 'users'
 
   constructor(
-    @inject(AbstractDatabaseProvider) public readonly DatabaseProvider: AbstractDatabaseProvider,
+    @inject(IAuthDatabaseProvider) public readonly DatabaseProvider: AbstractDatabaseProvider,
     @inject(AbstractCacheProvider) public readonly CacheProvider: AbstractCacheProvider
   ){
     super(

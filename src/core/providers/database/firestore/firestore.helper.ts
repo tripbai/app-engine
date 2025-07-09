@@ -5,6 +5,7 @@ import { AppLogger } from "../../../helpers/logger";
 import { Application } from "../../../application";
 import { FirestoreQueryType } from "./types";
 import { DatabaseTransactionStep } from "../database.provider";
+import { FirestoreService } from "./firestore.service";
 
 const FirestoreClientsPool: {[key: string]: FirebaseFirestore.Firestore} = {}
 
@@ -21,9 +22,14 @@ export class FirestoreHelper {
     return FirestoreClientsPool[projectId]
   }
 
-  createTransactionStep(qtype: FirestoreQueryType, collection: string, data: {[key:string]:any}): DatabaseTransactionStep {
+  createTransactionStep(
+    executor: FirestoreService,
+    qtype: FirestoreQueryType, 
+    collection: string, 
+    data: {[key:string]:any}
+  ): DatabaseTransactionStep {
     return {
-      namespace: 'Firestore',
+      executor: executor,
       type: (qtype === 'document.create') ? 'create' : 'update',
       query: `${qtype} ${collection}`, 
       data: data
