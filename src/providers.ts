@@ -29,6 +29,9 @@ import { AbstractObjectStorageProvider } from "./core/providers/storage/object-s
 import { AmazonS3StorageService } from "./core/providers/storage/aws3/aws3-storage.service";
 import { IAuthDatabaseProvider } from "./identity-authority/providers/iauth-database.provider";
 import { JSONFileDB } from "./core/providers/database/jsonfiledb/jsonfile-database.service";
+import { Application } from "./core/application";
+import { FirestoreService } from "./core/providers/database/firestore/firestore.service";
+import { InMemoryCacheService } from "./core/providers/cache/inmemory/inmemory-cache.service";
 
 export const providers = (container: Container) => {
 
@@ -39,7 +42,6 @@ export const providers = (container: Container) => {
   container.bind(AbstractMySqlPoolService).to(MySqlPoolService)
   container.bind(AbstractNodeEmitterConfig).to(NodeEmitterEnvConfig)
 
-  container.bind(AbstractCacheProvider).to(RedisCacheService)
   container.bind(AbstractDatabaseProvider).to(MySqlService)
   container.bind(AbstractJWTProvider).to(JsonWebToken)
   container.bind(AbstractIndexerProvider).to(KryptodocIndexerService)
@@ -48,5 +50,18 @@ export const providers = (container: Container) => {
   container.bind(AbstractTopicPublisherProvider).to(AmazonSNSTopicPublisherService)
   container.bind(AbstractEventManagerProvider).to(SimpleNodeEmitter)
   container.bind(AbstractObjectStorageProvider).to(AmazonS3StorageService)
-  container.bind(IAuthDatabaseProvider).to(JSONFileDB)
+
+  // Declare bindings based on environment
+  if (Application.environment() === 'development') {
+    container.bind(IAuthDatabaseProvider).to(JSONFileDB)
+    container.bind(AbstractCacheProvider).to(InMemoryCacheService)
+  } else if (Application.environment() === 'staging') {
+    container.bind(IAuthDatabaseProvider).to(FirestoreService)
+    container.bind(AbstractCacheProvider).to(RedisCacheService)
+  } else if (Application.environment() === 'production') {
+    container.bind(IAuthDatabaseProvider).to(FirestoreService)
+    container.bind(AbstractCacheProvider).to(RedisCacheService)
+  } else {
+
+  }
 }
