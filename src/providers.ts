@@ -32,6 +32,7 @@ import { JSONFileDB } from "./core/providers/database/jsonfiledb/jsonfile-databa
 import { Application } from "./core/application";
 import { FirestoreService } from "./core/providers/database/firestore/firestore.service";
 import { InMemoryCacheService } from "./core/providers/cache/inmemory/inmemory-cache.service";
+import { Notif8701TopicPublisher } from "./core/providers/topics/notif8701/notif8701-topic-publisher.service";
 
 export const providers = (container: Container) => {
 
@@ -47,7 +48,6 @@ export const providers = (container: Container) => {
   container.bind(AbstractIndexerProvider).to(KryptodocIndexerService)
   container.bind(AbstractAuthorizationProvider).to(NativeRBACService)
   container.bind(AbstractMailProvider).to(MailmanMail)
-  container.bind(AbstractTopicPublisherProvider).to(AmazonSNSTopicPublisherService)
   container.bind(AbstractEventManagerProvider).to(SimpleNodeEmitter)
   container.bind(AbstractObjectStorageProvider).to(AmazonS3StorageService)
 
@@ -55,12 +55,15 @@ export const providers = (container: Container) => {
   if (Application.environment() === 'development') {
     container.bind(IAuthDatabaseProvider).to(JSONFileDB)
     container.bind(AbstractCacheProvider).to(InMemoryCacheService)
+    container.bind(AbstractTopicPublisherProvider).to(Notif8701TopicPublisher)
   } else if (Application.environment() === 'staging') {
     container.bind(IAuthDatabaseProvider).to(FirestoreService)
     container.bind(AbstractCacheProvider).to(RedisCacheService)
+    container.bind(AbstractTopicPublisherProvider).to(AmazonSNSTopicPublisherService)
   } else if (Application.environment() === 'production') {
     container.bind(IAuthDatabaseProvider).to(FirestoreService)
     container.bind(AbstractCacheProvider).to(RedisCacheService)
+    container.bind(AbstractTopicPublisherProvider).to(AmazonSNSTopicPublisherService)
   } else {
 
   }

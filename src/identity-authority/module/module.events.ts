@@ -18,17 +18,31 @@ export const IdentityAuthorityEvents = (
   const tenantTeamIndexer = container.get(TenantTeamAccessIndexer)
 
   // Index user snippet for newly created or updated users
-  abstractEventManager.listen(new UserCreateEvent,userSnippetIndexer.execute)
-  abstractEventManager.listen(new UserUpdateEvent,userSnippetIndexer.execute)
+  abstractEventManager.listen(new UserCreateEvent, async (...args) => {
+    await userSnippetIndexer.execute(...args)
+  })
+
+  abstractEventManager.listen(new UserUpdateEvent, async (...args) => {
+    await userSnippetIndexer.execute(...args)
+  })
 
   // Send account verification email when a user is created
-  abstractEventManager.listen(new UserCreateEvent,accountVerificationEmailSender.execute)
+  // abstractEventManager.listen(new UserCreateEvent, async (...args) => {
+  //   await accountVerificationEmailSender.execute(...args)
+  // })
 
   // Index tenant snippet for newly created tenants
-  abstractEventManager.listen(new TenantCreateEvent, tenantSnippetIndexer.execute)
-  abstractEventManager.listen(new TenantUpdateEvent, tenantSnippetIndexer.execute)
+  abstractEventManager.listen(new TenantCreateEvent, async (...args) => {
+    await tenantSnippetIndexer.execute(...args)
+  })
+
+  abstractEventManager.listen(new TenantUpdateEvent, async (...args) => {
+    await tenantSnippetIndexer.execute(...args)
+  })
 
   // Index tenant team access for user actions
-  abstractEventManager.listen(new TenantTeamAccessEvent, tenantTeamIndexer.execute)
-  
+  abstractEventManager.listen(new TenantTeamAccessEvent, async (...args) => {
+    await tenantTeamIndexer.execute(...args)
+  })
+
 }

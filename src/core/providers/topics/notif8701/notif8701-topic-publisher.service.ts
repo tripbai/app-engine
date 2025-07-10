@@ -34,15 +34,28 @@ const queue: Array<{
   messageGroupId? :string
 }> = []
 
+/**
+ * Processes the queue by sending messages to the configured endpoint.
+ */
+const processQueue = async () => {
+  const uri = AppENV.get('NOTIF8071_RECEIVER')
+  const item = queue.shift()
+  if (item !== undefined) {
+    try {
+      await axios.post(uri, item)
+    } catch (error) {
+      console.log(`Failed to send message to ${uri}:`);
+      console.log({item})
+      console.error(error)
+    }
+  }
+}
+
+// Initialize the queue processing
 let started = false
 const __init = () => {
   if (started) return
   started = true
-  setInterval(async ()=>{
-    const uri  = AppENV.get('NOTIF8071_RECEIVER')
-    const item = queue.shift()
-    if (item !== undefined) {
-      await axios.post(uri, item)
-    }
-  },1000)
+  setInterval(processQueue,1000)
 }
+__init()

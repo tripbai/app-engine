@@ -85,6 +85,7 @@ import { ProxyRouter } from "./router/proxy-router"
 import { MySQLPoolManager } from "./services/mysql/mysql-pool-manager"
 import { AppLogger } from "./helpers/logger"
 import { providers } from "../providers"
+import { events } from "../events"
 
 bind(Application.container())
 providers(Application.container())
@@ -122,6 +123,8 @@ if (framework === 'express') {
     )
   })
 
+  /** Events Registry */
+  events(Application.container())
 
   /** For all routes not found */
   app.use((request, response)=>{

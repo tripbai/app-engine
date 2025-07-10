@@ -20,7 +20,7 @@ export class SimpleNodeEmitter implements AbstractEventManagerProvider {
 
   async dispatch<T extends EventInterface>(EventInterface: T, ...data: GetArguments<T["handler"]>): Promise<void> {
     this.nodeEmitterService.dispatch(
-      EventInterface.id(), data
+      EventInterface.id(), ...data
     )
   }
 

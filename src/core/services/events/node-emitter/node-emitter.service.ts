@@ -52,6 +52,11 @@ export class NodeEmitterService {
     try {
       await listener(...data)
     } catch (error) {
+      AppLogger.error({
+        severity: 1,
+        message: `event handler failed: ${error.message}`,
+        data: { eventId: id, error: error }
+      })
       if (attempts < this.abstractNodeEmitterConfig.getMaxRetries()) {
         setTimeout(() => this.emitWithRetry(id, listener, data, attempts + 1), 1000)
       } else {
