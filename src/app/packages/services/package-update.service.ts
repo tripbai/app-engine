@@ -49,6 +49,10 @@ export class PackageUpdateService {
         data: { package_id: packageModel.id }
       })
     }
+    if (!await this.packageRepository.hasDefaultPackage()) {
+      packageModel.is_default = true
+      return
+    }
     const currentDefaultPackage = await this.packageRepository.getCurrentDefaultPackage()
     if (currentDefaultPackage.entity_id === packageModel.entity_id) {
       // If the package is already the default package, no need to change

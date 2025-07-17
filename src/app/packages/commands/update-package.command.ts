@@ -35,8 +35,18 @@ export class UpdatePackageCommand {
       })
     }
     const packageModel = await this.packageRepository.getById(params.packageId)
+    const updateParams: Parameters<PackageUpdateService["updatePackage"]>[2] = Object.create(null)
+    if (params.isActive !== undefined) {
+      updateParams.is_active = params.isActive
+    }
+    if (params.isDefault !== undefined) {
+      updateParams.is_default = params.isDefault
+    }
+    if (params.name !== undefined) {
+      updateParams.name = params.name
+    }
     await this.packageUpdateService.updatePackage(
-      unitOfWork, packageModel, params
+      unitOfWork, packageModel, updateParams
     )
     await unitOfWork.commit()
     await this.abstractEventManagerProvider.dispatch(

@@ -56,6 +56,13 @@ protected collection: string = 'packages'
     return models
   }
 
+  async hasDefaultPackage(): Promise<boolean> {
+    const results = await this.DatabaseProvider.whereFieldHasValue(
+      this.collection, 'is_default', true
+    )
+    return results.length > 0
+  }
+
   async getCurrentDefaultPackage(): Promise<PackageModel> {
     const results = await this.DatabaseProvider.whereFieldHasValue(
       this.collection, 'is_default', true
