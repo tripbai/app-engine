@@ -1,4 +1,6 @@
 node_modules
+data/*
+!data/README.md
 dist
 src/test.ts
 .development.env
