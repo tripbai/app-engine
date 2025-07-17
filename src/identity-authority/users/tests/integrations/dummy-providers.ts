@@ -13,6 +13,7 @@ import { AbstractCacheProvider } from "../../../../core/providers/cache/cache.pr
 import { InMemoryCacheService } from "../../../../core/providers/cache/inmemory/inmemory-cache.service"
 import { AbstractEventManagerProvider } from "../../../../core/providers/event/event-manager.provider"
 import { SimpleNodeEmitter } from "../../../../core/providers/event/node-emitter/node-emitter.service"
+import { IAuthDatabaseProvider } from "../../../providers/iauth-database.provider"
 
 export class DummyIndexerProvider implements AbstractIndexerProvider {
   hasIndexed = false
@@ -52,4 +53,5 @@ export const bindDummyProviders = (container: Container) => {
   container.bind(AbstractDatabaseProvider).to(InMemoryDatabaseService)
   container.bind(AbstractCacheProvider).to(InMemoryCacheService)
   container.bind(AbstractEventManagerProvider).to(DummyEventManagerProvider)
+  container.bind(IAuthDatabaseProvider).to(InMemoryDatabaseService)
 }

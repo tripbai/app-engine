@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import { expect } from 'chai'
-import { AbstractDatabaseProvider, DatabaseTransactionStep, FlatDatabaseRecord } from "../../../../core/providers/database/database.provider";
+import { DatabaseTransactionStep, FlatDatabaseRecord } from "../../../../core/providers/database/database.provider";
 import { MockDatabaseProvider } from "../../../../core/providers/database/mock/mock-database.provider";
 import { UserAssertions } from "../../user.assertions";
 import { IdentityAuthority } from "../../../module/module.interface";
@@ -20,6 +20,7 @@ import { AbstractMailProvider } from "../../../../core/providers/mail/mail.provi
 import { MailmanMail } from "../../../../core/providers/mail/mailman/mailman-mail.service";
 import { AbstractTopicPublisherProvider } from "../../../../core/providers/topics/topic-publisher.provider";
 import { AmazonSNSTopicPublisherService } from "../../../../core/providers/topics/awsns/awsns-topic-publisher.service";
+import { IAuthDatabaseProvider } from "../../../providers/iauth-database.provider";
 
 const bindProviders = (container: Container) => {
   container.bind(AbstractJWTProvider).to(JsonWebToken)
@@ -40,7 +41,7 @@ describe('UserCreateService', () => {
       class TestDatabaseProvider extends MockDatabaseProvider {}
       class TestCacheProvider extends MockCacheProvider{}
       const localContainer = new Container()
-      localContainer.bind(AbstractDatabaseProvider).to(MockDatabaseProvider)
+      localContainer.bind(IAuthDatabaseProvider).to(MockDatabaseProvider)
       localContainer.bind(AbstractCacheProvider).to(TestCacheProvider)
       bind(localContainer)
       bindProviders(localContainer)
@@ -79,7 +80,7 @@ describe('UserCreateService', () => {
       const container = new Container()
       bind(container)
       bindProviders(container)
-      container.bind(AbstractDatabaseProvider).to(TestDatabaseProvider)
+      container.bind(IAuthDatabaseProvider).to(TestDatabaseProvider)
       container.bind(AbstractCacheProvider).to(TestCacheProvider)
       const rebound = await container.rebind(UserAssertions)
       rebound.to(TestUserAssertion)
