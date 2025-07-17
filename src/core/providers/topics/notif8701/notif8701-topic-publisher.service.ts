@@ -2,6 +2,7 @@ import { injectable } from "inversify";
 import { AppENV } from "../../../helpers/env";
 import { AbstractTopicPublisherProvider } from "../topic-publisher.provider";
 import axios from "axios"
+import { Application } from "../../../application";
 
 /**
  * A notification service used for quick integration testing. 
@@ -54,6 +55,10 @@ const processQueue = async () => {
 // Initialize the queue processing
 let started = false
 const __init = () => {
+  // Skip initialization in test environment 
+  // because it is not needed and can cause issues, 
+  // Test frameworks will not complete if this is running
+  if (Application.environment() === 'test') return
   if (started) return
   started = true
   setInterval(processQueue,1000)
