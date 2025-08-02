@@ -277,6 +277,15 @@ export namespace IdentityAuthority {
           upload_token: string
         }
       }
+      export type RefreshAccessToken = {
+        request: {
+          path: '/identity-authority/tokens/refresh',
+          method: 'POST'
+        },
+        response: {
+          token: string
+        }
+      }
     }
   }
   export namespace Profile {
