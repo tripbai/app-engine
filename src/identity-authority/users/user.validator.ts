@@ -20,7 +20,7 @@ export namespace UserValidator {
   }
 
   export const username = (value: string) => {
-    const regex = /^[a-zA-Z0-9]+$/
+    const regex = /^[a-zA-Z0-9_]+$/
     if (!regex.test(value)) {
       throw new Error('invalid or unsupported username format')
     }
