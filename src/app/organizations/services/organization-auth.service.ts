@@ -70,7 +70,9 @@ export class OrganizationAuthService {
     }
     // Generate permissions for each store the user has access to
     const permissions = storeIdsUserHasAccessTo.map(storeAccess => {
-      return storeAccess.permission
+      return this.organizationPermissionService.createStoreLevelPermission({
+        organizationId: tenantId, storeId: storeAccess.store_id
+      })
     })
     return this.requesterTokenService.generate({
       user: { id: userId, status: params.organizationRequester.getStatus() },

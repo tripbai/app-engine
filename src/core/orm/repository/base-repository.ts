@@ -160,9 +160,11 @@ export class BaseRepository<TModel extends BaseEntity<TModel>> {
         collection: this.collection,
         entityId: entityId
       }
+      const cacheData: TModel = Object.create(null)
+      this.ingest(cacheData, Data)
       await this.providers.cache.addItem(
         singleCacheItem,
-        JSON.stringify(Data)
+        JSON.stringify(cacheData)
       )
     }
 

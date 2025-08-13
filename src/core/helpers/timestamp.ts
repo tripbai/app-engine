@@ -31,4 +31,8 @@ export namespace TimeStamp {
     return `${YYYY}-${MM}-${DD} ${hh}:${mi}:${ss}`
   }
 
+  export const isIsoFormat = (date: string) => {
+    return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.000Z$/.test(date)
+  }
+
 }

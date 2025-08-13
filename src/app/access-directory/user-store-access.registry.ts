@@ -23,8 +23,7 @@ export class UserStoreAccessRegistry extends RegistryRepository<AccessDirectoryM
    * as well as the permissions they have for each store.
    */
   async getStoreIdsUserHasAccess(userId: Core.Entity.Id): Promise<Array<{
-    store_id: string,
-    permission: Core.Authorization.ConcreteToken
+    store_id: Core.Entity.Id
   }>> {
     const allModels = await this.getAll({
       foreignKeyValue: userId
@@ -34,8 +33,7 @@ export class UserStoreAccessRegistry extends RegistryRepository<AccessDirectoryM
     })
     return filteredModels.map(accessDirectoryModel => {
       return {
-        store_id: accessDirectoryModel.store_id,
-        permission: accessDirectoryModel.permissions
+        store_id: accessDirectoryModel.store_id
       }
     })
   }
