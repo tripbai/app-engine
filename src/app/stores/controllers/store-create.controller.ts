@@ -4,6 +4,9 @@ import { del, patch, post, put, get } from "../../../core/router/decorators";
 import { TripBai } from "../../module/module.interface";
 import { Core } from "../../../core/module/module";
 import { BadRequestException, LogicException } from "../../../core/exceptions/exceptions";
+import { IsValid } from "../../../core/helpers/isvalid";
+import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
+import { StoreValidator } from "../store.validator";
 
 @injectable()
 export class StoreCreateController {
@@ -19,19 +22,31 @@ export class StoreCreateController {
     const commandDTO: Parameters<CreateStoreCommand["execute"]>[0] = Object.create(null)
     commandDTO.requester = params.requester
     try {
-    
+      IsValid.NonEmptyString(params.data.organization_id)
+      EntityToolkit.Assert.idIsValid(params.data.organization_id)
+      commandDTO.organizationId = params.data.organization_id
+
+      IsValid.NonEmptyString(params.data.name)
+      StoreValidator.name(params.data.name)
+      commandDTO.name = params.data.name
+
     } catch (error) {
       throw new BadRequestException({
         message: 'request failed due to invalid params',
         data: { error }
       })
     }
-    throw new LogicException({
-      message: 'This controller is not implemented yet',
-      data: {
-        controller_name: 'StoreCreateController'
-      }
-    })
+    const storeModel = await this.createStoreCommand.execute(commandDTO)
+    return {
+      entity_id: storeModel.entity_id,
+      organization_id: storeModel.organization_id,
+      name: storeModel.name,
+      about: storeModel.about,
+      location_id: storeModel.location_id,
+      profile_photo_src: storeModel.profile_photo_src,
+      cover_photo_src: storeModel.cover_photo_src,
+      status: storeModel.status
+    }
   }
 
 }

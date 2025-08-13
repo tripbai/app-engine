@@ -43,7 +43,7 @@ export class StoreModel extends BaseEntity<StoreModel> {
   @nullable()
   @length(32)
   @varchar(StoreValidator.location_id)
-  location_id: string | null
+  location_id: TripBai.Locations.Id | null
 
   @length(64)
   @varchar()

@@ -48,9 +48,7 @@ export class FeaturesOverrideRepository extends BaseRepository<FeatureModel> {
         }
         const FeatMap = new FeaturesList
         const FeatObject = new FeatMap[key]
-        for (const key in filtered[0]) {
-          FeatObject[key] = filtered[0][key]
-        }
+        this.ingest(FeatObject, filtered[0])
         return FeatObject as InstanceType<FeaturesList[T]>
       }
     }

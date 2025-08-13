@@ -181,7 +181,7 @@ export namespace TripBai {
       name: string
       about: string | null
       organization_id: Core.Entity.Id
-      location_id: Locations.Id
+      location_id: Locations.Id | null
       profile_photo_src: Core.File.UploadPath | null
       cover_photo_src: Core.File.UploadPath | null
       status: Organizations.Fields.Status
@@ -206,7 +206,7 @@ export namespace TripBai {
           organization_id: Core.Entity.Id
           name: string
           about: string | null
-          location_id: Locations.Id
+          location_id: TripBai.Locations.Id | null
           profile_photo_src: Core.File.UploadPath | null
           cover_photo_src: Core.File.UploadPath | null
           status: Organizations.Fields.Status
