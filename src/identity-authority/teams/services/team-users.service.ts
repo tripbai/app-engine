@@ -86,21 +86,19 @@ export class TeamUsersService {
 
       }
 
-      const newTeamModel: TeamModel = {
-        entity_id: Pseudorandom.alphanum32(),
-        user_id: userId,
-        tenant_id: tenantId,
-        is_active: true,
-        is_owner: shouldUserOwnTenant,
-        role_id: null,
-        created_at: TimeStamp.now(),
-        updated_at: TimeStamp.now(),
-        archived_at: null
-      }
+      const teamEntityId = Pseudorandom.alphanum32()
 
       unitOfWork.addTransactionStep(
         this.teamRepository.create(
-          newTeamModel.entity_id, newTeamModel
+          teamEntityId, 
+          {
+            user_id: userId,
+            tenant_id: tenantId,
+            is_active: true,
+            is_owner: shouldUserOwnTenant,
+            role_id: null,
+            archived_at: null
+          }
         )
       )
 

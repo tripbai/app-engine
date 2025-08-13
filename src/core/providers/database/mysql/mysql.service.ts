@@ -202,8 +202,16 @@ export class MySqlService implements AbstractDatabaseProvider {
   }
 
   async whereFieldHasValue(collectionName: string, fieldName: string, value: string | number | boolean | null): Promise<FlatDatabaseRecord[]> {
-    const query = `SELECT * FROM ?? WHERE ${fieldName} = ?`
-    return await this.useSingleQuery(query, [collectionName, value])
+    let query: string = ''
+    let params: Array<string | number | boolean | null> = []
+    if (value === null) {
+      query = `SELECT * FROM ?? WHERE ${fieldName} IS NULL`
+      params = [collectionName]
+    } else {
+      query = `SELECT * FROM ?? WHERE ${fieldName} = ?`
+      params = [collectionName, value]
+    }
+    return await this.useSingleQuery(query, params)
   }
   
   async getRecordById(collectionName: string, id: Core.Entity.Id): Promise<FlatDatabaseRecord[]> {

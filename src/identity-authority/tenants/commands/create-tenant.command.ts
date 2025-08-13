@@ -69,7 +69,14 @@ export class CreateTenantCommand {
       iAuthRequester, unitOfWork, userModel, tenantModel
     )
     const transaction = this.tenantRepository.create(
-      tenantModel.entity_id, tenantModel
+      tenantModel.entity_id, 
+      {
+        secret_key: tenantModel.secret_key,
+        name: tenantModel.name,
+        profile_photo: tenantModel.profile_photo,
+        cover_photo: tenantModel.cover_photo,
+        archived_at: null
+      }
     )
     unitOfWork.addTransactionStep(transaction)
     await unitOfWork.commit()
