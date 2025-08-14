@@ -1,0 +1,9 @@
+node_modules
+data/*
+!data/README.md
+dist
+.development.env
+vault/*
+!vault/README.md
+aws_lambda/*
+!aws_lambda/README.md

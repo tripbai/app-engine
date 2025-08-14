@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "strictNullChecks": true,
+        "noImplicitReturns": true,
+        "strict": true,
+        "skipLibCheck": true,
+        "target": "ESNext",
+        "module":"CommonJS",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata":true,
+        "useDefineForClassFields": false,
+        "outDir": "./dist",
+        "rootDir":"./src",
+        "moduleResolution": "node"
+    },
+    "exclude": ["node_modules"],
+    "include": ["./src/**/*.ts"]
+}
