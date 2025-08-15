@@ -20,6 +20,7 @@
   "author": "",
   "devDependencies": {
     "@types/chai": "^5.2.2",
+    "@types/mysql": "^2.15.27",
     "@types/node": "^20.19.10",
     "archiver": "^7.0.1",
     "cli-progress": "^3.12.0",

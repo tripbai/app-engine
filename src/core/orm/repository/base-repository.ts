@@ -102,7 +102,7 @@ export class BaseRepository<TModel extends BaseEntity> {
       });
     }
     if (!recordExistsInCache) {
-      this.storeToCache(model);
+      await this.storeToCache(model);
     }
     return model;
   }

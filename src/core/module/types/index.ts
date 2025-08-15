@@ -1,4 +1,7 @@
 export * as Entity from "./entity";
+export * as User from "./user";
+export * as Authorization from "./authorization";
+export * as Route from "./route";
 /**
  * Represents a valid timestamp format this application
  * should use.
