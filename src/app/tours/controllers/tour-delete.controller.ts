@@ -1,37 +1,45 @@
 import { inject, injectable } from "inversify";
 import { DeleteTourCommand } from "../commands/delete-tour.command";
-import { del, patch, post, put, get } from "../../../core/router/decorators";
+import {
+  del,
+  patch,
+  post,
+  put,
+  get,
+} from "../../../core/router/route-decorators";
 import { TripBai } from "../../module/module.interface";
 import { Core } from "../../../core/module/module";
-import { BadRequestException, LogicException } from "../../../core/exceptions/exceptions";
+import {
+  BadRequestException,
+  LogicException,
+} from "../../../core/exceptions/exceptions";
 
 @injectable()
 export class TourDeleteController {
-
   constructor(
-    @inject(DeleteTourCommand) public readonly deleteTourCommand: DeleteTourCommand
+    @inject(DeleteTourCommand)
+    public readonly deleteTourCommand: DeleteTourCommand
   ) {}
 
-  @del<TripBai.Tours.Endpoints.DeleteTour>('/trip-engine/tours/:tour_id')
+  @del<TripBai.Tours.Endpoints.DeleteTour>("/trip-engine/tours/:tour_id")
   async deleteTour<T extends TripBai.Tours.Endpoints.DeleteTour>(
     params: Core.Route.ControllerDTO<T>
-  ): Promise<T['response']> {
-    const commandDTO: Parameters<DeleteTourCommand["execute"]>[0] = Object.create(null)
-    commandDTO.requester = params.requester
+  ): Promise<T["response"]> {
+    const commandDTO: Parameters<DeleteTourCommand["execute"]>[0] =
+      Object.create(null);
+    commandDTO.requester = params.requester;
     try {
-    
     } catch (error) {
       throw new BadRequestException({
-        message: 'request failed due to invalid params',
-        data: { error }
-      })
+        message: "request failed due to invalid params",
+        data: { error },
+      });
     }
     throw new LogicException({
-      message: 'This controller is not implemented yet',
+      message: "This controller is not implemented yet",
       data: {
-        controller_name: 'TourDeleteController'
-      }
-    })
+        controller_name: "TourDeleteController",
+      },
+    });
   }
-
 }

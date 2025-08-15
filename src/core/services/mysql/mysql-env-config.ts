@@ -1,34 +1,33 @@
-import * as fs from "fs"
-import { Application } from "../../application";
-import { AppENV } from "../../helpers/env";
+import * as fs from "fs";
 import { AbstractMySqlConfig } from "./mysql-config.interface";
+import { getEnv } from "../../application/appEnv";
+import { appRoot } from "../../application/appRoot";
+import { getEnvironmentContext } from "../../application/environmentContext";
 
 export class MySqlEnvConfig implements AbstractMySqlConfig {
-
   getHost(): string {
-    return AppENV.get('MYSQL_HOST_NAME')
+    return getEnv("MYSQL_HOST_NAME");
   }
 
   getUsername(): string {
-    return AppENV.get('MYSQL_USERNAME')
+    return getEnv("MYSQL_USERNAME");
   }
 
   getPassword(): string {
-    return AppENV.get('MYSQL_PASSWORD')
+    return getEnv("MYSQL_PASSWORD");
   }
 
   getDatabaseName(): string {
-    return AppENV.get('MYSQL_DATABASE')
+    return getEnv("MYSQL_DATABASE");
   }
 
   useSSL(): boolean {
-    return AppENV.get('MYSQL_USE_SSL') === 'true'
+    return getEnv("MYSQL_USE_SSL") === "true";
   }
 
   getCertificate(): string {
-    const environment = Application.environment()
-    const certificatePath = `${Application.root()}/${environment}.mysql.crt.pem`
-    return fs.readFileSync(certificatePath).toString()
+    const environment = getEnvironmentContext();
+    const certificatePath = `${appRoot()}/vault/${environment}.mysql.crt.pem`;
+    return fs.readFileSync(certificatePath).toString();
   }
-
 }

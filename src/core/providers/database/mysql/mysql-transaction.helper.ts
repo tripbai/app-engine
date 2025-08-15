@@ -5,7 +5,6 @@ import { MySqlService } from "./mysql.service";
 
 @injectable()
 export class MySqlTransactionHelper {
-  
   /**
    * Generates an SQL `INSERT` command with normalized data.
    *
@@ -20,10 +19,10 @@ export class MySqlTransactionHelper {
   ): MySqlTransactionStep {
     return {
       executor: executor,
-      type: 'create',
+      type: "create",
       query: `INSERT INTO ${collection} SET ?`,
       data: data,
-    }
+    };
   }
 
   /**
@@ -41,29 +40,27 @@ export class MySqlTransactionHelper {
     collection: string,
     data: FlatDatabaseRecord
   ): MySqlTransactionStep {
-    
-    let query = 'UPDATE ' + collection + ' SET '
+    let query = "UPDATE " + collection + " SET ";
 
     /** Contains all the actual updatable columns */
-    let datalist: Array<string | number | boolean | null> = []
-    const sets: Array<string> = []
+    let datalist: Array<string | number | boolean | null> = [];
+    const sets: Array<string> = [];
 
     for (const key in data) {
       /** Id cannot be updated and entity_id should be listed last */
-      if (key === 'id' || key === 'entity_id') continue
-      sets.push(`${key} = ?`)
-      datalist.push(data[key])
+      if (key === "id" || key === "entity_id") continue;
+      sets.push(`${key} = ?`);
+      datalist.push(data[key]);
     }
 
-    query += sets.join(',')
-    datalist.push(data['entity_id'])
+    query += sets.join(",");
+    datalist.push(data["entity_id"]);
 
     return {
       executor: executor,
-      type: 'update',
-      query: query + ' WHERE entity_id = ?',
+      type: "update",
+      query: query + " WHERE entity_id = ?",
       data: datalist,
-    }
+    };
   }
-
 }

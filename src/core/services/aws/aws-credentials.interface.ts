@@ -1,11 +1,9 @@
 export abstract class AbstractAWSCredentials {
+  abstract getRegion(): string;
 
-  abstract getRegion(): string
+  abstract getAccessKeyId(): string;
 
-  abstract getAccessKeyId(): string
+  abstract getSecretAccessKey(): string;
 
-  abstract getSecretAccessKey(): string
-
-  abstract getS3BucketName(): string
-
+  abstract getS3BucketName(): string;
 }

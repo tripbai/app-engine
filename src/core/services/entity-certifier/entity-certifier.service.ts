@@ -1,22 +1,21 @@
 import { inject, injectable } from "inversify";
-import { Core } from "../../module/module";
+import * as Core from "../../module/types";
 import { AbstractJWTProvider } from "../../providers/jwt/jwt.provider";
-import { JsonWebToken } from "../../providers/jwt/jsonwebtoken/json-web-token.service";
-import { AppENV } from "../../helpers/env";
-import { IsValid } from "../../helpers/isvalid";
-import { EntityToolkit } from "../../orm/entity/entity-toolkit";
+import { assertValidEntityId } from "../../utilities/entityToolkit";
+import { getEnv } from "../../application/appEnv";
+import { assertNonEmptyString } from "../../utilities/assertValid";
 
 /**
  * Namespace `EntityCertifier` provides functionality for generating and validating certification tokens
- * related to entity ID verification within a specified collection. It includes methods to certify entities 
+ * related to entity ID verification within a specified collection. It includes methods to certify entities
  * using JWTs and parse tokens for verification purposes.
  */
 @injectable()
 export class EntityCertifier {
-
   constructor(
-    @inject(AbstractJWTProvider) public readonly JWTProvider: AbstractJWTProvider
-  ){}
+    @inject(AbstractJWTProvider)
+    public readonly JWTProvider: AbstractJWTProvider
+  ) {}
 
   /**
    * Generates a JWT certification token for the specified entity.
@@ -30,77 +29,75 @@ export class EntityCertifier {
     const data = {
       collection: params.collection,
       entity_id: params.entity_id,
-      status: params.status
-    }
+      status: params.status,
+    };
     const token = this.JWTProvider.generate({
-      secret: AppENV.get('JWT_SECRET'),
-      untilMinutes: 60, 
+      secret: getEnv("JWT_SECRET"),
+      untilMinutes: 60,
       data: data,
-      issuer: 'core.entity.certification.service',
-      audience: audience
-    })
-    return token
+      issuer: "core.entity.certification.service",
+      audience: audience,
+    });
+    return token;
   }
 
   /**
    * Parses and validates a JWT certification token, ensuring its origin, audience, and payload integrity.
-   * Verifies each component of the payload, such as the collection, entity ID, and requester ID, according to 
+   * Verifies each component of the payload, such as the collection, entity ID, and requester ID, according to
    * established entity rules and constraints.
    *
    * @param {string} audience - The expected audience for the token.
    * @param {string} token - The JWT certification token to be parsed and validated.
-   * @returns {CertificationTokenPayload} The parsed payload data if validation passes, containing 
+   * @returns {CertificationTokenPayload} The parsed payload data if validation passes, containing
    * collection, entity ID, status, and requester ID.
    * @throws {ResourceAccessForbiddenException} If token validation fails due to issuer or audience mismatch.
    */
   parse(audience: string, token: string): CertificationTokenPayload {
+    const parsed = this.JWTProvider.parse(getEnv("JWT_SECRET"), token);
 
-    const parsed = this.JWTProvider.parse(AppENV.get('JWT_SECRET'), token) 
-
-    if (parsed.iss !== 'core.entity.certification.service') {
-      throw new Error('issuer must be: core.entity.certification.service')
+    if (parsed.iss !== "core.entity.certification.service") {
+      throw new Error("issuer must be: core.entity.certification.service");
     }
 
     if (parsed.aud !== audience) {
-      throw new Error('audience mismatch')
+      throw new Error("audience mismatch");
     }
 
-    const payload = parsed.data 
+    const payload = parsed.data;
 
-    if (typeof payload !== 'object' || payload === null) {
-      throw new Error('payload must be key-value pair')
+    if (typeof payload !== "object" || payload === null) {
+      throw new Error("payload must be key-value pair");
     }
 
-    if (!('collection' in payload)) {
-      throw new Error('missing collection in payload')
+    if (!("collection" in payload)) {
+      throw new Error("missing collection in payload");
     }
-    IsValid.NonEmptyString(payload.collection)
+    assertNonEmptyString(payload.collection);
 
-    if (!('entity_id' in payload)) {
-      throw new Error('missing entity_id in payload')
+    if (!("entity_id" in payload)) {
+      throw new Error("missing entity_id in payload");
     }
-    IsValid.NonEmptyString(payload.entity_id)
-    EntityToolkit.Assert.idIsValid(payload.entity_id)
+    assertNonEmptyString(payload.entity_id);
+    assertValidEntityId(payload.entity_id);
 
-    if (!('requester_id' in payload)) {
-      throw new Error('missing requester_id in payload')
+    if (!("requester_id" in payload)) {
+      throw new Error("missing requester_id in payload");
     }
-    IsValid.NonEmptyString(payload.requester_id)
-    EntityToolkit.Assert.idIsValid(payload.requester_id)
+    assertNonEmptyString(payload.requester_id);
+    assertValidEntityId(payload.requester_id);
 
-    if (!('status' in payload)) {
-      throw new Error('missing requester_id in payload')
+    if (!("status" in payload)) {
+      throw new Error("missing requester_id in payload");
     }
-    IsValid.NonEmptyString(payload.status)
+    assertNonEmptyString(payload.status);
 
     return {
       collection: payload.collection,
       entity_id: payload.entity_id,
       status: payload.status,
-      requester_id: payload.requester_id
-    }
+      requester_id: payload.requester_id,
+    };
   }
-
 }
 
 /**
@@ -113,8 +110,8 @@ export class EntityCertifier {
  * @property {Entity.Id} requester_id - Identifier of the requester for this certification.
  */
 export type CertificationTokenPayload = {
-  collection: string,
-  entity_id: Core.Entity.Id,
-  status: string,
-  requester_id: Core.Entity.Id
-}
+  collection: string;
+  entity_id: Core.Entity.Id;
+  status: string;
+  requester_id: Core.Entity.Id;
+};

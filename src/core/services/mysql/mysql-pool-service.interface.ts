@@ -1,5 +1,5 @@
-import { MySqlPool } from "./mysql";
+import { MySqlPool } from "./mysql.types";
 
 export abstract class AbstractMySqlPoolService {
-  abstract createOrGetPool(): Promise<MySqlPool>
+  abstract createOrGetPool(): Promise<MySqlPool>;
 }

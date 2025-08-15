@@ -1,40 +1,36 @@
 import { inject, injectable } from "inversify";
-import { Core } from "../../module/module";
-import { post } from "../../router/decorators";
-import { IsValid } from "../../helpers/isvalid";
-import { BadRequestException } from "../../exceptions/exceptions";
+import * as Core from "../../module/types";
+import { post } from "../../router/route-decorators";
 import { AppAuthService } from "../services/app-auth-service";
+import { InvalidArgumentException } from "../../exceptions/exceptions";
+import { assertNonEmptyString } from "../../utilities/assertValid";
 
 @injectable()
 export class AppAuthController {
-
   constructor(
     @inject(AppAuthService) public readonly AppAuthService: AppAuthService
-  ){
+  ) {}
 
-  }
-
-  @post<Core.Endpoints.Auth.WithAppAndSecretKey>('/core/authenticate')
-  async withAppKeyAndSecretKey<T extends Core.Endpoints.Auth.WithAppAndSecretKey>(
-    params: Core.Route.ControllerDTO<T>
-  ): Promise<T['response']> {
+  @post<Core.Endpoints.AuthWithAppAndSecretKey>("/core/authenticate")
+  async withAppKeyAndSecretKey<
+    T extends Core.Endpoints.AuthWithAppAndSecretKey
+  >(params: Core.Route.ControllerDTO<T>): Promise<T["response"]> {
     try {
-      IsValid.NonEmptyString(params.data.app_key)
-      IsValid.NonEmptyString(params.data.secret_key)
+      assertNonEmptyString(params.data.app_key);
+      assertNonEmptyString(params.data.secret_key);
     } catch (error) {
-      throw new BadRequestException({
-        message: error.message,
-        data: params.data
-      })
+      throw new InvalidArgumentException({
+        message: error instanceof Error ? error.message : "unknown error",
+        data: params.data,
+      });
     }
     this.AppAuthService.validateCredentials(
       params.data.app_key,
       params.data.secret_key
-    )
-    const token = this.AppAuthService.generateApplicationToken()
+    );
+    const token = this.AppAuthService.generateApplicationToken();
     return {
-      token: token
-    }
+      token: token,
+    };
   }
-
 }

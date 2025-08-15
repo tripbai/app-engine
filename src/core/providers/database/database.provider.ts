@@ -1,4 +1,4 @@
-import { Core } from "../../module/module"
+import * as Core from "../../module/types";
 
 /**
  * Implementing this as interface involves executing operations (e.g., create, update, query)
@@ -8,7 +8,7 @@ export abstract class AbstractDatabaseProvider {
   /**
    * Establishes a connection to the database.
    */
-  abstract connect(): Promise<boolean>
+  abstract connect(): Promise<boolean>;
 
   /**
    * Creates a document in a NoSQL database, or a row in a relational database table.
@@ -18,13 +18,15 @@ export abstract class AbstractDatabaseProvider {
   abstract createRecord(
     collectionName: string,
     record: FlatDatabaseRecord
-  ): Readonly<DatabaseTransactionStep>
+  ): Readonly<DatabaseTransactionStep>;
 
   /**
    * Begins a transaction with a series of database operations.
    * @param transactionableActions - Array of actions to be performed within the transaction.
    */
-  abstract beginTransaction(transactionableActions: Array<Readonly<DatabaseTransactionStep>>): Promise<void>
+  abstract beginTransaction(
+    transactionableActions: Array<Readonly<DatabaseTransactionStep>>
+  ): Promise<void>;
 
   /**
    * Queries a collection or table for records where the specified field has the given value.
@@ -36,19 +38,25 @@ export abstract class AbstractDatabaseProvider {
     collectionName: string,
     fieldName: string,
     value: string | number | boolean | null
-  ): Promise<Array<FlatDatabaseRecord>>
+  ): Promise<Array<FlatDatabaseRecord>>;
 
   /**
    * Retrieves a single record by its ID.
    * @param id - The unique ID of the record.
    */
-  abstract getRecordById(collectionName: string, id: Core.Entity.Id): Promise<Array<FlatDatabaseRecord>>
+  abstract getRecordById(
+    collectionName: string,
+    id: Core.Entity.Id
+  ): Promise<Array<FlatDatabaseRecord>>;
 
   /**
    * Retrieves multiple records by their IDs.
    * @param ids - An array of record IDs.
    */
-  abstract getRecordsByIds(collectionName: string, ids: Array<Core.Entity.Id>): Promise<Array<FlatDatabaseRecord>>
+  abstract getRecordsByIds(
+    collectionName: string,
+    ids: Array<Core.Entity.Id>
+  ): Promise<Array<FlatDatabaseRecord>>;
 
   /**
    * Updates a record by its ID.
@@ -58,7 +66,7 @@ export abstract class AbstractDatabaseProvider {
   abstract updateRecord(
     collectionName: string,
     record: FlatDatabaseRecord
-  ): Readonly<DatabaseTransactionStep>
+  ): Readonly<DatabaseTransactionStep>;
 
   /**
    * Executes a query wrapped in a DatabaseTransactionableAction and returns the result.
@@ -66,36 +74,35 @@ export abstract class AbstractDatabaseProvider {
    */
   abstract useQuery(
     transactionableAction: DatabaseTransactionStep
-  ): Promise<Array<{ [key: string]: any }>>
-
-  
+  ): Promise<Array<{ [key: string]: any }>>;
 }
 
 /**
  * A flat key-value object representing a database record.
  * Nested objects are not supported.
  */
-export type FlatDatabaseRecord = { [key: string]: string | number | boolean | null }
+export type FlatDatabaseRecord = {
+  [key: string]: string | number | boolean | null;
+};
 
 /**
  * Represents a single database operation, potentially within a transaction.
  */
 export type DatabaseTransactionStep = {
-  
   /**
    * The object or service, which implements this interface, that will execute the step.
    */
-  executor: AbstractDatabaseProvider
+  executor: AbstractDatabaseProvider;
   /**
    * The type of step
    */
-  type: 'create' | 'read' | 'update' | 'delete'
+  type: "create" | "read" | "update" | "delete";
   /**
    * The query string to be used for a single operation.
    */
-  query: string
+  query: string;
   /**
    * The data that populates the placeholders in the query, if any.
    */
-  data: FlatDatabaseRecord
-}
+  data: FlatDatabaseRecord;
+};

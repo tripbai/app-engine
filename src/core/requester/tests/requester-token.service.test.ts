@@ -1,47 +1,53 @@
-import { describe, it } from "node:test"
-import { expect } from 'chai'
+import { describe, it } from "node:test";
+import { expect } from "chai";
 import { Container } from "inversify";
 import { JsonWebToken } from "../../providers/jwt/jsonwebtoken/json-web-token.service";
 import { RequesterTokenService } from "../requester-token.service";
-import { AppENV } from "../../helpers/env";
 import { AbstractJWTProvider } from "../../providers/jwt/jwt.provider";
+import { setEnv } from "../../application/appEnv";
 
-AppENV.set('JWT_SECRET', 'asdasd')
+setEnv("JWT_SECRET", "asdasd");
 
-describe('RequesterTokenService', () => {
-  describe('parse()', () => {
-    it('should return expected object shape given the token is valid', () => {
+describe("RequesterTokenService", () => {
+  describe("parse()", () => {
+    it("should return expected object shape given the token is valid", () => {
       class JWTProviderTest extends JsonWebToken {
         parse(secret: string, token: string) {
           return {
-            iss: 'core/requester',
-            aud: 'test',
-            data: { user: { id: 'test', status: 'active',}, permissions: [ 'users:1838127318271123' ] }
-          }
+            iss: "core/requester",
+            aud: "test",
+            data: {
+              user: { id: "test", status: "active" },
+              permissions: ["users:1838127318271123"],
+            },
+          };
         }
       }
-      const container = new Container()
-      container.bind(AbstractJWTProvider).to(JWTProviderTest)
-      container.bind(RequesterTokenService).toSelf()
-      const requesterTokenService = container.get(RequesterTokenService)
-      expect(requesterTokenService.parse('testtoken').iss).to.equal('core/requester')
-    })
+      const container = new Container();
+      container.bind(AbstractJWTProvider).to(JWTProviderTest);
+      container.bind(RequesterTokenService).toSelf();
+      const requesterTokenService = container.get(RequesterTokenService);
+      expect(requesterTokenService.parse("testtoken").iss).to.equal(
+        "core/requester"
+      );
+    });
 
-    it('should throw an error if the token is invalid', () => {
+    it("should throw an error if the token is invalid", () => {
       class JWTProviderTest extends JsonWebToken {
-        parse(secret: string, token: string): { iss: unknown; aud: unknown; data: unknown; } {
-          throw new Error()
+        parse(
+          secret: string,
+          token: string
+        ): { iss: unknown; aud: unknown; data: unknown } {
+          throw new Error();
         }
       }
-      const container = new Container()
-      container.bind(AbstractJWTProvider).to(JWTProviderTest)
-      container.bind(RequesterTokenService).toSelf()
-      const requesterTokenService = container.get(RequesterTokenService)
-      expect(()=>{
-        requesterTokenService.parse('testtoken')
-      }).to.throw('parsing of JWT failed due to some reason')
-    })
-  })
-
-  
-})
+      const container = new Container();
+      container.bind(AbstractJWTProvider).to(JWTProviderTest);
+      container.bind(RequesterTokenService).toSelf();
+      const requesterTokenService = container.get(RequesterTokenService);
+      expect(() => {
+        requesterTokenService.parse("testtoken");
+      }).to.throw("parsing of JWT failed due to some reason");
+    });
+  });
+});

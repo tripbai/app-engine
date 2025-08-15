@@ -1,7 +1,5 @@
 export abstract class AbstractNodeEmitterConfig {
+  abstract getMaxRetries(): number;
 
-  abstract getMaxRetries(): number 
-
-  abstract isAsynchronous(): boolean
-
+  abstract isAsynchronous(): boolean;
 }

@@ -1,7 +1,5 @@
 export abstract class AbstractKryptodocConfig {
-  
-  abstract getTopicId(): string
+  abstract getTopicId(): string;
 
-  abstract getMessageGroupId(): string
-
+  abstract getMessageGroupId(): string;
 }

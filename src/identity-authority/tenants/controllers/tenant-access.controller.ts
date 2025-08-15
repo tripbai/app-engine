@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { AddTenantUserCommand } from "../commands/add-tenant-user.command";
 import { RemoveTenantUserCommand } from "../commands/remove-tenant-user.command";
-import { del, post } from "../../../core/router/decorators";
+import { del, post } from "../../../core/router/route-decorators";
 import { IdentityAuthority } from "../../module/module.interface";
 import { Core } from "../../../core/module/module";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
@@ -10,62 +10,64 @@ import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
 
 @injectable()
 export class TenantAccessController {
-
   constructor(
-    @inject(AddTenantUserCommand) private readonly addTenantUserCommand: AddTenantUserCommand,
-    @inject(RemoveTenantUserCommand) private readonly removeTenantUserCommand: RemoveTenantUserCommand,
+    @inject(AddTenantUserCommand)
+    private readonly addTenantUserCommand: AddTenantUserCommand,
+    @inject(RemoveTenantUserCommand)
+    private readonly removeTenantUserCommand: RemoveTenantUserCommand
   ) {}
-  
-  @post<IdentityAuthority.Tenants.Endpoints.AddUserToTeam>('/identity-authority/tenants/:tenant_id/team/users')
-  async addUserToTenant<T extends IdentityAuthority.Tenants.Endpoints.AddUserToTeam>(
-    params: Core.Route.ControllerDTO<T>
-  ): Promise<T['response']>{
-    try {
-      IsValid.NonEmptyString(params.data.tenant_id)
-      EntityToolkit.Assert.idIsValid(params.data.tenant_id)
 
-      IsValid.NonEmptyString(params.data.user_id)
-      EntityToolkit.Assert.idIsValid(params.data.user_id)
+  @post<IdentityAuthority.Tenants.Endpoints.AddUserToTeam>(
+    "/identity-authority/tenants/:tenant_id/team/users"
+  )
+  async addUserToTenant<
+    T extends IdentityAuthority.Tenants.Endpoints.AddUserToTeam
+  >(params: Core.Route.ControllerDTO<T>): Promise<T["response"]> {
+    try {
+      IsValid.NonEmptyString(params.data.tenant_id);
+      EntityToolkit.Assert.idIsValid(params.data.tenant_id);
+
+      IsValid.NonEmptyString(params.data.user_id);
+      EntityToolkit.Assert.idIsValid(params.data.user_id);
     } catch (error) {
       throw new BadRequestException({
-        message: 'failed to add user to tenant team due to an error',
-        data: { error: error }
-      })
+        message: "failed to add user to tenant team due to an error",
+        data: { error: error },
+      });
     }
 
     await this.addTenantUserCommand.execute({
       tenantId: params.data.tenant_id,
       userId: params.data.user_id,
-      requester: params.requester
-    })
+      requester: params.requester,
+    });
 
-    return {}
-
+    return {};
   }
 
-  @del<IdentityAuthority.Tenants.Endpoints.RemoveUserFromTeam>('/identity-authority/tenants/:tenant_id/team/users/:user_id')
-  async removeUserFromTenant<T extends IdentityAuthority.Tenants.Endpoints.RemoveUserFromTeam>(
-    params: Core.Route.ControllerDTO<T>
-  ): Promise<T['response']>{
+  @del<IdentityAuthority.Tenants.Endpoints.RemoveUserFromTeam>(
+    "/identity-authority/tenants/:tenant_id/team/users/:user_id"
+  )
+  async removeUserFromTenant<
+    T extends IdentityAuthority.Tenants.Endpoints.RemoveUserFromTeam
+  >(params: Core.Route.ControllerDTO<T>): Promise<T["response"]> {
     try {
-      IsValid.NonEmptyString(params.data.tenant_id)
-      EntityToolkit.Assert.idIsValid(params.data.tenant_id)
+      IsValid.NonEmptyString(params.data.tenant_id);
+      EntityToolkit.Assert.idIsValid(params.data.tenant_id);
 
-      IsValid.NonEmptyString(params.data.user_id)
-      EntityToolkit.Assert.idIsValid(params.data.user_id)
+      IsValid.NonEmptyString(params.data.user_id);
+      EntityToolkit.Assert.idIsValid(params.data.user_id);
     } catch (error) {
       throw new BadRequestException({
-        message: 'failed to remove user from tenant team due to an error',
-        data: { error: error }
-      })
+        message: "failed to remove user from tenant team due to an error",
+        data: { error: error },
+      });
     }
     await this.removeTenantUserCommand.execute({
       tenantId: params.data.tenant_id,
       userId: params.data.user_id,
-      requester: params.requester
-    })
-    return {}
+      requester: params.requester,
+    });
+    return {};
   }
-
-
 }

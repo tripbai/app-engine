@@ -1,42 +1,51 @@
 import { inject, injectable } from "inversify";
 import { CreateStoreCommand } from "../commands/create-store.command";
-import { del, patch, post, put, get } from "../../../core/router/decorators";
+import {
+  del,
+  patch,
+  post,
+  put,
+  get,
+} from "../../../core/router/route-decorators";
 import { TripBai } from "../../module/module.interface";
 import { Core } from "../../../core/module/module";
-import { BadRequestException, LogicException } from "../../../core/exceptions/exceptions";
+import {
+  BadRequestException,
+  LogicException,
+} from "../../../core/exceptions/exceptions";
 import { IsValid } from "../../../core/helpers/isvalid";
 import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
 import { StoreValidator } from "../store.validator";
 
 @injectable()
 export class StoreCreateController {
-
   constructor(
-    @inject(CreateStoreCommand) public readonly createStoreCommand: CreateStoreCommand
+    @inject(CreateStoreCommand)
+    public readonly createStoreCommand: CreateStoreCommand
   ) {}
 
-  @post<TripBai.Stores.Endpoints.CreateStore>('/tripbai/stores')
+  @post<TripBai.Stores.Endpoints.CreateStore>("/tripbai/stores")
   async createStore<T extends TripBai.Stores.Endpoints.CreateStore>(
     params: Core.Route.ControllerDTO<T>
-  ): Promise<T['response']> {
-    const commandDTO: Parameters<CreateStoreCommand["execute"]>[0] = Object.create(null)
-    commandDTO.requester = params.requester
+  ): Promise<T["response"]> {
+    const commandDTO: Parameters<CreateStoreCommand["execute"]>[0] =
+      Object.create(null);
+    commandDTO.requester = params.requester;
     try {
-      IsValid.NonEmptyString(params.data.organization_id)
-      EntityToolkit.Assert.idIsValid(params.data.organization_id)
-      commandDTO.organizationId = params.data.organization_id
+      IsValid.NonEmptyString(params.data.organization_id);
+      EntityToolkit.Assert.idIsValid(params.data.organization_id);
+      commandDTO.organizationId = params.data.organization_id;
 
-      IsValid.NonEmptyString(params.data.name)
-      StoreValidator.name(params.data.name)
-      commandDTO.name = params.data.name
-
+      IsValid.NonEmptyString(params.data.name);
+      StoreValidator.name(params.data.name);
+      commandDTO.name = params.data.name;
     } catch (error) {
       throw new BadRequestException({
-        message: 'request failed due to invalid params',
-        data: { error }
-      })
+        message: "request failed due to invalid params",
+        data: { error },
+      });
     }
-    const storeModel = await this.createStoreCommand.execute(commandDTO)
+    const storeModel = await this.createStoreCommand.execute(commandDTO);
     return {
       entity_id: storeModel.entity_id,
       organization_id: storeModel.organization_id,
@@ -45,8 +54,7 @@ export class StoreCreateController {
       location_id: storeModel.location_id,
       profile_photo_src: storeModel.profile_photo_src,
       cover_photo_src: storeModel.cover_photo_src,
-      status: storeModel.status
-    }
+      status: storeModel.status,
+    };
   }
-
 }

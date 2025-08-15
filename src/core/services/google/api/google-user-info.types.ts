@@ -1,6 +1,6 @@
 /**
  * Represents information about a Google user retrieved from the Google API.
- * 
+ *
  * @typedef {Object} GoogleUserInfo
  * @property {string} id - The unique identifier for the Google user.
  * @property {string} email - The email address of the Google user.
@@ -12,12 +12,12 @@
  * @property {string} locale - The locale setting of the Google user.
  */
 export type GoogleUserInfo = {
-  id: string,
-  email:string,
-  verified_email: boolean,
-  name: string,
-  given_name: string,
-  family_name: string,
-  picture: string,
-  locale: string
-}
+  id: string;
+  email: string;
+  verified_email: boolean;
+  name: string;
+  given_name: string;
+  family_name: string;
+  picture: string;
+  locale: string;
+};

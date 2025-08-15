@@ -1,15 +1,12 @@
-
 export abstract class AbstractJWTProvider {
-
   abstract parse(
-    secretKey: string, 
+    secretKey: string,
     JwToken: string
-  ): {iss: unknown, aud: unknown, data: unknown}
+  ): { iss: unknown; aud: unknown; data: unknown };
 
-  abstract generate<TPayload extends {[key:string]: any}>(
+  abstract generate<TPayload extends { [key: string]: any }>(
     param: JWTTokenParams<TPayload>
-  ): string
-
+  ): string;
 }
 
 /**
@@ -23,9 +20,9 @@ export abstract class AbstractJWTProvider {
  * @property {string} audience - The audience for which the token is intended.
  */
 export type JWTTokenParams<TDataPayload> = {
-  secret: string
-  untilMinutes: number
-  data: TDataPayload
-  issuer: string
-  audience: string
-}
+  secret: string;
+  untilMinutes: number;
+  data: TDataPayload;
+  issuer: string;
+  audience: string;
+};

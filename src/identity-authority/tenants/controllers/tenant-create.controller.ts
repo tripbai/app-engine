@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { post } from "../../../core/router/decorators";
+import { post } from "../../../core/router/route-decorators";
 import { IdentityAuthority } from "../../module/module.interface";
 import { Core } from "../../../core/module/module";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
@@ -14,28 +14,32 @@ import { UserAccessRegistry } from "../../teams/user-access.registry";
  */
 @injectable()
 export class TenantCreateController {
-
   constructor(
-    @inject(CreateTenantCommand) private readonly createTenantCommand: CreateTenantCommand,
-    @inject(UserAccessRegistry) private readonly userAccessRegistry: UserAccessRegistry
+    @inject(CreateTenantCommand)
+    private readonly createTenantCommand: CreateTenantCommand,
+    @inject(UserAccessRegistry)
+    private readonly userAccessRegistry: UserAccessRegistry
   ) {}
-  
-  @post<IdentityAuthority.Tenants.Endpoints.CreateTenant>('/identity-authority/tenants')
-  async createTenant<T extends IdentityAuthority.Tenants.Endpoints.CreateTenant>(
-    params: Core.Route.ControllerDTO<T>
-  ): Promise<T['response']> {
+
+  @post<IdentityAuthority.Tenants.Endpoints.CreateTenant>(
+    "/identity-authority/tenants"
+  )
+  async createTenant<
+    T extends IdentityAuthority.Tenants.Endpoints.CreateTenant
+  >(params: Core.Route.ControllerDTO<T>): Promise<T["response"]> {
     try {
-      IsValid.NonEmptyString(params.data.name)
-      TenantValidator.name(params.data.name)
+      IsValid.NonEmptyString(params.data.name);
+      TenantValidator.name(params.data.name);
     } catch (error) {
       throw new BadRequestException({
-        message: 'failed to create tenant due to invalid input',
-        data: { error }
-      })
+        message: "failed to create tenant due to invalid input",
+        data: { error },
+      });
     }
     const result = await this.createTenantCommand.execute(
-      params.requester, params.data.name
-    )
+      params.requester,
+      params.data.name
+    );
     return {
       entity_id: result.entity_id,
       secret_key: result.secret_key,
@@ -43,8 +47,7 @@ export class TenantCreateController {
       profile_photo: result.profile_photo,
       cover_photo: result.cover_photo,
       created_at: result.created_at,
-      updated_at: result.updated_at
-    }
+      updated_at: result.updated_at,
+    };
   }
-
 }

@@ -1,7 +1,5 @@
 export abstract class FirebaseProjectInterface {
-  
-  abstract getConfPath(): string
+  abstract getConfPath(): string;
 
-  abstract getProjectId(): string
-
+  abstract getProjectId(): string;
 }

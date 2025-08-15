@@ -1,16 +1,14 @@
 import { injectable } from "inversify";
-import { AppENV } from "../../helpers/env";
 import { AbstractKryptodocConfig } from "./kryptodoc-config.interface";
+import { getEnv } from "../../application/appEnv";
 
 @injectable()
 export class KryptodocEnvConfig implements AbstractKryptodocConfig {
-  
   getTopicId(): string {
-    return AppENV.get('KRYPTODOC_INDEXER_TOPIC_ARN')
+    return getEnv("KRYPTODOC_INDEXER_TOPIC_ARN");
   }
 
   getMessageGroupId(): string {
-    return AppENV.get('KRYPTODOC_MESSAGE_GROUP_ID')
+    return getEnv("KRYPTODOC_MESSAGE_GROUP_ID");
   }
-
 }

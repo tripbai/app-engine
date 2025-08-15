@@ -1,11 +1,15 @@
 import { inject, injectable } from "inversify";
-import { get } from "../../../core/router/decorators";
+import { get } from "../../../core/router/route-decorators";
 import { IdentityAuthority } from "../../module/module.interface";
 import { Core } from "../../../core/module/module";
 import { UserPermissionService } from "../services/user-permission.service";
 import { UserRepository } from "../user.repository";
 import { ProfileRepository } from "../../profiles/profile.repository";
-import { BadRequestException, RecordNotFoundException, ResourceAccessForbiddenException } from "../../../core/exceptions/exceptions";
+import {
+  BadRequestException,
+  RecordNotFoundException,
+  ResourceAccessForbiddenException,
+} from "../../../core/exceptions/exceptions";
 import { IsValid } from "../../../core/helpers/isvalid";
 import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
 import { IAuthRequesterFactory } from "../../requester/iauth-requester.factory";
@@ -14,23 +18,26 @@ import { UserAssertions } from "../user.assertions";
 
 @injectable()
 export class UserGetController {
-
   constructor(
-    @inject(IAuthRequesterFactory) public readonly iAuthRequesterFactory: IAuthRequesterFactory,
+    @inject(IAuthRequesterFactory)
+    public readonly iAuthRequesterFactory: IAuthRequesterFactory,
     @inject(UserRepository) public readonly userRepository: UserRepository,
-    @inject(ProfileRepository) public readonly profileRepository: ProfileRepository,
+    @inject(ProfileRepository)
+    public readonly profileRepository: ProfileRepository,
     @inject(UserAssertions) public readonly userAssertions: UserAssertions
-  ){}
+  ) {}
 
-  @get<IdentityAuthority.Users.Endpoints.GetSelf>('/identity-authority/user/me')
-  async me<T extends IdentityAuthority.Users.Endpoints.GetSelf>(params: Core.Route.ControllerDTO<T>): Promise<T['response']>{
-    const iAuthRequester = this.iAuthRequesterFactory.create(params.requester)
+  @get<IdentityAuthority.Users.Endpoints.GetSelf>("/identity-authority/user/me")
+  async me<T extends IdentityAuthority.Users.Endpoints.GetSelf>(
+    params: Core.Route.ControllerDTO<T>
+  ): Promise<T["response"]> {
+    const iAuthRequester = this.iAuthRequesterFactory.create(params.requester);
     if (!iAuthRequester.isRegularUser()) {
-      throw new IAuthForbiddenAccessException(params.requester)
+      throw new IAuthForbiddenAccessException(params.requester);
     }
-    const userId = iAuthRequester.get().user.entity_id
-    const userModel = await this.userRepository.getById(userId)
-    const profileModel = await this.profileRepository.getById(userId)
+    const userId = iAuthRequester.get().user.entity_id;
+    const userModel = await this.userRepository.getById(userId);
+    const profileModel = await this.profileRepository.getById(userId);
     return {
       entity_id: userModel.entity_id,
       first_name: profileModel.first_name,
@@ -44,30 +51,34 @@ export class UserGetController {
       user_type: userModel.type,
       status: userModel.status,
       verified_since: userModel.verified_since,
-      role: userModel.role
-    }
+      role: userModel.role,
+    };
   }
 
-  @get<IdentityAuthority.Users.Endpoints.GetModel>('/identity-authority/users/:user_id')
-  async getUserModel<T extends IdentityAuthority.Users.Endpoints.GetModel>(params: Core.Route.ControllerDTO<T>): Promise<T['response']>{
+  @get<IdentityAuthority.Users.Endpoints.GetModel>(
+    "/identity-authority/users/:user_id"
+  )
+  async getUserModel<T extends IdentityAuthority.Users.Endpoints.GetModel>(
+    params: Core.Route.ControllerDTO<T>
+  ): Promise<T["response"]> {
     try {
-      IsValid.NonEmptyString(params.data.user_id)
-      EntityToolkit.Assert.idIsValid(params.data.user_id)
+      IsValid.NonEmptyString(params.data.user_id);
+      EntityToolkit.Assert.idIsValid(params.data.user_id);
     } catch (error) {
       throw new BadRequestException({
-        message: 'invalid user id',
-        data: {user_id: params.data.user_id}
-      })
+        message: "invalid user id",
+        data: { user_id: params.data.user_id },
+      });
     }
-    const iAuthRequester = this.iAuthRequesterFactory.create(params.requester)
-    if (!iAuthRequester.hasAllowedAccess()) 
-      throw new IAuthForbiddenAccessException(params.requester)
-    if (!iAuthRequester.isRegularUser()) 
-      throw new IAuthForbiddenAccessException(params.requester)
-    if (!iAuthRequester.canOperateThisUser(params.data.user_id)) 
-      throw new IAuthForbiddenAccessException(params.requester)
-    const userIdToRetrieve = params.data.user_id
-    const userModel = await this.userRepository.getById(userIdToRetrieve)
+    const iAuthRequester = this.iAuthRequesterFactory.create(params.requester);
+    if (!iAuthRequester.hasAllowedAccess())
+      throw new IAuthForbiddenAccessException(params.requester);
+    if (!iAuthRequester.isRegularUser())
+      throw new IAuthForbiddenAccessException(params.requester);
+    if (!iAuthRequester.canOperateThisUser(params.data.user_id))
+      throw new IAuthForbiddenAccessException(params.requester);
+    const userIdToRetrieve = params.data.user_id;
+    const userModel = await this.userRepository.getById(userIdToRetrieve);
     return {
       identity_provider: userModel.identity_provider,
       email_address: userModel.email_address,
@@ -79,63 +90,45 @@ export class UserGetController {
       role: userModel.role,
       status: userModel.status,
       type: userModel.type,
-    }
-  } 
+    };
+  }
 
-  @get<IdentityAuthority.Users.Endpoints.GetByEmailOrUsername>('/identity-authority/user/get/snippet?type=:type&value=:value')
-  async getByEmailOrUsername<T extends IdentityAuthority.Users.Endpoints.GetByEmailOrUsername>(
-    params: Core.Route.ControllerDTO<T>
-  ): Promise<T['response']> {
+  @get<IdentityAuthority.Users.Endpoints.GetByEmailOrUsername>(
+    "/identity-authority/user/get/snippet?type=:type&value=:value"
+  )
+  async getByEmailOrUsername<
+    T extends IdentityAuthority.Users.Endpoints.GetByEmailOrUsername
+  >(params: Core.Route.ControllerDTO<T>): Promise<T["response"]> {
     try {
-      IsValid.NonEmptyString(params.data.type)
-      IsValid.NonEmptyString(params.data.value)
-      if (!['email_address', 'username'].includes(params.data.type)) {
+      IsValid.NonEmptyString(params.data.type);
+      IsValid.NonEmptyString(params.data.value);
+      if (!["email_address", "username"].includes(params.data.type)) {
         throw new BadRequestException({
-          message: 'invalid type, must be email_address or username',
-          data: { type: params.data.type }
-        })
+          message: "invalid type, must be email_address or username",
+          data: { type: params.data.type },
+        });
       }
     } catch (error) {
       throw new BadRequestException({
-        message: 'invalid get params',
-        data: {}
-      })
+        message: "invalid get params",
+        data: {},
+      });
     }
 
-    if (params.data.type === 'email_address') {
-      this.userAssertions.isEmailAddress(params.data.value)
-      const userModel = await this.userRepository.getByEmailAddress(params.data.value)
+    if (params.data.type === "email_address") {
+      this.userAssertions.isEmailAddress(params.data.value);
+      const userModel = await this.userRepository.getByEmailAddress(
+        params.data.value
+      );
       if (userModel === null) {
         throw new RecordNotFoundException({
-          message: 'user not found',
-          data: { email_address: params.data.value }
-        })
+          message: "user not found",
+          data: { email_address: params.data.value },
+        });
       }
-      const profileModel = await this.profileRepository.getById(userModel.entity_id)
-      return {
-        id: userModel.entity_id,
-        first_name: profileModel.first_name,
-        last_name:profileModel.last_name,
-        email_address: userModel.email_address,
-        username: userModel.username,
-        is_email_verified: userModel.is_email_verified,
-        status: userModel.status,
-        profile_photo: profileModel.profile_photo,
-        cover_photo: profileModel.cover_photo,
-        user_type: userModel.type
-      }
-    }
-
-    if (params.data.type === 'username') {
-      this.userAssertions.isUsername(params.data.value)
-      const userModel = await this.userRepository.getByUsername(params.data.value)
-      if (userModel === null) {
-        throw new RecordNotFoundException({
-          message: 'user not found',
-          data: { username: params.data.value }
-        })
-      }
-      const profileModel = await this.profileRepository.getById(userModel.entity_id)
+      const profileModel = await this.profileRepository.getById(
+        userModel.entity_id
+      );
       return {
         id: userModel.entity_id,
         first_name: profileModel.first_name,
@@ -146,14 +139,41 @@ export class UserGetController {
         status: userModel.status,
         profile_photo: profileModel.profile_photo,
         cover_photo: profileModel.cover_photo,
-        user_type: userModel.type
+        user_type: userModel.type,
+      };
+    }
+
+    if (params.data.type === "username") {
+      this.userAssertions.isUsername(params.data.value);
+      const userModel = await this.userRepository.getByUsername(
+        params.data.value
+      );
+      if (userModel === null) {
+        throw new RecordNotFoundException({
+          message: "user not found",
+          data: { username: params.data.value },
+        });
       }
+      const profileModel = await this.profileRepository.getById(
+        userModel.entity_id
+      );
+      return {
+        id: userModel.entity_id,
+        first_name: profileModel.first_name,
+        last_name: profileModel.last_name,
+        email_address: userModel.email_address,
+        username: userModel.username,
+        is_email_verified: userModel.is_email_verified,
+        status: userModel.status,
+        profile_photo: profileModel.profile_photo,
+        cover_photo: profileModel.cover_photo,
+        user_type: userModel.type,
+      };
     }
 
     throw new BadRequestException({
-      message: 'invalid type, must be email_address or username',
-      data: { type: params.data.type }
-    })
+      message: "invalid type, must be email_address or username",
+      data: { type: params.data.type },
+    });
   }
-
 }

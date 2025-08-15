@@ -1,19 +1,18 @@
 import { injectable } from "inversify";
-import { get } from "../../router/decorators";
-import { Core } from "../../module/module";
-import { AppENV } from "../../helpers/env";
-import { Application } from "../../application";
+import { get } from "../../router/route-decorators";
+import * as Core from "../../module/types";
+import { getEnvironmentContext } from "../../application/environmentContext";
 
 @injectable()
 export class AppInfoController {
-
-  @get<Core.Endpoints.Info>('/core/application')
-  async getAppInfo<T extends Core.Endpoints.Info>(): Promise<T['response']>{
+  @get<Core.Endpoints.GetAppInfo>("/core/application")
+  async getAppInfo<T extends Core.Endpoints.GetAppInfo>(): Promise<
+    T["response"]
+  > {
     return {
-      name: Application.name(),
-      environment: Application.environment(),
-      build_time: Application.build()
-    }
+      name: "unknown",
+      environment: getEnvironmentContext(),
+      build_time: "unknown",
+    };
   }
-
 }

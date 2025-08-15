@@ -1,47 +1,55 @@
-import { AppLogger } from "../../../helpers/logger"
-
-
-let generic = `Request failed to complete due to error encountered `
-    generic += `by one of your database service providers `
+import { logError } from "../../../application/appLogger";
 
 export class MySqlConnectionError extends Error {
-  code: number
-  constructor(params: {message: string, data: Record<string,any>}) {
-    super(generic)
-    AppLogger.error(
-      { severity: 3, message: params.message, data: params.data }
-    )
-    this.message = generic
-    this.name = this.constructor.name
-    Error.captureStackTrace(this, this.constructor)
-    this.code = 500
+  code: number;
+  constructor({
+    message,
+    data,
+  }: {
+    message: string;
+    data: Record<string, any>;
+  }) {
+    super(message);
+    logError({ severity: 3, message: message, data: data });
+    this.message = message;
+    this.name = this.constructor.name;
+    Error.captureStackTrace(this, this.constructor);
+    this.code = 10001;
   }
 }
 
 export class FatalMySqlConnectionError extends Error {
-  code: number
-  constructor(params: {message: string, data: Record<string,any>}) {
-    super(generic)
-    AppLogger.error(
-      { severity: 1, message: params.message, data: params.data }
-    )
-    this.message = generic
-    this.name = this.constructor.name
-    Error.captureStackTrace(this, this.constructor)
-    this.code = 500
+  code: number;
+  constructor({
+    message,
+    data,
+  }: {
+    message: string;
+    data: Record<string, any>;
+  }) {
+    super(message);
+    logError({ severity: 1, message: message, data: data });
+    this.message = message;
+    this.name = this.constructor.name;
+    Error.captureStackTrace(this, this.constructor);
+    this.code = 10001;
   }
 }
 
 export class GenericMySqlException extends Error {
-  code: number
-  constructor(params: {message: string, data: Record<string,any>}) {
-    super(generic)
-    AppLogger.error(
-      { severity: 3, message: params.message, data: params.data }
-    )
-    this.message = generic
-    this.name = this.constructor.name
-    Error.captureStackTrace(this, this.constructor)
-    this.code = 500
+  code: number;
+  constructor({
+    message,
+    data,
+  }: {
+    message: string;
+    data: Record<string, any>;
+  }) {
+    super(message);
+    logError({ severity: 3, message: message, data: data });
+    this.message = message;
+    this.name = this.constructor.name;
+    Error.captureStackTrace(this, this.constructor);
+    this.code = 10001;
   }
 }

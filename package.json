@@ -19,6 +19,7 @@
   "keywords": [],
   "author": "",
   "devDependencies": {
+    "@types/chai": "^5.2.2",
     "@types/node": "^20.17.5",
     "archiver": "^7.0.1",
     "cli-progress": "^3.12.0",

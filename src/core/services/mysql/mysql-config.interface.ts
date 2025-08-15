@@ -3,16 +3,15 @@
  */
 export abstract class AbstractMySqlConfig {
   /** Database server hostname. */
-  abstract getHost(): string
+  abstract getHost(): string;
   /** Username for database authentication. */
-  abstract getUsername(): string
+  abstract getUsername(): string;
   /** Password for database authentication. */
-  abstract getPassword(): string
+  abstract getPassword(): string;
   /** Name of the database to connect to. */
-  abstract getDatabaseName(): string
+  abstract getDatabaseName(): string;
   /** Optional SSL configuration for secure connections. */
-  abstract useSSL(): boolean
-   /** CA certificate for SSL. */
-  abstract getCertificate(): string
-  
+  abstract useSSL(): boolean;
+  /** CA certificate for SSL. */
+  abstract getCertificate(): string;
 }

@@ -1,2 +1,4 @@
-export type FirestoreQueryType = 'collection.create' | 'document.create' | 'document.update'
-
+export type FirestoreQueryType =
+  | "collection.create"
+  | "document.create"
+  | "document.update";

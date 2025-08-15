@@ -4,15 +4,12 @@ import { UnitOfWork } from "./unit-of-work";
 
 @injectable()
 export class UnitOfWorkFactory {
-
   constructor(
-    @inject(AbstractDatabaseProvider) public readonly abstractDatabaseProvider: AbstractDatabaseProvider
-  ){}
+    @inject(AbstractDatabaseProvider)
+    public readonly abstractDatabaseProvider: AbstractDatabaseProvider
+  ) {}
 
-  create(){
-    return new UnitOfWork(
-      this.abstractDatabaseProvider
-    )
+  create() {
+    return new UnitOfWork(this.abstractDatabaseProvider);
   }
-
 }
