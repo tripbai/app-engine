@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { post } from "../../../core/router/route-decorators";
-import { IdentityAuthority } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as IdentityAuthority from "../../module/types";
+import * as Core from "../../../core/module/types";
 import { ResendAccountVerificationEmailCommand } from "../commands/resend-account-verification-email.command";
 import { UserAssertions } from "../user.assertions";
 import { BadRequestException } from "../../../core/exceptions/exceptions";

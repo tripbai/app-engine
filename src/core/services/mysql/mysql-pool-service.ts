@@ -12,7 +12,7 @@ import { AbstractMySqlPoolService } from "./mysql-pool-service.interface";
 export class MySqlPoolService implements AbstractMySqlPoolService {
   constructor(
     @inject(AbstractMySqlConfig)
-    public readonly MySqlConfig: AbstractMySqlConfig
+    private MySqlConfig: AbstractMySqlConfig
   ) {}
 
   async createOrGetPool() {

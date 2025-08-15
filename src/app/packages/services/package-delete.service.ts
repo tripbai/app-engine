@@ -3,9 +3,7 @@ import { PackageRepository } from "../package.repository";
 
 @injectable()
 export class PackageDeleteService {
-
   constructor(
-    @inject(PackageRepository) public readonly packageRepository: PackageRepository
+    @inject(PackageRepository) private packageRepository: PackageRepository
   ) {}
-
 }

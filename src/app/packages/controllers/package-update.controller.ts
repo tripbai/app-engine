@@ -8,7 +8,7 @@ import {
   get,
 } from "../../../core/router/route-decorators";
 import { TripBai } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
   LogicException,
@@ -21,7 +21,7 @@ import { PackageValidator } from "../package.validator";
 export class PackageUpdateController {
   constructor(
     @inject(UpdatePackageCommand)
-    public readonly updatePackageCommand: UpdatePackageCommand
+    private updatePackageCommand: UpdatePackageCommand
   ) {}
 
   @put<TripBai.Packages.Endpoints.UpdatePackage>(
@@ -34,12 +34,12 @@ export class PackageUpdateController {
       Object.create(null);
     commandDTO.requester = params.requester;
     try {
-      IsValid.NonEmptyString(params.data.package_id);
-      EntityToolkit.Assert.idIsValid(params.data.package_id);
+      assertNonEmptyString(params.data.package_id);
+      assertValidEntityId(params.data.package_id);
       commandDTO.packageId = params.data.package_id;
 
       if (params.data.name) {
-        IsValid.NonEmptyString(params.data.name);
+        assertNonEmptyString(params.data.name);
         PackageValidator.name(params.data.name);
         commandDTO.name = params.data.name;
       }

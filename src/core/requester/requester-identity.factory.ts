@@ -8,7 +8,7 @@ import { BaseRequester } from "./requester-base";
 export class RequesterIdentityFactory {
   constructor(
     @inject(RequesterTokenService)
-    public readonly RequesterTokenService: RequesterTokenService
+    private RequesterTokenService: RequesterTokenService
   ) {}
 
   create({

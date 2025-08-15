@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { get } from "../../../core/router/route-decorators";
-import { IdentityAuthority } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as IdentityAuthority from "../../module/types";
+import * as Core from "../../../core/module/types";
 import { IAuthRequesterFactory } from "../../requester/iauth-requester.factory";
 import { EmailTemplateRepository } from "../email-template.repository";
 import { ResourceAccessForbiddenException } from "../../../core/exceptions/exceptions";
@@ -10,9 +10,9 @@ import { ResourceAccessForbiddenException } from "../../../core/exceptions/excep
 export class EmailTemplateGetController {
   constructor(
     @inject(IAuthRequesterFactory)
-    public readonly iAuthRequesterFactory: IAuthRequesterFactory,
+    private iAuthRequesterFactory: IAuthRequesterFactory,
     @inject(EmailTemplateRepository)
-    public readonly emailTemplateRepository: EmailTemplateRepository
+    private emailTemplateRepository: EmailTemplateRepository
   ) {}
 
   @get<IdentityAuthority.EmailTemplatesRegistry.Endpoints.GetAll>(

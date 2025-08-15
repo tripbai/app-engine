@@ -10,9 +10,9 @@ const crypto = require("crypto");
 export class KryptodocIndexerService implements AbstractIndexerProvider {
   constructor(
     @inject(KryptodocEnvConfig)
-    public readonly kryptodocConfig: AbstractKryptodocConfig,
+    private kryptodocConfig: AbstractKryptodocConfig,
     @inject(AbstractTopicPublisherProvider)
-    public readonly topicPublisherService: AbstractTopicPublisherProvider
+    private topicPublisherService: AbstractTopicPublisherProvider
   ) {}
 
   async index(tasks: Array<IndexTaskItem>): Promise<void> {

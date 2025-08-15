@@ -6,7 +6,7 @@ import { UnitOfWork } from "./unit-of-work";
 export class UnitOfWorkFactory {
   constructor(
     @inject(AbstractDatabaseProvider)
-    public readonly abstractDatabaseProvider: AbstractDatabaseProvider
+    private abstractDatabaseProvider: AbstractDatabaseProvider
   ) {}
 
   create() {

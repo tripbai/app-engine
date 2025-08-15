@@ -6,22 +6,19 @@ import { StoreModel } from "./store.model";
 
 @injectable()
 export class StoreRepository extends BaseRepository<StoreModel> {
-
-protected collection: string = 'stores'
+  protected collection: string = "stores";
 
   constructor(
-    @inject(AbstractDatabaseProvider) public readonly DatabaseProvider: AbstractDatabaseProvider,
-    @inject(AbstractCacheProvider) public readonly CacheProvider: AbstractCacheProvider
-  ){
-    super(
-    StoreModel,
-    DatabaseProvider,
-    CacheProvider
-    )
+    @inject(AbstractDatabaseProvider)
+    private DatabaseProvider: AbstractDatabaseProvider,
+    @inject(AbstractCacheProvider) private CacheProvider: AbstractCacheProvider
+  ) {
+    super(StoreModel, DatabaseProvider, CacheProvider);
   }
 
-  async getStoresByOrganizationId(organizationId: string): Promise<StoreModel[]> {
-    throw new Error('Method not implemented.');
+  async getStoresByOrganizationId(
+    organizationId: string
+  ): Promise<StoreModel[]> {
+    throw new Error("Method not implemented.");
   }
-
 }

@@ -2,18 +2,18 @@ import { inject, injectable } from "inversify";
 import { ProfileModel } from "../profile.model";
 import { ProfileRepository } from "../profile.repository";
 import { UnitOfWork } from "../../../core/workflow/unit-of-work";
-import { IdentityAuthority } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as IdentityAuthority from "../../module/types";
+import * as Core from "../../../core/module/types";
 import { UserModel } from "../../users/user.model";
 import { TimeStamp } from "../../../core/helpers/timestamp";
 
 @injectable()
 export class ProfileCreateService {
-
   constructor(
-    @inject(ProfileRepository) public readonly profileRepository: ProfileRepository
-  ){}
-  
+    @inject(ProfileRepository)
+    private profileRepository: ProfileRepository
+  ) {}
+
   create(
     user_id: Core.Entity.Id,
     first_name: IdentityAuthority.Profile.Fields.FirstName,
@@ -31,9 +31,8 @@ export class ProfileCreateService {
       about: about,
       created_at: TimeStamp.now(),
       updated_at: TimeStamp.now(),
-      archived_at: null
-    }
-    return profileModel
+      archived_at: null,
+    };
+    return profileModel;
   }
-
 }

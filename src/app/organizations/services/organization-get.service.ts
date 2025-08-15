@@ -3,9 +3,8 @@ import { OrganizationRepository } from "../organization.repository";
 
 @injectable()
 export class OrganizationGetService {
-
   constructor(
-    @inject(OrganizationRepository) public readonly organizationRepository: OrganizationRepository
+    @inject(OrganizationRepository)
+    private organizationRepository: OrganizationRepository
   ) {}
-
 }

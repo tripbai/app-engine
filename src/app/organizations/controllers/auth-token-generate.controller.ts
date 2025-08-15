@@ -8,7 +8,7 @@ import {
   get,
 } from "../../../core/router/route-decorators";
 import { TripBai } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
   LogicException,
@@ -19,7 +19,7 @@ import { IsValid } from "../../../core/helpers/isvalid";
 export class AuthTokenGenerateController {
   constructor(
     @inject(GenerateAuthTokenCommand)
-    public readonly generateAuthTokenCommand: GenerateAuthTokenCommand
+    private generateAuthTokenCommand: GenerateAuthTokenCommand
   ) {}
 
   @post<TripBai.Organizations.Endpoints.GenerateAuthToken>(
@@ -32,7 +32,7 @@ export class AuthTokenGenerateController {
       Object.create(null);
     commandDTO.requester = params.requester;
     try {
-      IsValid.NonEmptyString(params.data.tenant_access_certification_token);
+      assertNonEmptyString(params.data.tenant_access_certification_token);
       commandDTO.iAuthCertificationToken =
         params.data.tenant_access_certification_token;
     } catch (error) {

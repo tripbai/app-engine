@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { post } from "../../../core/router/route-decorators";
-import { IdentityAuthority } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as IdentityAuthority from "../../module/types";
+import * as Core from "../../../core/module/types";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
 import { IsValid } from "../../../core/helpers/isvalid";
 import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
@@ -12,7 +12,7 @@ import { CreateEmailTeamplateCommand } from "../commands/create-email-template.c
 export class EmailTemplateCreateController {
   constructor(
     @inject(CreateEmailTeamplateCommand)
-    public readonly createEmailTeamplateCommand: CreateEmailTeamplateCommand
+    private createEmailTeamplateCommand: CreateEmailTeamplateCommand
   ) {}
 
   @post<IdentityAuthority.EmailTemplatesRegistry.Endpoints.Create>(
@@ -24,7 +24,7 @@ export class EmailTemplateCreateController {
     const templateType = params.data.template_type;
     let description: string | null = null;
     try {
-      IsValid.NonEmptyString(templateType);
+      assertNonEmptyString(templateType);
       if (
         templateType !== "password_reset_template" &&
         templateType !== "account_verification_template" &&
@@ -35,10 +35,10 @@ export class EmailTemplateCreateController {
           "email template type must be one of the pre-defined keys"
         );
       }
-      IsValid.NonEmptyString(params.data.template_id);
-      EntityToolkit.Assert.idIsValid(params.data.template_id);
+      assertNonEmptyString(params.data.template_id);
+      assertValidEntityId(params.data.template_id);
       if (params.data.description !== null) {
-        IsValid.NonEmptyString(params.data.description);
+        assertNonEmptyString(params.data.description);
         EmailTemplateValidator.description(params.data.description);
         description = params.data.description.trim();
       }

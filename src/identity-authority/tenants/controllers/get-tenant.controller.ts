@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { get } from "../../../core/router/route-decorators";
-import { IdentityAuthority } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as IdentityAuthority from "../../module/types";
+import * as Core from "../../../core/module/types";
 import { IsValid } from "../../../core/helpers/isvalid";
 import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
 import {
@@ -18,13 +18,13 @@ import { UserAccessRegistry } from "../../teams/user-access.registry";
 export class GetTenantController {
   constructor(
     @inject(TenantRepository)
-    public readonly tenantRepository: TenantRepository,
+    private tenantRepository: TenantRepository,
     @inject(TenantUsersRegistry)
-    public readonly tenantUsersRegistry: TenantUsersRegistry,
+    private tenantUsersRegistry: TenantUsersRegistry,
     @inject(IAuthRequesterFactory)
-    public readonly iAuthRequesterFactory: IAuthRequesterFactory,
+    private iAuthRequesterFactory: IAuthRequesterFactory,
     @inject(UserAccessRegistry)
-    public readonly userAccessRegistry: UserAccessRegistry
+    private userAccessRegistry: UserAccessRegistry
   ) {}
 
   @get<IdentityAuthority.Tenants.Endpoints.GetTenant>(
@@ -34,8 +34,8 @@ export class GetTenantController {
     params: Core.Route.ControllerDTO<T>
   ): Promise<T["response"]> {
     try {
-      IsValid.NonEmptyString(params.data.tenant_id);
-      EntityToolkit.Assert.idIsValid(params.data.tenant_id);
+      assertNonEmptyString(params.data.tenant_id);
+      assertValidEntityId(params.data.tenant_id);
     } catch (error) {
       throw new BadRequestException({
         message: "invalid get tenant params",
@@ -64,8 +64,8 @@ export class GetTenantController {
   //   })
 
   // try {
-  //   IsValid.NonEmptyString(params.data.tenant_id)
-  //   EntityToolkit.Assert.idIsValid(params.data.tenant_id)
+  //   assertNonEmptyString(params.data.tenant_id)
+  //   assertValidEntityId(params.data.tenant_id)
   // } catch (error) {
   //   throw new BadRequestException({
   //     message: 'invalid get tenant users params',

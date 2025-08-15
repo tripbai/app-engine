@@ -22,9 +22,9 @@ import { logError } from "../../../application/appLogger";
 export class MySqlService implements AbstractDatabaseProvider {
   constructor(
     @inject(MySqlTransactionHelper)
-    public readonly MySqlTransactionHelper: MySqlTransactionHelper,
+    private MySqlTransactionHelper: MySqlTransactionHelper,
     @inject(MySqlPoolService)
-    public readonly MySqlPoolService: AbstractMySqlPoolService
+    private MySqlPoolService: AbstractMySqlPoolService
   ) {}
 
   async connect(): Promise<boolean> {

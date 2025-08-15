@@ -8,7 +8,7 @@ import {
   get,
 } from "../../../core/router/route-decorators";
 import { TripBai } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
   LogicException,
@@ -16,9 +16,7 @@ import {
 
 @injectable()
 export class StoreGetController {
-  constructor(
-    @inject(GetStoreQuery) public readonly getStoreQuery: GetStoreQuery
-  ) {}
+  constructor(@inject(GetStoreQuery) private getStoreQuery: GetStoreQuery) {}
 
   @get<TripBai.Stores.Endpoints.GetStore>("/tripbai/stores/:store_id")
   async getStore<T extends TripBai.Stores.Endpoints.GetStore>(

@@ -8,7 +8,7 @@ import {
   get,
 } from "../../../core/router/route-decorators";
 import { TripBai } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
   LogicException,
@@ -18,7 +18,7 @@ import {
 export class TourCreateController {
   constructor(
     @inject(CreateTourCommand)
-    public readonly createTourCommand: CreateTourCommand
+    private createTourCommand: CreateTourCommand
   ) {}
 
   @post<TripBai.Tours.Endpoints.CreateTour>("/trip-engine/tours")

@@ -19,7 +19,7 @@ export class AmazonSNSService {
 
   constructor(
     @inject(AbstractAWSCredentials)
-    public readonly abstractAWSCredentials: AbstractAWSCredentials
+    private abstractAWSCredentials: AbstractAWSCredentials
   ) {}
 
   getClient() {

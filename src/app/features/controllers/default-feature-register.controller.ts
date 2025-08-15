@@ -8,7 +8,7 @@ import {
   get,
 } from "../../../core/router/route-decorators";
 import { TripBai } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
   LogicException,
@@ -21,9 +21,9 @@ import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
 export class DefaultFeatureRegisterController {
   constructor(
     @inject(RegisterDefaultFeatureCommand)
-    public readonly registerDefaultFeatureCommand: RegisterDefaultFeatureCommand,
+    private registerDefaultFeatureCommand: RegisterDefaultFeatureCommand,
     @inject(FeatureAssertions)
-    public readonly featureAssertions: FeatureAssertions
+    private featureAssertions: FeatureAssertions
   ) {}
 
   @post<TripBai.Features.Endpoints.RegisterDefaultFeature>("/tripbai/features")
@@ -37,11 +37,11 @@ export class DefaultFeatureRegisterController {
       this.featureAssertions.isValidKey(params.data.key);
       commandDTO.featureKey = params.data.key;
 
-      IsValid.NonEmptyString(params.data.value);
+      assertNonEmptyString(params.data.value);
       commandDTO.featureValue = params.data.value;
 
-      IsValid.NonEmptyString(params.data.package_id);
-      EntityToolkit.Assert.idIsValid(params.data.package_id);
+      assertNonEmptyString(params.data.package_id);
+      assertValidEntityId(params.data.package_id);
       commandDTO.packageId = params.data.package_id;
     } catch (error) {
       throw new BadRequestException({

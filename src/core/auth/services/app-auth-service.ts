@@ -16,13 +16,13 @@ export class AppAuthService {
 
   constructor(
     @inject(RequesterTokenService)
-    public readonly RequesterTokenService: RequesterTokenService,
+    private RequesterTokenService: RequesterTokenService,
     @inject(PermissionManager)
-    public readonly PermissionManager: PermissionManager,
+    private PermissionManager: PermissionManager,
     @inject(PermissionTokenValidator)
-    public readonly PermissionTokenValidator: PermissionTokenValidator,
+    private PermissionTokenValidator: PermissionTokenValidator,
     @inject(AbstractAuthorizationProvider)
-    public readonly AuthorizationProvider: AbstractAuthorizationProvider
+    private AuthorizationProvider: AbstractAuthorizationProvider
   ) {}
 
   validateCredentials(appKey: string, secretKey: string) {

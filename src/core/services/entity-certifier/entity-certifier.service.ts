@@ -14,7 +14,7 @@ import { assertNonEmptyString } from "../../utilities/assertValid";
 export class EntityCertifier {
   constructor(
     @inject(AbstractJWTProvider)
-    public readonly JWTProvider: AbstractJWTProvider
+    private JWTProvider: AbstractJWTProvider
   ) {}
 
   /**

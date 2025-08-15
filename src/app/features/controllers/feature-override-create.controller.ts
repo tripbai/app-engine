@@ -8,7 +8,7 @@ import {
   get,
 } from "../../../core/router/route-decorators";
 import { TripBai } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
   LogicException,
@@ -21,9 +21,9 @@ import { FeatureAssertions } from "../feature.assertions";
 export class FeatureOverrideCreateController {
   constructor(
     @inject(CreateFeatureOverrideCommand)
-    public readonly createFeatureOverrideCommand: CreateFeatureOverrideCommand,
+    private createFeatureOverrideCommand: CreateFeatureOverrideCommand,
     @inject(FeatureAssertions)
-    public readonly featureAssertions: FeatureAssertions
+    private featureAssertions: FeatureAssertions
   ) {}
 
   @post<TripBai.Features.Endpoints.CreateFeatureOverride>(
@@ -36,23 +36,23 @@ export class FeatureOverrideCreateController {
       Object.create(null);
     commandDTO.requester = params.requester;
     try {
-      IsValid.NonEmptyString(params.data.organization_id);
-      EntityToolkit.Assert.idIsValid(params.data.organization_id);
+      assertNonEmptyString(params.data.organization_id);
+      assertValidEntityId(params.data.organization_id);
       commandDTO.organizationId = params.data.organization_id;
 
-      IsValid.NonEmptyString(params.data.key);
+      assertNonEmptyString(params.data.key);
       this.featureAssertions.isValidKey(params.data.key);
       commandDTO.featureKey = params.data.key;
 
-      IsValid.NonEmptyString(params.data.value);
+      assertNonEmptyString(params.data.value);
       commandDTO.featureValue = params.data.value;
 
-      IsValid.NonEmptyString(params.data.package_id);
-      EntityToolkit.Assert.idIsValid(params.data.package_id);
+      assertNonEmptyString(params.data.package_id);
+      assertValidEntityId(params.data.package_id);
       commandDTO.packageId = params.data.package_id;
 
-      IsValid.NonEmptyString(params.data.override_for_entity_id);
-      EntityToolkit.Assert.idIsValid(params.data.override_for_entity_id);
+      assertNonEmptyString(params.data.override_for_entity_id);
+      assertValidEntityId(params.data.override_for_entity_id);
       commandDTO.featurableEntityId = params.data.override_for_entity_id;
 
       if (params.data.override_for_entity_type === "store") {

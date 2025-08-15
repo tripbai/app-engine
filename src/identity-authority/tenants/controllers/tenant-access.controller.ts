@@ -2,8 +2,8 @@ import { inject, injectable } from "inversify";
 import { AddTenantUserCommand } from "../commands/add-tenant-user.command";
 import { RemoveTenantUserCommand } from "../commands/remove-tenant-user.command";
 import { del, post } from "../../../core/router/route-decorators";
-import { IdentityAuthority } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as IdentityAuthority from "../../module/types";
+import * as Core from "../../../core/module/types";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
 import { IsValid } from "../../../core/helpers/isvalid";
 import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
@@ -24,11 +24,11 @@ export class TenantAccessController {
     T extends IdentityAuthority.Tenants.Endpoints.AddUserToTeam
   >(params: Core.Route.ControllerDTO<T>): Promise<T["response"]> {
     try {
-      IsValid.NonEmptyString(params.data.tenant_id);
-      EntityToolkit.Assert.idIsValid(params.data.tenant_id);
+      assertNonEmptyString(params.data.tenant_id);
+      assertValidEntityId(params.data.tenant_id);
 
-      IsValid.NonEmptyString(params.data.user_id);
-      EntityToolkit.Assert.idIsValid(params.data.user_id);
+      assertNonEmptyString(params.data.user_id);
+      assertValidEntityId(params.data.user_id);
     } catch (error) {
       throw new BadRequestException({
         message: "failed to add user to tenant team due to an error",
@@ -52,11 +52,11 @@ export class TenantAccessController {
     T extends IdentityAuthority.Tenants.Endpoints.RemoveUserFromTeam
   >(params: Core.Route.ControllerDTO<T>): Promise<T["response"]> {
     try {
-      IsValid.NonEmptyString(params.data.tenant_id);
-      EntityToolkit.Assert.idIsValid(params.data.tenant_id);
+      assertNonEmptyString(params.data.tenant_id);
+      assertValidEntityId(params.data.tenant_id);
 
-      IsValid.NonEmptyString(params.data.user_id);
-      EntityToolkit.Assert.idIsValid(params.data.user_id);
+      assertNonEmptyString(params.data.user_id);
+      assertValidEntityId(params.data.user_id);
     } catch (error) {
       throw new BadRequestException({
         message: "failed to remove user from tenant team due to an error",

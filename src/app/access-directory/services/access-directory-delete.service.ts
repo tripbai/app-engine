@@ -3,9 +3,8 @@ import { AccessDirectoryRepository } from "../access-directory.repository";
 
 @injectable()
 export class AccessDirectoryDeleteService {
-
   constructor(
-    @inject(AccessDirectoryRepository) public readonly accessDirectoryRepository: AccessDirectoryRepository
+    @inject(AccessDirectoryRepository)
+    private accessDirectoryRepository: AccessDirectoryRepository
   ) {}
-
 }

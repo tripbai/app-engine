@@ -13,9 +13,7 @@ export class UnitOfWork {
    */
   private transactionSteps: Array<DatabaseTransactionStep>;
 
-  constructor(
-    public readonly abstractDatabaseProvider: AbstractDatabaseProvider
-  ) {
+  constructor(private abstractDatabaseProvider: AbstractDatabaseProvider) {
     this.transactionSteps = [];
   }
 

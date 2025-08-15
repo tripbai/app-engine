@@ -20,9 +20,9 @@ export class FirestoreService implements AbstractDatabaseProvider {
   private client!: FirebaseFirestore.Firestore;
 
   constructor(
-    @inject(FirestoreHelper) public readonly FirestoreHelper: FirestoreHelper,
+    @inject(FirestoreHelper) private FirestoreHelper: FirestoreHelper,
     @inject(FirebaseEnvBasedProjectService)
-    public readonly FirebaseProject: FirebaseProjectInterface
+    private FirebaseProject: FirebaseProjectInterface
   ) {}
 
   async connect(): Promise<boolean> {

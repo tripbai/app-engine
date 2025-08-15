@@ -8,7 +8,7 @@ import {
   get,
 } from "../../../core/router/route-decorators";
 import { TripBai } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
   LogicException,
@@ -18,7 +18,7 @@ import {
 export class TourScheduleGetController {
   constructor(
     @inject(GetTourScheduleQuery)
-    public readonly getTourScheduleQuery: GetTourScheduleQuery
+    private getTourScheduleQuery: GetTourScheduleQuery
   ) {}
 
   @get<TripBai.Schedules.Endpoints.GetTourSchedule>(

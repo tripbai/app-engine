@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { post } from "../../../core/router/route-decorators";
-import { IdentityAuthority } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as IdentityAuthority from "../../module/types";
+import * as Core from "../../../core/module/types";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
 import { IsValid } from "../../../core/helpers/isvalid";
 import { TenantValidator } from "../tenant.validator";
@@ -28,7 +28,7 @@ export class TenantCreateController {
     T extends IdentityAuthority.Tenants.Endpoints.CreateTenant
   >(params: Core.Route.ControllerDTO<T>): Promise<T["response"]> {
     try {
-      IsValid.NonEmptyString(params.data.name);
+      assertNonEmptyString(params.data.name);
       TenantValidator.name(params.data.name);
     } catch (error) {
       throw new BadRequestException({

@@ -6,97 +6,102 @@ import { OrganizationModel } from "../organization.model";
 import { Pseudorandom } from "../../../core/helpers/pseudorandom";
 import { PackageModel } from "../../packages/package.model";
 import { TimeStamp } from "../../../core/helpers/timestamp";
-import { Core } from "../../../core/module/module";
+import * as Core from "../../../core/module/types";
 import { OrganizationRequester } from "../../requester/organization-requester";
 import { UnitOfWork } from "../../../core/workflow/unit-of-work";
 
 @injectable()
 export class OrganizationCreateService {
-
   constructor(
-    @inject(OrganizationRepository) public readonly organizationRepository: OrganizationRepository,
-    @inject(OrganizationIAuthTokenService) public readonly organizationIAuthTokenService: OrganizationIAuthTokenService
+    @inject(OrganizationRepository)
+    private organizationRepository: OrganizationRepository,
+    @inject(OrganizationIAuthTokenService)
+    private organizationIAuthTokenService: OrganizationIAuthTokenService
   ) {}
 
   async createOrganizationIfNotExist(params: {
-    unitOfWork: UnitOfWork,
-    requester: OrganizationRequester
-    businessName: string
-    accessCertificationToken: string
-    packageModel: PackageModel
+    unitOfWork: UnitOfWork;
+    requester: OrganizationRequester;
+    businessName: string;
+    accessCertificationToken: string;
+    packageModel: PackageModel;
   }) {
-    const tokenData = await this.organizationIAuthTokenService.parseToken(params.accessCertificationToken)
+    const tokenData = await this.organizationIAuthTokenService.parseToken(
+      params.accessCertificationToken
+    );
     if (!tokenData.is_owner) {
       throw new ResourceAccessForbiddenException({
-        message: 'Only tenant owners can create organizations',
-        data: { token_data: tokenData }
-      })
+        message: "Only tenant owners can create organizations",
+        data: { token_data: tokenData },
+      });
     }
     if (params.requester.getUserId() !== tokenData.user_id) {
       throw new ResourceAccessForbiddenException({
-        message: 'Tenant owner entity ID does not match token data user ID',
+        message: "Tenant owner entity ID does not match token data user ID",
         data: {
           tenant_owner_entity_id: params.requester.getUserId(),
-          token_data_user_id: tokenData.user_id
-        }
-      })
+          token_data_user_id: tokenData.user_id,
+        },
+      });
     }
     if (!params.packageModel.is_active) {
       throw new ResourceAccessForbiddenException({
-        message: 'Package is not active, cannot create organization',
-        data: { package_model: params.packageModel }
-      })
+        message: "Package is not active, cannot create organization",
+        data: { package_model: params.packageModel },
+      });
     }
     if (!params.packageModel.is_default) {
       throw new ResourceAccessForbiddenException({
-        message: 'Package is not default, cannot create organization',
-        data: { package_model: params.packageModel }
-      })
+        message: "Package is not default, cannot create organization",
+        data: { package_model: params.packageModel },
+      });
     }
-    const tenantId = tokenData.tenant_id
+    const tenantId = tokenData.tenant_id;
     try {
-      const organizationModel = await this.organizationRepository.getById(tenantId, {
-        allow_archived_record: true
-      })
+      const organizationModel = await this.organizationRepository.getById(
+        tenantId,
+        {
+          allow_archived_record: true,
+        }
+      );
       if (organizationModel.archived_at !== null) {
         // Users will need to reach out to support to unarchive the organization
-        throw new Error('Organization is archived, cannot create a new one')
+        throw new Error("Organization is archived, cannot create a new one");
       }
       // organization already exists, no need to create a new one
-      return organizationModel
+      return organizationModel;
     } catch (error) {
-      if (error.message === 'Organization is archived, cannot create a new one') {
+      if (
+        error.message === "Organization is archived, cannot create a new one"
+      ) {
         throw new ResourceAccessForbiddenException({
           message: error.message,
-          data: { tenant_id: tenantId }
-        })
+          data: { tenant_id: tenantId },
+        });
       }
       // organizationRepository.getById threw an error, which means the organization does not exist
       // we can proceed to create a new organization
     }
-    const secretKey = Pseudorandom.alphanum32()
+    const secretKey = createEntityId();
     const organizationModel: OrganizationModel = {
       entity_id: tenantId,
       secret_key: secretKey,
       business_name: params.businessName,
       package_id: params.packageModel.entity_id,
-      status: 'active',
+      status: "active",
       created_at: TimeStamp.now(),
       updated_at: TimeStamp.now(),
       archived_at: null,
-    }
+    };
     params.unitOfWork.addTransactionStep(
       this.organizationRepository.create(tenantId, {
         secret_key: secretKey,
         business_name: params.businessName,
         package_id: params.packageModel.entity_id,
-        status: 'active',
-        archived_at: null
+        status: "active",
+        archived_at: null,
       })
-    )
-    return organizationModel
+    );
+    return organizationModel;
   }
-
-
-
 }

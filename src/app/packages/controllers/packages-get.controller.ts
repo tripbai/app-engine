@@ -8,7 +8,7 @@ import {
   get,
 } from "../../../core/router/route-decorators";
 import { TripBai } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
   LogicException,
@@ -17,7 +17,7 @@ import {
 @injectable()
 export class PackagesGetController {
   constructor(
-    @inject(GetPackagesQuery) public readonly getPackagesQuery: GetPackagesQuery
+    @inject(GetPackagesQuery) private getPackagesQuery: GetPackagesQuery
   ) {}
 
   @get<TripBai.Packages.Endpoints.GetPackages>("/tripbai/packages")

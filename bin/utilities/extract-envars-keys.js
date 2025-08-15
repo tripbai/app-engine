@@ -1,8 +1,8 @@
-import * as fs from 'fs'
-import * as path from 'path'
+import * as fs from "fs";
+import * as path from "path";
 
 /**
- * Recursively scans the given directory for files and extracts all AppENV.get('...') parameters.
+ * Recursively scans the given directory for files and extracts all getEnv('...') parameters.
  * @param {string} dirPath - The starting directory (e.g., './src')
  * @returns {string[]} - List of extracted keys
  */
@@ -18,8 +18,8 @@ export function extractAppEnvKeys(dirPath) {
 
       if (stat.isDirectory()) {
         walkDirectory(fullPath); // Recurse into subdirectory
-      } else if (stat.isFile() && fullPath.endsWith('.ts')) {
-        const content = fs.readFileSync(fullPath, 'utf-8');
+      } else if (stat.isFile() && fullPath.endsWith(".ts")) {
+        const content = fs.readFileSync(fullPath, "utf-8");
         const regex = /AppENV\.get\(\s*['"]([^'"]+)['"]\s*\)/g;
 
         let match;

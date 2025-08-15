@@ -6,25 +6,26 @@ import { Core } from "../../core/module/module";
 
 @injectable()
 export class StoreOrganizationRegistry extends RegistryRepository<StoreModel> {
-
   constructor(
-    @inject(AbstractDatabaseProvider) public readonly abstractDatabaseProvider: AbstractDatabaseProvider
+    @inject(AbstractDatabaseProvider)
+    private abstractDatabaseProvider: AbstractDatabaseProvider
   ) {
     super({
-      collection: 'stores',
-      reference: 'organization_id',
+      collection: "stores",
+      reference: "organization_id",
       modelInstance: new StoreModel(),
-      databaseProvider: abstractDatabaseProvider
+      databaseProvider: abstractDatabaseProvider,
     });
   }
 
-  async getActiveStoresByOrganizationId(organizationId: Core.Entity.Id): Promise<StoreModel[]> {
+  async getActiveStoresByOrganizationId(
+    organizationId: Core.Entity.Id
+  ): Promise<StoreModel[]> {
     const allStores = await this.getAll({
-      foreignKeyValue: organizationId
-    })
-    return allStores.filter(store => {
-      store.status === 'active'
-    })
+      foreignKeyValue: organizationId,
+    });
+    return allStores.filter((store) => {
+      store.status === "active";
+    });
   }
-
 }

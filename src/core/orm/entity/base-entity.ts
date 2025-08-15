@@ -12,11 +12,6 @@ export class BaseEntity {
    */
   id?: Core.Entity.Id;
 
-  private _entity_id!: Core.Entity.Id;
-  private _created_at!: string;
-  private _updated_at!: string;
-  private _archived_at: string | null = null;
-
   /**
    * The Entity ID of an object. This value can only be provided once,
    * and cannot be overriden. This property only accepts value typeof string,
@@ -24,11 +19,11 @@ export class BaseEntity {
    */
   set entity_id(value: Core.Entity.Id) {
     assertValidEntityId(value);
-    const alias = createPropAlias("entity_id");
+    const alias = createPropAlias("entity_id") as "entity_id";
     if (undefined === this[alias]) this[alias] = value;
   }
   get entity_id(): Core.Entity.Id {
-    const alias = createPropAlias("entity_id");
+    const alias = createPropAlias("entity_id") as "entity_id";
     return this[alias];
   }
 
@@ -37,7 +32,7 @@ export class BaseEntity {
    * provided by the Storage Provider, and cannot be overridden.
    */
   set created_at(value: Core.TimeStamp) {
-    const alias = createPropAlias("created_at");
+    const alias = createPropAlias("created_at") as "created_at";
     if (!isValidTimestamp(value)) {
       throw new DataIntegrityException({
         message: "entity created_at value is not valid timestamp string",
@@ -47,7 +42,7 @@ export class BaseEntity {
     if (undefined === this[alias]) this[alias] = value;
   }
   get created_at(): Core.TimeStamp {
-    const alias = createPropAlias("created_at");
+    const alias = createPropAlias("created_at") as "created_at";
     return this[alias] as Core.TimeStamp;
   }
 
@@ -56,7 +51,7 @@ export class BaseEntity {
    * provided and updated by the Storage Provider.
    */
   set updated_at(value: string) {
-    const alias = createPropAlias("updated_at");
+    const alias = createPropAlias("updated_at") as "updated_at";
     if (!isValidTimestamp(value)) {
       throw new DataIntegrityException({
         message: "updated_at value is not valid timestamp string",
@@ -66,7 +61,7 @@ export class BaseEntity {
     this[alias] = value;
   }
   get updated_at(): Core.TimeStamp {
-    const alias = createPropAlias("updated_at");
+    const alias = createPropAlias("updated_at") as "updated_at";
     return this[alias] as Core.TimeStamp;
   }
 
@@ -75,7 +70,7 @@ export class BaseEntity {
    * when cleaning up unused soft-deleted records.
    */
   set archived_at(value: Core.TimeStamp | null) {
-    const alias = createPropAlias("archived_at");
+    const alias = createPropAlias("archived_at") as "archived_at";
     if (value !== null && !isValidTimestamp(value)) {
       throw new DataIntegrityException({
         message: "archived_at value is not valid timestamp string",
@@ -85,7 +80,7 @@ export class BaseEntity {
     this[alias] = value;
   }
   get archived_at(): Core.TimeStamp | null {
-    const alias = createPropAlias("archived_at");
+    const alias = createPropAlias("archived_at") as "archived_at";
     return this[alias] as Core.TimeStamp | null;
   }
 }

@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { Core } from "../../../core/module/module";
+import * as Core from "../../../core/module/types";
 import { IAuthRequesterFactory } from "../../requester/iauth-requester.factory";
 import { ResourceAccessForbiddenException } from "../../../core/exceptions/exceptions";
 import { UserRepository } from "../../users/user.repository";
@@ -11,41 +11,47 @@ import { TenantTeamAccessEvent } from "../tenant.events";
 
 @injectable()
 export class RemoveTenantUserCommand {
-
   constructor(
-    @inject(UnitOfWorkFactory) public readonly unitOfWorkFactory: UnitOfWorkFactory,
-    @inject(IAuthRequesterFactory) public readonly iAuthRequesterFactory: IAuthRequesterFactory,
-    @inject(UserRepository) public readonly userRepository: UserRepository,
-    @inject(TenantRepository) public readonly tenantRepository: TenantRepository,
-    @inject(TeamUsersService) public readonly teamUsersService: TeamUsersService,
-    @inject(AbstractEventManagerProvider) public readonly eventManager: AbstractEventManagerProvider
-  ){}
+    @inject(UnitOfWorkFactory)
+    private unitOfWorkFactory: UnitOfWorkFactory,
+    @inject(IAuthRequesterFactory)
+    private iAuthRequesterFactory: IAuthRequesterFactory,
+    @inject(UserRepository) private userRepository: UserRepository,
+    @inject(TenantRepository)
+    private tenantRepository: TenantRepository,
+    @inject(TeamUsersService)
+    private teamUsersService: TeamUsersService,
+    @inject(AbstractEventManagerProvider)
+    private eventManager: AbstractEventManagerProvider
+  ) {}
 
   async execute(params: {
-    requester: Core.Authorization.Requester,
-    userId: Core.Entity.Id,
-    tenantId: Core.Entity.Id
-  }){
-    const unitOfWork = this.unitOfWorkFactory.create()
-    const iAuthRequester = this.iAuthRequesterFactory.create(params.requester)
+    requester: Core.Authorization.Requester;
+    userId: Core.Entity.Id;
+    tenantId: Core.Entity.Id;
+  }) {
+    const unitOfWork = this.unitOfWorkFactory.create();
+    const iAuthRequester = this.iAuthRequesterFactory.create(params.requester);
     if (!iAuthRequester.isRegularUser()) {
       throw new ResourceAccessForbiddenException({
-        message: 'public users cannot invoke this command',
-        data: params.requester
-      })
+        message: "public users cannot invoke this command",
+        data: params.requester,
+      });
     }
-    const userModelToRemove 
-      = await this.userRepository.getById(params.userId)
-    const tenantModel 
-      = await this.tenantRepository.getById(params.tenantId) 
+    const userModelToRemove = await this.userRepository.getById(params.userId);
+    const tenantModel = await this.tenantRepository.getById(params.tenantId);
     await this.teamUsersService.removeUserFromTenantTeam(
-      iAuthRequester, userModelToRemove, tenantModel
-    )
-    await unitOfWork.commit()
+      iAuthRequester,
+      userModelToRemove,
+      tenantModel
+    );
+    await unitOfWork.commit();
     await this.eventManager.dispatch(
-      new TenantTeamAccessEvent, 'remove:user', userModelToRemove, tenantModel
-    )
-    return
+      new TenantTeamAccessEvent(),
+      "remove:user",
+      userModelToRemove,
+      tenantModel
+    );
+    return;
   }
-
 }

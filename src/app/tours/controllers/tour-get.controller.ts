@@ -8,7 +8,7 @@ import {
   get,
 } from "../../../core/router/route-decorators";
 import { TripBai } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
   LogicException,
@@ -16,9 +16,7 @@ import {
 
 @injectable()
 export class TourGetController {
-  constructor(
-    @inject(GetTourQuery) public readonly getTourQuery: GetTourQuery
-  ) {}
+  constructor(@inject(GetTourQuery) private getTourQuery: GetTourQuery) {}
 
   @get<TripBai.Tours.Endpoints.GetTour>("/trip-engine/tours/:tour_id")
   async getTour<T extends TripBai.Tours.Endpoints.GetTour>(

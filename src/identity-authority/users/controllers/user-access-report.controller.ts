@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { post } from "../../../core/router/route-decorators";
-import { IdentityAuthority } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as IdentityAuthority from "../../module/types";
+import * as Core from "../../../core/module/types";
 import { UserAccessReportService } from "../services/user-access-report.service";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
 import { UserValidator } from "../user.validator";
@@ -12,8 +12,8 @@ import { UserAssertions } from "../user.assertions";
 export class UserAccessReportController {
   constructor(
     @inject(UserAccessReportService)
-    public readonly userAccessReportService: UserAccessReportService,
-    @inject(UserAssertions) public readonly userAssertions: UserAssertions
+    private userAccessReportService: UserAccessReportService,
+    @inject(UserAssertions) private userAssertions: UserAssertions
   ) {}
 
   @post<IdentityAuthority.Users.Endpoints.AccessReport>(

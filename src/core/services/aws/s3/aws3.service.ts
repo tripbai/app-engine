@@ -14,7 +14,7 @@ export class AmazonS3Service {
 
   constructor(
     @inject(AbstractAWSCredentials)
-    public readonly abstractAWSCredentials: AbstractAWSCredentials
+    private abstractAWSCredentials: AbstractAWSCredentials
   ) {}
 
   /**

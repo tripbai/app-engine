@@ -3,9 +3,7 @@ import { ScheduleRepository } from "../schedule.repository";
 
 @injectable()
 export class ScheduleDeleteService {
-
   constructor(
-    @inject(ScheduleRepository) public readonly scheduleRepository: ScheduleRepository
+    @inject(ScheduleRepository) private scheduleRepository: ScheduleRepository
   ) {}
-
 }

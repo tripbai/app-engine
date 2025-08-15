@@ -8,7 +8,7 @@ import {
   get,
 } from "../../../core/router/route-decorators";
 import { TripBai } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
   LogicException,
@@ -18,7 +18,7 @@ import {
 export class ImageUploadController {
   constructor(
     @inject(UploadImageCommand)
-    public readonly uploadImageCommand: UploadImageCommand
+    private uploadImageCommand: UploadImageCommand
   ) {}
 
   @post<TripBai.Images.Endpoints.UploadImage>("/tripbai/images")

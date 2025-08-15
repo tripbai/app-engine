@@ -6,20 +6,17 @@ import { AppAuthService } from "../../core/auth/services/app-auth-service";
 
 @injectable()
 export class OrganizationRequesterFactory {
-
   constructor(
-    @inject(OrganizationPermissionService) public readonly organizationPermissionsService: OrganizationPermissionService,
-    @inject(AppAuthService) public readonly appAuthService: AppAuthService
+    @inject(OrganizationPermissionService)
+    private organizationPermissionsService: OrganizationPermissionService,
+    @inject(AppAuthService) private appAuthService: AppAuthService
   ) {}
 
-  create(
-    requester: Core.Authorization.Requester
-  ) {
+  create(requester: Core.Authorization.Requester) {
     return new OrganizationRequester(
-      requester, 
+      requester,
       this.organizationPermissionsService,
       this.appAuthService
-    )
+    );
   }
-
 }

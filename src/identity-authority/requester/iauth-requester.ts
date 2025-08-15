@@ -1,140 +1,145 @@
 import { AppAuthService } from "../../core/auth/services/app-auth-service";
-import { ResourceAccessForbiddenException, UnauthorizedAccessException } from "../../core/exceptions/exceptions";
+import {
+  ResourceAccessForbiddenException,
+  UnauthorizedAccessException,
+} from "../../core/exceptions/exceptions";
 import { Core } from "../../core/module/module";
 import { EntityToolkit } from "../../core/orm/entity/entity-toolkit";
-import { IdentityAuthority } from "../module/module.interface";
+import * as IdentityAuthority from "../module/types";
 import { UserPermissionService } from "../users/services/user-permission.service";
 import { IAuthForbiddenAccessException } from "./iauth-requester.exceptions";
 
 /** A requester with status that is allowed, and an entity_id */
-type IAuthValidRequester = Core.Authorization.Requester & {user: {entity_id: Core.Entity.Id, status: IdentityAuthority.Users.Status.Type}}
+type IAuthValidRequester = Core.Authorization.Requester & {
+  user: {
+    entity_id: Core.Entity.Id;
+    status: IdentityAuthority.Users.Status.Type;
+  };
+};
 
 export class IAuthRequester {
-
   constructor(
-    public readonly requester: Core.Authorization.Requester,
-    public readonly userPermissionService: UserPermissionService,
-    public readonly appAuthService: AppAuthService
-  ){}
+    private requester: Core.Authorization.Requester,
+    private userPermissionService: UserPermissionService,
+    private appAuthService: AppAuthService
+  ) {}
 
-  private static assertIAuthValidRequester(requester: Core.Authorization.Requester): asserts requester is IAuthValidRequester {
+  private static assertIAuthValidRequester(
+    requester: Core.Authorization.Requester
+  ): asserts requester is IAuthValidRequester {
     if (requester.user === undefined || requester.user === null) {
-      throw new Error()
+      throw new Error();
     }
-    const userid = requester.user.entity_id
+    const userid = requester.user.entity_id;
     if (userid === undefined || userid === null) {
-      throw new Error()
+      throw new Error();
     }
-    if (userid !== 'kernel') {
+    if (userid !== "kernel") {
       try {
-        EntityToolkit.Assert.idIsValid(userid)
+        assertValidEntityId(userid);
       } catch (error) {
-        throw new Error()
+        throw new Error();
       }
     }
-    const status = requester.user.status
+    const status = requester.user.status;
     if (status === undefined || status === null) {
-      throw new Error()
+      throw new Error();
     }
     if (
-      status !== 'active' && 
-      status !== 'archived' && 
-      status !== 'banned' &&
-      status !== 'deactivated' && 
-      status !== 'suspended' &&
-      status !== 'unverified'
+      status !== "active" &&
+      status !== "archived" &&
+      status !== "banned" &&
+      status !== "deactivated" &&
+      status !== "suspended" &&
+      status !== "unverified"
     ) {
-      throw new Error()
+      throw new Error();
     }
-
   }
 
   hasAllowedAccess(): boolean {
     try {
-      IAuthRequester.assertIAuthValidRequester(this.requester)
+      IAuthRequester.assertIAuthValidRequester(this.requester);
     } catch (error) {
-      return false
+      return false;
     }
-    const status = this.requester.user.status
-    if (status === 'archived' || 
-        status === 'banned' ||
-        status === 'deactivated' || 
-        status === 'suspended'
-    ){
-      const filtered: 
-        IdentityAuthority.Users.ApplicationAccess.Limited | 
-        IdentityAuthority.Users.ApplicationAccess.Prohibited 
-        = status 
-      return false
+    const status = this.requester.user.status;
+    if (
+      status === "archived" ||
+      status === "banned" ||
+      status === "deactivated" ||
+      status === "suspended"
+    ) {
+      const filtered:
+        | IdentityAuthority.Users.ApplicationAccess.Limited
+        | IdentityAuthority.Users.ApplicationAccess.Prohibited = status;
+      return false;
     }
-    return true
+    return true;
   }
 
   isRegularUser(): boolean {
     try {
-      IAuthRequester.assertIAuthValidRequester(this.requester)
+      IAuthRequester.assertIAuthValidRequester(this.requester);
     } catch (error) {
-      return false
+      return false;
     }
     return this.userPermissionService.isOneOfThePermissionsBasicUserLike(
       this.requester.permissions,
       this.requester.user.entity_id
-    )
+    );
   }
 
   isWebAdmin(): boolean {
     try {
-      IAuthRequester.assertIAuthValidRequester(this.requester)
+      IAuthRequester.assertIAuthValidRequester(this.requester);
     } catch (error) {
-      return false
+      return false;
     }
     return this.userPermissionService.isOneOfThePermissionsAdminLike(
       this.requester.permissions
-    )
+    );
   }
 
-  hasCoreAppAccess(){
+  hasCoreAppAccess() {
     try {
-      this.appAuthService.hasHighestPermission(
-        this.requester
-      )
-      return true
+      this.appAuthService.hasHighestPermission(this.requester);
+      return true;
     } catch (error) {
-      return false
+      return false;
     }
   }
 
   canOperateThisUser(userId: Core.Entity.Id): boolean {
     try {
-      IAuthRequester.assertIAuthValidRequester(this.requester)
+      IAuthRequester.assertIAuthValidRequester(this.requester);
     } catch (error) {
-      return false
+      return false;
     }
     return this.userPermissionService.caOneOfThePermissionsOperateUser(
       this.requester.permissions,
       userId
-    )
+    );
   }
 
   isAModerator(): boolean {
     try {
-      IAuthRequester.assertIAuthValidRequester(this.requester)
+      IAuthRequester.assertIAuthValidRequester(this.requester);
     } catch (error) {
-      return false
+      return false;
     }
-    if (this.isWebAdmin()) return true 
+    if (this.isWebAdmin()) return true;
     return this.userPermissionService.hasModeratorPermission(
       this.requester.permissions
-    )
+    );
   }
 
   get(): IAuthValidRequester {
     try {
-      IAuthRequester.assertIAuthValidRequester(this.requester)
+      IAuthRequester.assertIAuthValidRequester(this.requester);
     } catch (error) {
-      throw new IAuthForbiddenAccessException(this.requester)
+      throw new IAuthForbiddenAccessException(this.requester);
     }
-    return this.requester
+    return this.requester;
   }
-
 }

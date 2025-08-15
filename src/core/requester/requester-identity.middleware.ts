@@ -6,7 +6,7 @@ import { RequesterIdentityFactory } from "./requester-identity.factory";
 export class RequesterIdentityMiddleware {
   constructor(
     @inject(RequesterIdentityFactory)
-    public readonly RequesterIdentityFactory: RequesterIdentityFactory
+    private RequesterIdentityFactory: RequesterIdentityFactory
   ) {}
 
   handle(

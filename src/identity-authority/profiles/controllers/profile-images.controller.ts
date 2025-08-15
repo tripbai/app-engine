@@ -1,8 +1,8 @@
 import { inject, injectable } from "inversify";
 import { UploadProfileImagesCommand } from "../commands/upload-profile-images.command";
 import { post } from "../../../core/router/route-decorators";
-import { IdentityAuthority } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as IdentityAuthority from "../../module/types";
+import * as Core from "../../../core/module/types";
 import { ImageHelperService } from "../../services/image-helper.service";
 import { IsValid } from "../../../core/helpers/isvalid";
 import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
@@ -24,9 +24,9 @@ export class ProfileImagesController {
     T extends IdentityAuthority.Users.Endpoints.UploadImage
   >(params: Core.Route.ControllerDTO<T>): Promise<T["response"]> {
     try {
-      IsValid.NonEmptyString(params.data.user_id);
-      EntityToolkit.Assert.idIsValid(params.data.user_id);
-      IsValid.NonEmptyString(params.data.type);
+      assertNonEmptyString(params.data.user_id);
+      assertValidEntityId(params.data.user_id);
+      assertNonEmptyString(params.data.type);
       if (
         params.data.type !== "profile_photo" &&
         params.data.type !== "cover_photo"

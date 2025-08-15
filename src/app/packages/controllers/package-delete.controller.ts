@@ -8,7 +8,7 @@ import {
   get,
 } from "../../../core/router/route-decorators";
 import { TripBai } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
   LogicException,
@@ -20,7 +20,7 @@ import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
 export class PackageDeleteController {
   constructor(
     @inject(DeletePackageCommand)
-    public readonly deletePackageCommand: DeletePackageCommand
+    private deletePackageCommand: DeletePackageCommand
   ) {}
 
   @del<TripBai.Packages.Endpoints.DeletePackage>(
@@ -33,8 +33,8 @@ export class PackageDeleteController {
       Object.create(null);
     commandDTO.requester = params.requester;
     try {
-      IsValid.NonEmptyString(params.data.package_id);
-      EntityToolkit.Assert.idIsValid(params.data.package_id);
+      assertNonEmptyString(params.data.package_id);
+      assertValidEntityId(params.data.package_id);
       commandDTO.packageId = params.data.package_id;
     } catch (error) {
       throw new BadRequestException({

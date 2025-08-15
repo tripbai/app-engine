@@ -1,7 +1,10 @@
 import { inject, injectable } from "inversify";
 import { OrganizationRequesterFactory } from "../../requester/organization-requester.factory";
-import { Core } from "../../../core/module/module";
-import { LogicException, ResourceAccessForbiddenException } from "../../../core/exceptions/exceptions";
+import * as Core from "../../../core/module/types";
+import {
+  LogicException,
+  ResourceAccessForbiddenException,
+} from "../../../core/exceptions/exceptions";
 import { AbstractEventManagerProvider } from "../../../core/providers/event/event-manager.provider";
 import { UnitOfWorkFactory } from "../../../core/workflow/unit-of-work.factory";
 import { OrganizationCreateService } from "../services/organization-create.service";
@@ -11,43 +14,51 @@ import { OrganizationCreatedEvent } from "../organization.events";
 
 @injectable()
 export class CreateOrganizationCommand {
-
   constructor(
-    @inject(OrganizationRequesterFactory) public readonly organizationRequesterFactory: OrganizationRequesterFactory,
-    @inject(UnitOfWorkFactory) public readonly unitOfWorkFactory: UnitOfWorkFactory,
-    @inject(OrganizationRepository) public readonly organizationRepository: OrganizationRepository,
-    @inject(OrganizationCreateService) public readonly organizationCreateService: OrganizationCreateService,
-    @inject(AbstractEventManagerProvider) public readonly abstractEventManagerProvider: AbstractEventManagerProvider,
-    @inject(PackageRepository) public readonly packageRepository: PackageRepository
+    @inject(OrganizationRequesterFactory)
+    private organizationRequesterFactory: OrganizationRequesterFactory,
+    @inject(UnitOfWorkFactory)
+    private unitOfWorkFactory: UnitOfWorkFactory,
+    @inject(OrganizationRepository)
+    private organizationRepository: OrganizationRepository,
+    @inject(OrganizationCreateService)
+    private organizationCreateService: OrganizationCreateService,
+    @inject(AbstractEventManagerProvider)
+    private abstractEventManagerProvider: AbstractEventManagerProvider,
+    @inject(PackageRepository)
+    private packageRepository: PackageRepository
   ) {}
 
   async execute(params: {
-    requester: Core.Authorization.Requester,
-    accessCertificationToken: string,
-    businessName: string
-    packageId: Core.Entity.Id
+    requester: Core.Authorization.Requester;
+    accessCertificationToken: string;
+    businessName: string;
+    packageId: Core.Entity.Id;
   }) {
-    const unitOfWork = this.unitOfWorkFactory.create()
-    const requester = this.organizationRequesterFactory.create(params.requester)
+    const unitOfWork = this.unitOfWorkFactory.create();
+    const requester = this.organizationRequesterFactory.create(
+      params.requester
+    );
     if (!requester.hasAllowedAccess()) {
       throw new ResourceAccessForbiddenException({
-        message: 'Requester does not have access to create an organization',
-        data: { requester }
-      })
+        message: "Requester does not have access to create an organization",
+        data: { requester },
+      });
     }
-    const packageModel = await this.packageRepository.getById(params.packageId)
-    const organizationModel= await this.organizationCreateService.createOrganizationIfNotExist({
-      unitOfWork: unitOfWork,
-      requester: requester,
-      businessName: params.businessName,
-      accessCertificationToken: params.accessCertificationToken,
-      packageModel
-    })
-    await unitOfWork.commit()
+    const packageModel = await this.packageRepository.getById(params.packageId);
+    const organizationModel =
+      await this.organizationCreateService.createOrganizationIfNotExist({
+        unitOfWork: unitOfWork,
+        requester: requester,
+        businessName: params.businessName,
+        accessCertificationToken: params.accessCertificationToken,
+        packageModel,
+      });
+    await unitOfWork.commit();
     this.abstractEventManagerProvider.dispatch(
-      new OrganizationCreatedEvent, organizationModel
-    )
-    return organizationModel
+      new OrganizationCreatedEvent(),
+      organizationModel
+    );
+    return organizationModel;
   }
-
 }

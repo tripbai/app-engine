@@ -9,9 +9,7 @@ import { handleAxiosError } from "../../../utilities/handleAxiosError";
 
 @injectable()
 export class GoogleReCAPTCHAService {
-  constructor(
-    @inject(AxiosService) public readonly AxiosService: AxiosService
-  ) {}
+  constructor(@inject(AxiosService) private AxiosService: AxiosService) {}
 
   async verify(token: string, action: string): Promise<void> {
     const siteKey = getEnv("RECAPTCHA_SITE_KEY");

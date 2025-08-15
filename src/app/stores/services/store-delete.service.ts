@@ -3,9 +3,7 @@ import { StoreRepository } from "../store.repository";
 
 @injectable()
 export class StoreDeleteService {
-
   constructor(
-    @inject(StoreRepository) public readonly storeRepository: StoreRepository
+    @inject(StoreRepository) private storeRepository: StoreRepository
   ) {}
-
 }

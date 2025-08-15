@@ -1,8 +1,8 @@
 import { inject, injectable } from "inversify";
 import { UpdateTenantCommand } from "../commands/update-tenant.command";
 import { patch } from "../../../core/router/route-decorators";
-import { IdentityAuthority } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as IdentityAuthority from "../../module/types";
+import * as Core from "../../../core/module/types";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
 import { IsValid } from "../../../core/helpers/isvalid";
 import { TenantValidator } from "../tenant.validator";
@@ -32,9 +32,9 @@ export class UpdateTenantController {
     } = {};
 
     try {
-      EntityToolkit.Assert.idIsValid(params.data.tenant_id);
+      assertValidEntityId(params.data.tenant_id);
 
-      IsValid.NonEmptyString(params.data.name);
+      assertNonEmptyString(params.data.name);
       TenantValidator.name(params.data.name);
       updateParams.name = params.data.name;
 
@@ -45,7 +45,7 @@ export class UpdateTenantController {
         "upload_token" in params.data.profile_photo &&
         params.data.profile_photo.upload_token
       ) {
-        IsValid.NonEmptyString(params.data.profile_photo.upload_token);
+        assertNonEmptyString(params.data.profile_photo.upload_token);
         updateParams.profile_photo = {
           upload_token: params.data.profile_photo.upload_token,
         };
@@ -58,7 +58,7 @@ export class UpdateTenantController {
         "upload_token" in params.data.cover_photo &&
         params.data.cover_photo.upload_token
       ) {
-        IsValid.NonEmptyString(params.data.cover_photo.upload_token);
+        assertNonEmptyString(params.data.cover_photo.upload_token);
         updateParams.cover_photo = {
           upload_token: params.data.cover_photo.upload_token,
         };

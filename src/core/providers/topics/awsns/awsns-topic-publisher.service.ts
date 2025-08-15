@@ -8,7 +8,7 @@ export class AmazonSNSTopicPublisherService
   implements AbstractTopicPublisherProvider
 {
   constructor(
-    @inject(AmazonSNSService) public readonly AmazonSNSService: AmazonSNSService
+    @inject(AmazonSNSService) private AmazonSNSService: AmazonSNSService
   ) {}
 
   async publishTopic(

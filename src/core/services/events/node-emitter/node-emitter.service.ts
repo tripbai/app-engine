@@ -15,7 +15,7 @@ const emitter = new Events.EventEmitter();
 export class NodeEmitterService {
   constructor(
     @inject(AbstractNodeEmitterConfig)
-    public readonly abstractNodeEmitterConfig: AbstractNodeEmitterConfig
+    private abstractNodeEmitterConfig: AbstractNodeEmitterConfig
   ) {}
 
   listen(eventId: string, handler: (...args: any[]) => void) {

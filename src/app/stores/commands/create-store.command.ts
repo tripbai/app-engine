@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { OrganizationRequesterFactory } from "../../requester/organization-requester.factory";
-import { Core } from "../../../core/module/module";
+import * as Core from "../../../core/module/types";
 import { LogicException } from "../../../core/exceptions/exceptions";
 import { AbstractEventManagerProvider } from "../../../core/providers/event/event-manager.provider";
 import { UnitOfWorkFactory } from "../../../core/workflow/unit-of-work.factory";
@@ -11,31 +11,42 @@ import { StoreCreatedEvent } from "../store.events";
 
 @injectable()
 export class CreateStoreCommand {
-
   constructor(
-    @inject(OrganizationRequesterFactory) public readonly organizationRequesterFactory: OrganizationRequesterFactory,
-    @inject(UnitOfWorkFactory) public readonly unitOfWorkFactory: UnitOfWorkFactory,
-    @inject(StoreRepository) public readonly storeRepository: StoreRepository,
-    @inject(StoreCreateService) public readonly storeCreateService: StoreCreateService,
-    @inject(AbstractEventManagerProvider) public readonly abstractEventManagerProvider: AbstractEventManagerProvider,
-    @inject(OrganizationRepository) public readonly organizationRepository: OrganizationRepository,
+    @inject(OrganizationRequesterFactory)
+    private organizationRequesterFactory: OrganizationRequesterFactory,
+    @inject(UnitOfWorkFactory)
+    private unitOfWorkFactory: UnitOfWorkFactory,
+    @inject(StoreRepository) private storeRepository: StoreRepository,
+    @inject(StoreCreateService)
+    private storeCreateService: StoreCreateService,
+    @inject(AbstractEventManagerProvider)
+    private abstractEventManagerProvider: AbstractEventManagerProvider,
+    @inject(OrganizationRepository)
+    private organizationRepository: OrganizationRepository
   ) {}
 
   async execute(params: {
-    requester: Core.Authorization.Requester,
-    organizationId: Core.Entity.Id,
-    name: string
+    requester: Core.Authorization.Requester;
+    organizationId: Core.Entity.Id;
+    name: string;
   }) {
-    const unitOfWork = this.unitOfWorkFactory.create()
-    const requester = this.organizationRequesterFactory.create(params.requester)
-    const organizationModel = await this.organizationRepository.getById(params.organizationId)
-    this.storeCreateService.assertRequesterCanCreateStore(requester, organizationModel)
-    this.storeCreateService.assertOrganizationCanCreateStore(organizationModel)
+    const unitOfWork = this.unitOfWorkFactory.create();
+    const requester = this.organizationRequesterFactory.create(
+      params.requester
+    );
+    const organizationModel = await this.organizationRepository.getById(
+      params.organizationId
+    );
+    this.storeCreateService.assertRequesterCanCreateStore(
+      requester,
+      organizationModel
+    );
+    this.storeCreateService.assertOrganizationCanCreateStore(organizationModel);
     const storeModel = await this.storeCreateService.createStore({
       requester,
       organizationModel,
-      name: params.name
-    })
+      name: params.name,
+    });
     unitOfWork.addTransactionStep(
       this.storeRepository.create(storeModel.entity_id, {
         name: storeModel.name,
@@ -48,14 +59,14 @@ export class CreateStoreCommand {
         secret_key: storeModel.secret_key,
         status: storeModel.status,
         archived_at: storeModel.archived_at,
-        language: storeModel.language
+        language: storeModel.language,
       })
-    )
-    await unitOfWork.commit()
+    );
+    await unitOfWork.commit();
     this.abstractEventManagerProvider.dispatch(
-      new StoreCreatedEvent, storeModel
-    )
-    return storeModel
+      new StoreCreatedEvent(),
+      storeModel
+    );
+    return storeModel;
   }
-
 }

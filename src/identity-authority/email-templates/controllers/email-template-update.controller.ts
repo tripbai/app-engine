@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { patch } from "../../../core/router/route-decorators";
-import { IdentityAuthority } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as IdentityAuthority from "../../module/types";
+import * as Core from "../../../core/module/types";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
 import { IsValid } from "../../../core/helpers/isvalid";
 import { EmailTemplateValidator } from "../email-template.validator";
@@ -12,7 +12,7 @@ import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
 export class EmailTemplateUpdateController {
   constructor(
     @inject(UpdateEmailTemplateCommand)
-    public readonly emailTemplateUpdateService: UpdateEmailTemplateCommand
+    private emailTemplateUpdateService: UpdateEmailTemplateCommand
   ) {}
 
   @patch<IdentityAuthority.EmailTemplatesRegistry.Endpoints.Update>(
@@ -22,12 +22,12 @@ export class EmailTemplateUpdateController {
     T extends IdentityAuthority.EmailTemplatesRegistry.Endpoints.Update
   >(params: Core.Route.ControllerDTO<T>): Promise<T["response"]> {
     try {
-      IsValid.NonEmptyString(params.data.description);
+      assertNonEmptyString(params.data.description);
       EmailTemplateValidator.description(params.data.description);
-      IsValid.NonEmptyString(params.data.entity_id);
-      EntityToolkit.Assert.idIsValid(params.data.entity_id);
-      IsValid.NonEmptyString(params.data.template_id);
-      EntityToolkit.Assert.idIsValid(params.data.template_id);
+      assertNonEmptyString(params.data.entity_id);
+      assertValidEntityId(params.data.entity_id);
+      assertNonEmptyString(params.data.template_id);
+      assertValidEntityId(params.data.template_id);
     } catch (error) {
       throw new BadRequestException({
         message: "Failed to update email template due to invalid input.",

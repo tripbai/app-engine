@@ -6,7 +6,7 @@ import { PermissionTokenValidator } from "./permission-token.validator";
 export class PermissionManager {
   constructor(
     @inject(PermissionTokenValidator)
-    public readonly PermissionTokenValidator: PermissionTokenValidator
+    private PermissionTokenValidator: PermissionTokenValidator
   ) {}
 
   /**

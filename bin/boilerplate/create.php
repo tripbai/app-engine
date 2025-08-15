@@ -213,14 +213,14 @@ foreach ($boilerplates as $boilerplate) {
         import { $commandOrQueryName } from "../$commandOrQueryFolderName/$commandOrQueryKebabCase.$commandOrQueryType";
         import { del, patch, post, put, get } from "../../../core/router/decorators";
         import { TripBai } from "../../module/module.interface";
-        import { Core } from "../../../core/module/module";
+        import * as Core from "../../../core/module/types";
         import { BadRequestException, LogicException } from "../../../core/exceptions/exceptions";
 
         @injectable()
         export class $controllerName {
         
           constructor(
-            @inject($commandOrQueryName) public readonly $lcCommandOrQueryName: $commandOrQueryName
+            @inject($commandOrQueryName) private $lcCommandOrQueryName: $commandOrQueryName
           ) {}
         
           @$lowecasemethod<TripBai.$ucDomain.Endpoints.$endpointName>('/$endpointRequestPath')
@@ -267,7 +267,7 @@ foreach ($boilerplates as $boilerplate) {
     foreach ($serviceVerbs as $serviceVerb) {
         if (str_contains($commandOrQueryName, $serviceVerb)) {
             $possibleServiceDependencyName = $ucSingularDomain . $serviceVerb . 'Service';
-            $possibleServiceDependencyInjection = '@inject(' . $possibleServiceDependencyName . ') public readonly ' . lcfirst($possibleServiceDependencyName) . ': ' . $possibleServiceDependencyName . ',';
+            $possibleServiceDependencyInjection = '@inject(' . $possibleServiceDependencyName . ') private ' . lcfirst($possibleServiceDependencyName) . ': ' . $possibleServiceDependencyName . ',';
             $possibleServiceDependencyFilePath = 'import { '.$possibleServiceDependencyName.' } from "../services/'.$lcSingularDomain.'-'.strtolower($serviceVerb).'.service";';
             break;
         }
@@ -279,7 +279,7 @@ foreach ($boilerplates as $boilerplate) {
         $commandOrQueryContent = <<<EOT
         import { inject, injectable } from "inversify";
         import { OrganizationRequesterFactory } from "../../requester/organization-requester.factory";
-        import { Core } from "../../../core/module/module";
+        import * as Core from "../../../core/module/types";
         import { LogicException } from "../../../core/exceptions/exceptions";
         import { AbstractEventManagerProvider } from "../../../core/providers/event/event-manager.provider";
         import { UnitOfWorkFactory } from "../../../core/workflow/unit-of-work.factory";
@@ -290,11 +290,11 @@ foreach ($boilerplates as $boilerplate) {
         export class $commandOrQueryName {
 
           constructor(
-            @inject(OrganizationRequesterFactory) public readonly organizationRequesterFactory: OrganizationRequesterFactory,
-            @inject(UnitOfWorkFactory) public readonly unitOfWorkFactory: UnitOfWorkFactory,
-            @inject({$ucSingularDomain}Repository) public readonly {$singularDomain}Repository: {$ucSingularDomain}Repository,
+            @inject(OrganizationRequesterFactory) private organizationRequesterFactory: OrganizationRequesterFactory,
+            @inject(UnitOfWorkFactory) private unitOfWorkFactory: UnitOfWorkFactory,
+            @inject({$ucSingularDomain}Repository) private {$singularDomain}Repository: {$ucSingularDomain}Repository,
             {$possibleServiceDependencyInjection}
-            @inject(AbstractEventManagerProvider) public readonly abstractEventManagerProvider: AbstractEventManagerProvider
+            @inject(AbstractEventManagerProvider) private abstractEventManagerProvider: AbstractEventManagerProvider
           ) {}
 
           async execute(params: {
@@ -347,7 +347,7 @@ foreach ($boilerplates as $boilerplate) {
             export class $serviceName {
 
               constructor(
-                @inject({$ucSingularDomain}Repository) public readonly {$singularDomain}Repository: {$ucSingularDomain}Repository
+                @inject({$ucSingularDomain}Repository) private {$singularDomain}Repository: {$ucSingularDomain}Repository
               ) {}
 
             }
@@ -392,8 +392,8 @@ foreach ($boilerplates as $boilerplate) {
         protected collection: string = '$domain'
 
           constructor(
-            @inject(AbstractDatabaseProvider) public readonly DatabaseProvider: AbstractDatabaseProvider,
-            @inject(AbstractCacheProvider) public readonly CacheProvider: AbstractCacheProvider
+            @inject(AbstractDatabaseProvider) private DatabaseProvider: AbstractDatabaseProvider,
+            @inject(AbstractCacheProvider) private CacheProvider: AbstractCacheProvider
           ){
             super(
             {$ucSingularDomain}Model,

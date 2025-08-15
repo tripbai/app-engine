@@ -8,7 +8,7 @@ import {
   get,
 } from "../../../core/router/route-decorators";
 import { TripBai } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
   LogicException,
@@ -18,7 +18,7 @@ import {
 export class StoreUpdateController {
   constructor(
     @inject(UpdateStoreCommand)
-    public readonly updateStoreCommand: UpdateStoreCommand
+    private updateStoreCommand: UpdateStoreCommand
   ) {}
 
   @put<TripBai.Stores.Endpoints.UpdateStore>("/tripbai/stores/:store_id")

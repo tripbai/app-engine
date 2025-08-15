@@ -1,8 +1,8 @@
 import { inject, injectable } from "inversify";
 import { UserCreateService } from "../services/user-create.service";
 import { post } from "../../../core/router/route-decorators";
-import { IdentityAuthority } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as IdentityAuthority from "../../module/types";
+import * as Core from "../../../core/module/types";
 import { UserAssertions } from "../user.assertions";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
 import { ProfileAssertions } from "../../profiles/profile.assertions";
@@ -12,12 +12,12 @@ import { CreateUserCommand } from "../commands/create-user.command";
 export class UserCreateController {
   constructor(
     @inject(UserCreateService)
-    public readonly userCreateService: UserCreateService,
-    @inject(UserAssertions) public readonly userAssertions: UserAssertions,
+    private userCreateService: UserCreateService,
+    @inject(UserAssertions) private userAssertions: UserAssertions,
     @inject(ProfileAssertions)
-    public readonly profileAssertions: ProfileAssertions,
+    private profileAssertions: ProfileAssertions,
     @inject(CreateUserCommand)
-    public readonly createUserCommand: CreateUserCommand
+    private createUserCommand: CreateUserCommand
   ) {}
 
   @post<IdentityAuthority.Users.Endpoints.Create>("/identity-authority/users")

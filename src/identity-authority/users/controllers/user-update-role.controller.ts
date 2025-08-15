@@ -1,8 +1,8 @@
 import { inject, injectable } from "inversify";
 import { UserAssertions } from "../user.assertions";
 import { UpdateUserRoleCommand } from "../commands/update-user-role.command";
-import { IdentityAuthority } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as IdentityAuthority from "../../module/types";
+import * as Core from "../../../core/module/types";
 import { IsValid } from "../../../core/helpers/isvalid";
 import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
@@ -11,9 +11,9 @@ import { post } from "../../../core/router/route-decorators";
 @injectable()
 export class UserUpdateRoleController {
   constructor(
-    @inject(UserAssertions) public readonly userAssertions: UserAssertions,
+    @inject(UserAssertions) private userAssertions: UserAssertions,
     @inject(UpdateUserRoleCommand)
-    public readonly updateUserRoleCommand: UpdateUserRoleCommand
+    private updateUserRoleCommand: UpdateUserRoleCommand
   ) {}
 
   @post<IdentityAuthority.Users.Endpoints.UpdateUserRole>(
@@ -28,11 +28,11 @@ export class UserUpdateRoleController {
     } = Object.create(null);
 
     try {
-      IsValid.NonEmptyString(params.data.user_id);
-      EntityToolkit.Assert.idIsValid(params.data.user_id);
+      assertNonEmptyString(params.data.user_id);
+      assertValidEntityId(params.data.user_id);
       dto.user_id = params.data.user_id;
 
-      IsValid.NonEmptyString(params.data.role);
+      assertNonEmptyString(params.data.role);
       this.userAssertions.isRole(params.data.role);
       dto.newRole = params.data.role;
     } catch (error) {

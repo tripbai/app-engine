@@ -7,7 +7,7 @@ import { PermissionManager } from "../../../services/rbac/permissions.manager";
 export class NativeRBACService implements AbstractAuthorizationProvider {
   constructor(
     @inject(PermissionManager)
-    public readonly PermissionManager: PermissionManager
+    private PermissionManager: PermissionManager
   ) {}
 
   canOperate(

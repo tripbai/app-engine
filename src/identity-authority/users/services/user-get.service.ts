@@ -3,11 +3,5 @@ import { UserRepository } from "../user.repository";
 
 @injectable()
 export class UserGetService {
-
-  constructor(
-    @inject(UserRepository) public readonly userRepository: UserRepository
-  ){}
-
-  
-
+  constructor(@inject(UserRepository) private userRepository: UserRepository) {}
 }

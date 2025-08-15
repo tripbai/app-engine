@@ -9,9 +9,7 @@ import { handleAxiosError } from "../../../utilities/handleAxiosError";
  */
 @injectable()
 export class GoogleUserInfoService {
-  constructor(
-    @inject(AxiosService) public readonly AxiosService: AxiosService
-  ) {}
+  constructor(@inject(AxiosService) private AxiosService: AxiosService) {}
 
   /**
    * Retrieves Google user information using an OAuth provider token.

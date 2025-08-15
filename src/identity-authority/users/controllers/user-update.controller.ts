@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { patch } from "../../../core/router/route-decorators";
-import { IdentityAuthority } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as IdentityAuthority from "../../module/types";
+import * as Core from "../../../core/module/types";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
 import { UserValidator } from "../user.validator";
 import { IsValid } from "../../../core/helpers/isvalid";
@@ -14,10 +14,10 @@ import { ProfileAssertions } from "../../profiles/profile.assertions";
 export class UserUpdateController {
   constructor(
     @inject(UpdateUserCommand)
-    public readonly updateUserCommand: UpdateUserCommand,
-    @inject(UserAssertions) public readonly userAssertions: UserAssertions,
+    private updateUserCommand: UpdateUserCommand,
+    @inject(UserAssertions) private userAssertions: UserAssertions,
     @inject(ProfileAssertions)
-    public readonly profileAssertions: ProfileAssertions
+    private profileAssertions: ProfileAssertions
   ) {}
 
   @patch<IdentityAuthority.Users.Endpoints.UpdateUser>(
@@ -30,28 +30,28 @@ export class UserUpdateController {
       Object.create(null);
 
     try {
-      EntityToolkit.Assert.idIsValid(params.data.user_id);
+      assertValidEntityId(params.data.user_id);
 
       if (params.data.identity_provider) {
-        IsValid.NonEmptyString(params.data.identity_provider);
+        assertNonEmptyString(params.data.identity_provider);
         this.userAssertions.isProvider(params.data.identity_provider);
         commandParams.identity_provider = params.data.identity_provider;
       }
 
       if (params.data.first_name) {
-        IsValid.NonEmptyString(params.data.first_name);
+        assertNonEmptyString(params.data.first_name);
         this.profileAssertions.isFirstName(params.data.first_name);
         commandParams.first_name = params.data.first_name;
       }
 
       if (params.data.last_name) {
-        IsValid.NonEmptyString(params.data.last_name);
+        assertNonEmptyString(params.data.last_name);
         this.profileAssertions.isLastName(params.data.last_name);
         commandParams.last_name = params.data.last_name;
       }
 
       if (params.data.about) {
-        IsValid.NonEmptyString(params.data.about);
+        assertNonEmptyString(params.data.about);
         commandParams.about = params.data.about;
       }
 

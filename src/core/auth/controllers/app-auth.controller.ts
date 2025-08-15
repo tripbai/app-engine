@@ -7,9 +7,7 @@ import { assertNonEmptyString } from "../../utilities/assertValid";
 
 @injectable()
 export class AppAuthController {
-  constructor(
-    @inject(AppAuthService) public readonly AppAuthService: AppAuthService
-  ) {}
+  constructor(@inject(AppAuthService) private AppAuthService: AppAuthService) {}
 
   @post<Core.Endpoints.AuthWithAppAndSecretKey>("/core/authenticate")
   async withAppKeyAndSecretKey<

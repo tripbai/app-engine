@@ -1,59 +1,73 @@
 import { BaseEntity } from "../../core/orm/entity/base-entity";
-import { boolean, collection, length, nullable, timestamp, unique, varchar } from "../../core/orm/entity/decorators";
-import { IdentityAuthority } from "../module/module.interface";
-import { UserValidator } from "./user.validator";
+import {
+  boolean,
+  collection,
+  length,
+  nullable,
+  timestamp,
+  unique,
+  varchar,
+} from "../../core/orm/entity/entity-decorators";
+import * as IdentityAuthority from "../module/types";
+import {
+  assertIsCreationContext,
+  assertIsEmailAddress,
+  assertIsIdentityProvider,
+  assertIsRole,
+  assertIsStatus,
+  assertIsUsername,
+  assertIsUserType,
+} from "./user.assertions";
 
-@collection('users')
-export class UserModel extends BaseEntity<UserModel> {
-
+@collection("users")
+export class UserModel extends BaseEntity {
   @length(12)
-  @varchar(UserValidator.identity_provider)
-  identity_provider: IdentityAuthority.Providers.Identity
+  @varchar(assertIsIdentityProvider)
+  identity_provider!: IdentityAuthority.Providers.Identity;
 
   @length(64)
   @unique()
-  @varchar(UserValidator.email_address) 
-  email_address: IdentityAuthority.Users.Fields.UniqueEmailAddress 
+  @varchar(assertIsEmailAddress)
+  email_address!: IdentityAuthority.Users.Fields.UniqueEmailAddress;
 
   @length(32)
   @unique()
-  @varchar(UserValidator.username)
-  username: IdentityAuthority.Users.Fields.UniqueUsername 
+  @varchar(assertIsUsername)
+  username!: IdentityAuthority.Users.Fields.UniqueUsername;
 
   @boolean()
-  is_email_verified: boolean
+  is_email_verified!: boolean;
 
   @nullable()
   @timestamp()
-  verified_since: string | null
+  verified_since!: string | null;
 
   @nullable()
   @timestamp()
-  suspended_until: string | null
+  suspended_until!: string | null;
 
   @length(12)
-  @varchar(UserValidator.creation_context)
-  creation_context: 'external' | 'internal'
+  @varchar(assertIsCreationContext)
+  creation_context!: "external" | "internal";
 
   @length(12)
-  @varchar(UserValidator.role)
-  role: 'webadmin' | 'user' | 'moderator'
+  @varchar(assertIsRole)
+  role!: "webadmin" | "user" | "moderator";
 
   @length(512)
   @nullable()
-  @varchar() 
-  password_hash: IdentityAuthority.Users.Fields.HashedPassword | null
+  @varchar()
+  password_hash!: IdentityAuthority.Users.Fields.HashedPassword | null;
 
   @length(12)
-  @varchar(UserValidator.status) 
-  status: IdentityAuthority.Users.Status.Type
+  @varchar(assertIsStatus)
+  status!: IdentityAuthority.Users.Status.Type;
 
   @length(12)
-  @varchar(UserValidator.type)
-  type: IdentityAuthority.Users.Type
-  
+  @varchar(assertIsUserType)
+  type!: IdentityAuthority.Users.Type;
+
   @length(64)
   @varchar()
-  otp_secret: string
-  
+  otp_secret!: string;
 }

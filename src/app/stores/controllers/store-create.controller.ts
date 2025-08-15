@@ -8,7 +8,7 @@ import {
   get,
 } from "../../../core/router/route-decorators";
 import { TripBai } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
   LogicException,
@@ -21,7 +21,7 @@ import { StoreValidator } from "../store.validator";
 export class StoreCreateController {
   constructor(
     @inject(CreateStoreCommand)
-    public readonly createStoreCommand: CreateStoreCommand
+    private createStoreCommand: CreateStoreCommand
   ) {}
 
   @post<TripBai.Stores.Endpoints.CreateStore>("/tripbai/stores")
@@ -32,11 +32,11 @@ export class StoreCreateController {
       Object.create(null);
     commandDTO.requester = params.requester;
     try {
-      IsValid.NonEmptyString(params.data.organization_id);
-      EntityToolkit.Assert.idIsValid(params.data.organization_id);
+      assertNonEmptyString(params.data.organization_id);
+      assertValidEntityId(params.data.organization_id);
       commandDTO.organizationId = params.data.organization_id;
 
-      IsValid.NonEmptyString(params.data.name);
+      assertNonEmptyString(params.data.name);
       StoreValidator.name(params.data.name);
       commandDTO.name = params.data.name;
     } catch (error) {

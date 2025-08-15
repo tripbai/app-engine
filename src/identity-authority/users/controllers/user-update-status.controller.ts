@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
-import { IdentityAuthority } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as IdentityAuthority from "../../module/types";
+import * as Core from "../../../core/module/types";
 import { post } from "../../../core/router/route-decorators";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
 import { IsValid } from "../../../core/helpers/isvalid";
@@ -13,9 +13,9 @@ import { UpdateUserStatusCommand } from "../commands/update-user-status.command"
 @injectable()
 export class UserUpdateStatusController {
   constructor(
-    @inject(UserAssertions) public readonly userAssertions: UserAssertions,
+    @inject(UserAssertions) private userAssertions: UserAssertions,
     @inject(UpdateUserStatusCommand)
-    public readonly updateUserStatusCommand: UpdateUserStatusCommand
+    private updateUserStatusCommand: UpdateUserStatusCommand
   ) {}
 
   @post<IdentityAuthority.Users.Endpoints.UpdateUserStatus>(
@@ -31,11 +31,11 @@ export class UserUpdateStatusController {
     } = Object.create(null);
 
     try {
-      IsValid.NonEmptyString(params.data.user_id);
-      EntityToolkit.Assert.idIsValid(params.data.user_id);
+      assertNonEmptyString(params.data.user_id);
+      assertValidEntityId(params.data.user_id);
       dto.user_id = params.data.user_id;
 
-      IsValid.NonEmptyString(params.data.status);
+      assertNonEmptyString(params.data.status);
       this.userAssertions.isStatus(params.data.status);
       dto.status = params.data.status;
 
@@ -43,7 +43,7 @@ export class UserUpdateStatusController {
         if (!("suspended_until" in params.data)) {
           throw new Error("Missing suspended_until field for suspended status");
         }
-        IsValid.NonEmptyString(params.data.suspended_until);
+        assertNonEmptyString(params.data.suspended_until);
         TimeStamp.isValid(params.data.suspended_until);
         dto.suspended_until = params.data.suspended_until;
       }

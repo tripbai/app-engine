@@ -3,12 +3,12 @@
  * If you update this file, it will be overwritten.
  * @since 2025-06-03T13:46:34.494Z
  */
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import { router } from './dist/core/services/lambda/lambda-router.js';
-import { LambdaRoutesRegistry } from './dist/core/services/lambda/lambda-routes-registry.js';
-import { Application } from './dist/core/application.js';
-import { AppENV } from './dist/core/helpers/env.js';
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+import { router } from "./dist/core/services/lambda/lambda-router.js";
+import { LambdaRoutesRegistry } from "./dist/core/services/lambda/lambda-routes-registry.js";
+import { Application } from "./dist/core/application.js";
+import { AppENV } from "./dist/core/application/appEnv.js";
 import { AppAuthController } from "./dist/core/auth/controllers/app-auth.controller.js";
 import { AppInfoController } from "./dist/core/auth/controllers/app-info.controller.js";
 import { AppAuthService } from "./dist/core/auth/services/app-auth-service.js";
@@ -38,17 +38,19 @@ import { MySqlPoolService } from "./dist/core/services/mysql/mysql-pool-service.
 import { PermissionTokenValidator } from "./dist/core/services/rbac/permission-token.validator.js";
 import { PermissionManager } from "./dist/core/services/rbac/permissions.manager.js";
 
-
-const __filename = fileURLToPath(import.meta.url)
-const rootDir = dirname(__filename)
-Application.boot()
-Application.root(rootDir)
-Application.environment('development')
-AppENV.set('APP_KEY',"L3PG65VenOcRuwhqPf4QCUOSZqOftwf8")
-AppENV.set('SECRET_KEY',"zmV0M1q30FM0sGw7eASce7RuuyAnYOHU")
-AppENV.set('JWT_SECRET',"gVpjkAZl9gr49iKcfZfmSyWYEKiDvpApdevelopment")
-AppENV.set('APPLICATION_NAME',"tripbai/mailman")
-AppENV.set('APPLICATION_BUILD',"Tue Jun 03 2025 21:46:34 GMT+0800 (Philippine Standard Time)")
+const __filename = fileURLToPath(import.meta.url);
+const rootDir = dirname(__filename);
+Application.boot();
+Application.root(rootDir);
+Application.environment("development");
+AppENV.set("APP_KEY", "L3PG65VenOcRuwhqPf4QCUOSZqOftwf8");
+AppENV.set("SECRET_KEY", "zmV0M1q30FM0sGw7eASce7RuuyAnYOHU");
+AppENV.set("JWT_SECRET", "gVpjkAZl9gr49iKcfZfmSyWYEKiDvpApdevelopment");
+AppENV.set("APPLICATION_NAME", "tripbai/mailman");
+AppENV.set(
+  "APPLICATION_BUILD",
+  "Tue Jun 03 2025 21:46:34 GMT+0800 (Philippine Standard Time)"
+);
 Application.container().bind(AppAuthController).toSelf();
 Application.container().bind(AppInfoController).toSelf();
 Application.container().bind(AppAuthService).toSelf();
@@ -78,30 +80,28 @@ Application.container().bind(MySqlPoolService).toSelf();
 Application.container().bind(PermissionTokenValidator).toSelf();
 Application.container().bind(PermissionManager).toSelf();
 
-
-Application.route().forEach(routeConfig => {
-  const Controller = Application.container().get(routeConfig.Controller)
+Application.route().forEach((routeConfig) => {
+  const Controller = Application.container().get(routeConfig.Controller);
   LambdaRoutesRegistry.register(
     routeConfig.method,
     routeConfig.path,
     async (data) => {
-      return await Controller[routeConfig.handler](data)
+      return await Controller[routeConfig.handler](data);
     }
-  )
-})
-
+  );
+});
 
 export const handler = async (event) => {
   try {
-    const response = await router(event)
+    const response = await router(event);
     return {
       statusCode: response.code,
-      body: JSON.stringify(response.data)
-    }
+      body: JSON.stringify(response.data),
+    };
   } catch (error) {
     return {
       statusCode: error.code ?? 500,
-      body: JSON.stringify({ error: error.message ?? 'unknown exception' }),
-    }
+      body: JSON.stringify({ error: error.message ?? "unknown exception" }),
+    };
   }
-}
+};

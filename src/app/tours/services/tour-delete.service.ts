@@ -3,9 +3,5 @@ import { TourRepository } from "../tour.repository";
 
 @injectable()
 export class TourDeleteService {
-
-  constructor(
-    @inject(TourRepository) public readonly tourRepository: TourRepository
-  ) {}
-
+  constructor(@inject(TourRepository) private tourRepository: TourRepository) {}
 }

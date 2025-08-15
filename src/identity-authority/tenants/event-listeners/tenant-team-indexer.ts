@@ -3,86 +3,90 @@ import { EventListenerInterface } from "../../../core/providers/event/event-mana
 import { TenantTeamAccessEvent } from "../tenant.events";
 import { UserModel } from "../../users/user.model";
 import { TenantModel } from "../tenant.model";
-import { AbstractIndexerProvider, IndexTaskItem } from "../../../core/providers/indexer/indexer.provider";
-import { AppENV } from "../../../core/helpers/env";
+import {
+  AbstractIndexerProvider,
+  IndexTaskItem,
+} from "../../../core/providers/indexer/indexer.provider";
+import { AppENV } from "../../../core/application/appEnv";
 import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
 
 /**
  * Listens to `TenantTeamAccessEvent` and updates the index for user access
  */
 @injectable()
-export class TenantTeamAccessIndexer implements EventListenerInterface<TenantTeamAccessEvent> {
-
+export class TenantTeamAccessIndexer
+  implements EventListenerInterface<TenantTeamAccessEvent>
+{
   constructor(
-    @inject(AbstractIndexerProvider) private readonly indexerProvider: AbstractIndexerProvider
+    @inject(AbstractIndexerProvider)
+    private readonly indexerProvider: AbstractIndexerProvider
   ) {}
 
   async execute(
-    action: "add:user" | "remove:user", 
-    userModel: UserModel, 
+    action: "add:user" | "remove:user",
+    userModel: UserModel,
     tenantModel: TenantModel
-  ){
-
-    const indexerNamespaceId = AppENV.get('IAUTH_INDEXER_NAMESPACE_ID')
-    EntityToolkit.Assert.idIsValid(indexerNamespaceId)
+  ) {
+    const indexerNamespaceId = getEnv("IAUTH_INDEXER_NAMESPACE_ID");
+    assertValidEntityId(indexerNamespaceId);
 
     /**
      * This task is used to index the list of users that can access a tenant.
      */
     const taskToAddUserToIndexTenantUsers: IndexTaskItem = {
       namespace_id: indexerNamespaceId,
-      type: 'Index:Add:Entity',
-      entity_collection: 'tenants',
+      type: "Index:Add:Entity",
+      entity_collection: "tenants",
       entity_id: tenantModel.entity_id,
-      index_name: 'users',
+      index_name: "users",
       subject_id: userModel.entity_id,
-    }
+    };
 
     /**
      * This task is used to remove a user from the index of users
      */
     const taskToRemoveUserFromIndexTenantUsers: IndexTaskItem = {
       namespace_id: indexerNamespaceId,
-      type: 'Index:Remove:Entity',
-      entity_collection: 'tenants',
+      type: "Index:Remove:Entity",
+      entity_collection: "tenants",
       entity_id: tenantModel.entity_id,
-      index_name: 'users',
+      index_name: "users",
       subject_id: userModel.entity_id,
-    }
+    };
 
     /**
      * This task is used to index the list of tenants a user can access.
      */
     const taskToAddTenantToIndexOfUserCanAccess: IndexTaskItem = {
       namespace_id: indexerNamespaceId,
-      type: 'Index:Add:Entity',
-      entity_collection: 'users',
+      type: "Index:Add:Entity",
+      entity_collection: "users",
       entity_id: userModel.entity_id,
-      index_name: 'tenants',
+      index_name: "tenants",
       subject_id: tenantModel.entity_id,
-    }
+    };
 
     /**
      * This task is used to remove a tenant from the index of tenants
      */
     const taskToRemoveTenantFromIndexOfUserCanAccess: IndexTaskItem = {
       namespace_id: indexerNamespaceId,
-      type: 'Index:Remove:Entity',
-      entity_collection: 'users',
+      type: "Index:Remove:Entity",
+      entity_collection: "users",
       entity_id: userModel.entity_id,
-      index_name: 'tenants',
+      index_name: "tenants",
       subject_id: tenantModel.entity_id,
-    }
+    };
 
-    /** 
+    /**
      * If the action is to add a user, we will index the user access
      * to the tenant.
      */
-    if (action === 'add:user') {
+    if (action === "add:user") {
       await this.indexerProvider.index([
         taskToAddUserToIndexTenantUsers,
-        taskToAddTenantToIndexOfUserCanAccess
-      ])
+        taskToAddTenantToIndexOfUserCanAccess,
+      ]);
     } else {
       /**
        * If the action is to remove a user, we will remove the user access
@@ -90,9 +94,8 @@ export class TenantTeamAccessIndexer implements EventListenerInterface<TenantTea
        */
       await this.indexerProvider.index([
         taskToRemoveUserFromIndexTenantUsers,
-        taskToRemoveTenantFromIndexOfUserCanAccess
-      ])
+        taskToRemoveTenantFromIndexOfUserCanAccess,
+      ]);
     }
   }
-
 }

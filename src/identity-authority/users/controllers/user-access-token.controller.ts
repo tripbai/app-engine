@@ -1,8 +1,8 @@
 import { inject, injectable } from "inversify";
 import { post } from "../../../core/router/route-decorators";
-import { IdentityAuthority } from "../../module/module.interface";
+import * as IdentityAuthority from "../../module/types";
 import { RefreshAccessTokenCommand } from "../commands/refresh-access-token.command";
-import { Core } from "../../../core/module/module";
+import * as Core from "../../../core/module/types";
 
 @injectable()
 export class UserAccessTokenController {

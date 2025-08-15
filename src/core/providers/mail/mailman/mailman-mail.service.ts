@@ -8,9 +8,9 @@ import { getEnv } from "../../../application/appEnv";
 @injectable()
 export class MailmanMail implements AbstractMailProvider {
   constructor(
-    @inject(AbstractJWTProvider) public readonly jwtHelper: AbstractJWTProvider,
+    @inject(AbstractJWTProvider) private jwtHelper: AbstractJWTProvider,
     @inject(AbstractTopicPublisherProvider)
-    public readonly topicPublisher: AbstractTopicPublisherProvider
+    private topicPublisher: AbstractTopicPublisherProvider
   ) {}
 
   async sendEmail(params: SendMailParams): Promise<void> {

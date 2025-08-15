@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { get } from "../../../core/router/route-decorators";
-import { IdentityAuthority } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as IdentityAuthority from "../../module/types";
+import * as Core from "../../../core/module/types";
 import { UserPermissionService } from "../services/user-permission.service";
 import { UserRepository } from "../user.repository";
 import { ProfileRepository } from "../../profiles/profile.repository";
@@ -20,11 +20,11 @@ import { UserAssertions } from "../user.assertions";
 export class UserGetController {
   constructor(
     @inject(IAuthRequesterFactory)
-    public readonly iAuthRequesterFactory: IAuthRequesterFactory,
-    @inject(UserRepository) public readonly userRepository: UserRepository,
+    private iAuthRequesterFactory: IAuthRequesterFactory,
+    @inject(UserRepository) private userRepository: UserRepository,
     @inject(ProfileRepository)
-    public readonly profileRepository: ProfileRepository,
-    @inject(UserAssertions) public readonly userAssertions: UserAssertions
+    private profileRepository: ProfileRepository,
+    @inject(UserAssertions) private userAssertions: UserAssertions
   ) {}
 
   @get<IdentityAuthority.Users.Endpoints.GetSelf>("/identity-authority/user/me")
@@ -62,8 +62,8 @@ export class UserGetController {
     params: Core.Route.ControllerDTO<T>
   ): Promise<T["response"]> {
     try {
-      IsValid.NonEmptyString(params.data.user_id);
-      EntityToolkit.Assert.idIsValid(params.data.user_id);
+      assertNonEmptyString(params.data.user_id);
+      assertValidEntityId(params.data.user_id);
     } catch (error) {
       throw new BadRequestException({
         message: "invalid user id",
@@ -100,8 +100,8 @@ export class UserGetController {
     T extends IdentityAuthority.Users.Endpoints.GetByEmailOrUsername
   >(params: Core.Route.ControllerDTO<T>): Promise<T["response"]> {
     try {
-      IsValid.NonEmptyString(params.data.type);
-      IsValid.NonEmptyString(params.data.value);
+      assertNonEmptyString(params.data.type);
+      assertNonEmptyString(params.data.value);
       if (!["email_address", "username"].includes(params.data.type)) {
         throw new BadRequestException({
           message: "invalid type, must be email_address or username",

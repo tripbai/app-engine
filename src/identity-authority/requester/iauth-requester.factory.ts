@@ -6,18 +6,17 @@ import { AppAuthService } from "../../core/auth/services/app-auth-service";
 
 @injectable()
 export class IAuthRequesterFactory {
-
   constructor(
-    @inject(UserPermissionService) public readonly userPermissionService: UserPermissionService,
-    @inject(AppAuthService) public readonly appAuthService: AppAuthService
-  ){}
+    @inject(UserPermissionService)
+    private userPermissionService: UserPermissionService,
+    @inject(AppAuthService) private appAuthService: AppAuthService
+  ) {}
 
-  create(requesterContext: Core.Authorization.Requester){
+  create(requesterContext: Core.Authorization.Requester) {
     return new IAuthRequester(
-      requesterContext, 
+      requesterContext,
       this.userPermissionService,
       this.appAuthService
-    )
+    );
   }
-
 }

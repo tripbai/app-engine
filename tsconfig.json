@@ -11,7 +11,8 @@
     "useDefineForClassFields": false,
     "outDir": "./dist",
     "rootDir": "./src",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "types": ["node", "mocha"]
   },
   "exclude": ["node_modules"],
   "include": ["./src/**/*.ts"]

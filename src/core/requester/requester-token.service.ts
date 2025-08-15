@@ -11,7 +11,7 @@ export class RequesterTokenService {
 
   constructor(
     @inject(AbstractJWTProvider)
-    public readonly JWTProvider: AbstractJWTProvider
+    private JWTProvider: AbstractJWTProvider
   ) {}
 
   parse(requesterToken: string): { iss: string; aud: string; data: unknown } {

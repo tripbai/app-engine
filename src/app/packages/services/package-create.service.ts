@@ -8,22 +8,19 @@ import { TimeStamp } from "../../../core/helpers/timestamp";
 
 @injectable()
 export class PackageCreateService {
-
   constructor(
-    @inject(PackageRepository) public readonly packageRepository: PackageRepository
+    @inject(PackageRepository)
+    private packageRepository: PackageRepository
   ) {}
 
-  createPackage(
-    requester: OrganizationRequester,
-    name: string,
-  ): PackageModel {
+  createPackage(requester: OrganizationRequester, name: string): PackageModel {
     if (!requester.isWebAdmin()) {
       throw new ResourceAccessForbiddenException({
         message: "Requester has no permission to create packages.",
-        data: { requester: requester.requester }
-      })
+        data: { requester: requester.requester },
+      });
     }
-    const packageId = Pseudorandom.alphanum32()
+    const packageId = createEntityId();
     const packageModel: PackageModel = {
       entity_id: packageId,
       name: name,
@@ -33,9 +30,8 @@ export class PackageCreateService {
       is_default: false,
       created_at: TimeStamp.now(),
       updated_at: TimeStamp.now(),
-      archived_at: null
-    }
-    return packageModel
+      archived_at: null,
+    };
+    return packageModel;
   }
-
 }

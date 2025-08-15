@@ -8,7 +8,7 @@ import {
   get,
 } from "../../../core/router/route-decorators";
 import { TripBai } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
   LogicException,
@@ -19,7 +19,7 @@ import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
 @injectable()
 export class PackageGetController {
   constructor(
-    @inject(GetPackageQuery) public readonly getPackageQuery: GetPackageQuery
+    @inject(GetPackageQuery) private getPackageQuery: GetPackageQuery
   ) {}
 
   @get<TripBai.Packages.Endpoints.GetPackage>("/tripbai/packages/:package_id")
@@ -30,8 +30,8 @@ export class PackageGetController {
       Object.create(null);
     commandDTO.requester = params.requester;
     try {
-      IsValid.NonEmptyString(params.data.package_id);
-      EntityToolkit.Assert.idIsValid(params.data.package_id);
+      assertNonEmptyString(params.data.package_id);
+      assertValidEntityId(params.data.package_id);
       commandDTO.packageId = params.data.package_id;
     } catch (error) {
       throw new BadRequestException({

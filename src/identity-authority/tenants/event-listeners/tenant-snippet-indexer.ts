@@ -2,36 +2,39 @@ import { inject, injectable } from "inversify";
 import { EventListenerInterface } from "../../../core/providers/event/event-manager.provider";
 import { TenantCreateEvent, TenantUpdateEvent } from "../tenant.events";
 import { TenantModel } from "../tenant.model";
-import { AbstractIndexerProvider, IndexTaskItem } from "../../../core/providers/indexer/indexer.provider";
-import { AppENV } from "../../../core/helpers/env";
+import {
+  AbstractIndexerProvider,
+  IndexTaskItem,
+} from "../../../core/providers/indexer/indexer.provider";
+import { AppENV } from "../../../core/application/appEnv";
 import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
 
 @injectable()
-export class TenantSnippetIndexer implements EventListenerInterface<TenantCreateEvent|TenantUpdateEvent> {
-
+export class TenantSnippetIndexer
+  implements EventListenerInterface<TenantCreateEvent | TenantUpdateEvent>
+{
   constructor(
-    @inject(AbstractIndexerProvider) private readonly indexerProvider: AbstractIndexerProvider
+    @inject(AbstractIndexerProvider)
+    private readonly indexerProvider: AbstractIndexerProvider
   ) {}
 
   async execute(tenantModel: TenantModel) {
-
-    const indexerNamespaceId = AppENV.get('IAUTH_INDEXER_NAMESPACE_ID')
-    EntityToolkit.Assert.idIsValid(indexerNamespaceId)
+    const indexerNamespaceId = getEnv("IAUTH_INDEXER_NAMESPACE_ID");
+    assertValidEntityId(indexerNamespaceId);
 
     const tenantSnippetTask: IndexTaskItem = {
       namespace_id: indexerNamespaceId,
-      type: 'Snippet:Entity',
-      entity_collection: 'tenants',
+      type: "Snippet:Entity",
+      entity_collection: "tenants",
       entity_id: tenantModel.entity_id,
       entity_snippet: {
         name: tenantModel.name,
         profile_photo: tenantModel.profile_photo ?? null,
         cover_photo: tenantModel.cover_photo ?? null,
-        archived_at: tenantModel.archived_at ?? null
-      }
-    }
+        archived_at: tenantModel.archived_at ?? null,
+      },
+    };
 
-    await this.indexerProvider.index([tenantSnippetTask])
-
+    await this.indexerProvider.index([tenantSnippetTask]);
   }
 }

@@ -5,7 +5,7 @@ import { AmazonS3Service } from "../../../services/aws/s3/aws3.service";
 
 export class AmazonS3StorageService implements AbstractObjectStorageProvider {
   constructor(
-    @inject(AmazonS3Service) public readonly amazonS3Service: AmazonS3Service
+    @inject(AmazonS3Service) private amazonS3Service: AmazonS3Service
   ) {}
 
   async storeBuffer(

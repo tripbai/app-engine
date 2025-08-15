@@ -3,9 +3,7 @@ import { ImageRepository } from "../image.repository";
 
 @injectable()
 export class ImageCreateService {
-
   constructor(
-    @inject(ImageRepository) public readonly imageRepository: ImageRepository
+    @inject(ImageRepository) private imageRepository: ImageRepository
   ) {}
-
 }

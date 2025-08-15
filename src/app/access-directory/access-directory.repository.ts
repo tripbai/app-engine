@@ -7,18 +7,13 @@ import { Core } from "../../core/module/module";
 
 @injectable()
 export class AccessDirectoryRepository extends BaseRepository<AccessDirectoryModel> {
-
-protected collection: string = 'access_directory'
+  protected collection: string = "access_directory";
 
   constructor(
-    @inject(AbstractDatabaseProvider) public readonly DatabaseProvider: AbstractDatabaseProvider,
-    @inject(AbstractCacheProvider) public readonly CacheProvider: AbstractCacheProvider
-  ){
-    super(
-      AccessDirectoryModel,
-      DatabaseProvider,
-      CacheProvider
-    )
+    @inject(AbstractDatabaseProvider)
+    private DatabaseProvider: AbstractDatabaseProvider,
+    @inject(AbstractCacheProvider) private CacheProvider: AbstractCacheProvider
+  ) {
+    super(AccessDirectoryModel, DatabaseProvider, CacheProvider);
   }
-
 }

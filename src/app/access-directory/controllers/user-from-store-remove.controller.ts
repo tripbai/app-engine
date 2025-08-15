@@ -8,7 +8,7 @@ import {
   get,
 } from "../../../core/router/route-decorators";
 import { TripBai } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
   LogicException,
@@ -18,7 +18,7 @@ import {
 export class UserFromStoreRemoveController {
   constructor(
     @inject(RemoveUserFromStoreCommand)
-    public readonly removeUserFromStoreCommand: RemoveUserFromStoreCommand
+    private removeUserFromStoreCommand: RemoveUserFromStoreCommand
   ) {}
 
   @post<TripBai.AccessLibrary.Endpoints.RemoveUserFromStore>(

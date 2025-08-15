@@ -8,7 +8,7 @@ import {
   get,
 } from "../../../core/router/route-decorators";
 import { TripBai } from "../../module/module.interface";
-import { Core } from "../../../core/module/module";
+import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
   LogicException,
@@ -18,7 +18,7 @@ import {
 export class UserAccessLibraryGetController {
   constructor(
     @inject(GetUserAccessDirectoryQuery)
-    public readonly getUserAccessDirectoryQuery: GetUserAccessDirectoryQuery
+    private getUserAccessDirectoryQuery: GetUserAccessDirectoryQuery
   ) {}
 
   @get<TripBai.AccessLibrary.Endpoints.GetUserAccessLibrary>(

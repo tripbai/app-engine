@@ -13,7 +13,7 @@ import { NodeEmitterService } from "../../../services/events/node-emitter/node-e
 export class SimpleNodeEmitter implements AbstractEventManagerProvider {
   constructor(
     @inject(NodeEmitterService)
-    public readonly nodeEmitterService: NodeEmitterService
+    private nodeEmitterService: NodeEmitterService
   ) {}
 
   listen<T extends EventInterface>(
