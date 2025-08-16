@@ -5,13 +5,11 @@ import { AbstractDatabaseProvider } from "../../core/providers/database/database
 import { AbstractCacheProvider } from "../../core/providers/cache/cache.provider";
 import * as IdentityAuthority from "../module/types";
 import { DataIntegrityException } from "../../core/exceptions/exceptions";
-import { RegistryRepository } from "../../core/orm/repository/registry-repository";
-import { TimeStamp } from "../../core/helpers/timestamp";
 import { IAuthDatabaseProvider } from "../providers/iauth-database.provider";
 
 @injectable()
 export class EmailTemplateRepository extends BaseRepository<EmailTemplateModel> {
-  protected collection: string = "email_templates";
+  protected collectionName: string = "email_templates";
 
   constructor(
     @inject(IAuthDatabaseProvider)
@@ -19,14 +17,17 @@ export class EmailTemplateRepository extends BaseRepository<EmailTemplateModel> 
     @inject(AbstractCacheProvider)
     private CacheProvider: AbstractCacheProvider
   ) {
-    super(EmailTemplateModel, DatabaseProvider, CacheProvider);
+    super("email_templates", EmailTemplateModel, {
+      database: DatabaseProvider,
+      cache: CacheProvider,
+    });
   }
 
   async getTemplateByType(
     templateType: IdentityAuthority.EmailTemplatesRegistry.Fields.EmailType
   ) {
     const results = await this.DatabaseProvider.whereFieldHasValue(
-      this.collection,
+      this.collectionName,
       "template_type",
       templateType
     );
@@ -38,14 +39,14 @@ export class EmailTemplateRepository extends BaseRepository<EmailTemplateModel> 
     }
     if (results.length === 0) return null;
     const emailTemplateModel = new EmailTemplateModel();
-    this.ingest(emailTemplateModel, results[0]);
+    this.ingestIntoModel(emailTemplateModel, results[0]);
     return emailTemplateModel;
   }
 
   async getAllActiveTemplates() {
     const models: Array<EmailTemplateModel> = [];
     const results = await this.DatabaseProvider.whereFieldHasValue(
-      this.collection,
+      this.collectionName,
       "archived_at",
       null
     );
@@ -56,14 +57,7 @@ export class EmailTemplateRepository extends BaseRepository<EmailTemplateModel> 
       const data = results[i];
       const Registry: EmailTemplateModel = new EmailTemplateModel();
       try {
-        for (const key in data) {
-          if (BaseRepository.isDateObject(data[key])) {
-            // @ts-expect-error the above check will determine if the value is Date object
-            Registry[key] = TimeStamp.normalize(data[key]);
-          } else {
-            Registry[key] = data[key];
-          }
-        }
+        this.ingestIntoModel(Registry, data);
       } catch (error) {
         throw new DataIntegrityException({
           message: "one of email template records contains invalid data",

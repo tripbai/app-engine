@@ -21,15 +21,20 @@ export class ProfileCreateService {
     about: string | null,
     unitOfWork: UnitOfWork
   ): ProfileModel {
+    const data = {
+      first_name: first_name,
+      last_name: last_name,
+      profile_photo: profile_photo,
+      cover_photo: cover_photo,
+      about: about,
+    };
+    const options = {
+      useEntityId: user_id,
+    };
     const profileModel = this.profileRepository.create(
-      {
-        first_name: first_name,
-        last_name: last_name,
-        profile_photo: profile_photo,
-        cover_photo: cover_photo,
-        about: about,
-      },
-      unitOfWork
+      data,
+      unitOfWork,
+      options
     );
     return profileModel;
   }

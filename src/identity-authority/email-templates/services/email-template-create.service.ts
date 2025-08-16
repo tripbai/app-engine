@@ -8,8 +8,7 @@ import {
 } from "../../../core/exceptions/exceptions";
 import { EmailTemplateRepository } from "../email-template.repository";
 import { EmailTemplateModel } from "../email-template.model";
-import { Pseudorandom } from "../../../core/helpers/pseudorandom";
-import { TimeStamp } from "../../../core/helpers/timestamp";
+import { UnitOfWork } from "../../../core/workflow/unit-of-work";
 
 @injectable()
 export class EmailTemplateCreateService {
@@ -19,6 +18,7 @@ export class EmailTemplateCreateService {
   ) {}
 
   async createEmailTemplate(
+    unitOfWork: UnitOfWork,
     iAuthRequester: IAuthRequester,
     templateType: IdentityAuthority.EmailTemplatesRegistry.Fields.EmailType,
     templateId: Core.Entity.Id,
@@ -41,15 +41,14 @@ export class EmailTemplateCreateService {
         },
       });
     }
-    const emailTemplateModel: EmailTemplateModel = {
-      entity_id: createEntityId(),
-      template_type: templateType,
-      template_id: templateId,
-      description: description,
-      created_at: TimeStamp.now(),
-      updated_at: TimeStamp.now(),
-      archived_at: null,
-    };
+    const emailTemplateModel = this.emailTemplateRepository.create(
+      {
+        template_type: templateType,
+        template_id: templateId,
+        description: description,
+      },
+      unitOfWork
+    );
     return emailTemplateModel;
   }
 }

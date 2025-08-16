@@ -1,10 +1,6 @@
 import { AppAuthService } from "../../core/auth/services/app-auth-service";
-import {
-  ResourceAccessForbiddenException,
-  UnauthorizedAccessException,
-} from "../../core/exceptions/exceptions";
-import { Core } from "../../core/module/module";
-import { EntityToolkit } from "../../core/orm/entity/entity-toolkit";
+import * as Core from "../../core/module/types";
+import { assertValidEntityId } from "../../core/utilities/entityToolkit";
 import * as IdentityAuthority from "../module/types";
 import { UserPermissionService } from "../users/services/user-permission.service";
 import { IAuthForbiddenAccessException } from "./iauth-requester.exceptions";

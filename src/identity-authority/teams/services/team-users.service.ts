@@ -1,11 +1,7 @@
 import { inject, injectable } from "inversify";
-import * as Core from "../../../core/module/types";
 import { UserAccessRegistry } from "../user-access.registry";
-import { TeamModel } from "../team.model";
 import { UnitOfWork } from "../../../core/workflow/unit-of-work";
-import { Pseudorandom } from "../../../core/helpers/pseudorandom";
 import { TenantUsersRegistry } from "../tenant-users.registry";
-import { TimeStamp } from "../../../core/helpers/timestamp";
 import { TeamRepository } from "../team.repository";
 import { UserModel } from "../../users/user.model";
 import { TenantModel } from "../../tenants/tenant.model";
@@ -93,17 +89,15 @@ export class TeamUsersService {
         }
       }
 
-      const teamEntityId = createEntityId();
-
-      unitOfWork.addTransactionStep(
-        this.teamRepository.create(teamEntityId, {
+      this.teamRepository.create(
+        {
           user_id: userId,
           tenant_id: tenantId,
           is_active: true,
           is_owner: shouldUserOwnTenant,
           role_id: null,
-          archived_at: null,
-        })
+        },
+        unitOfWork
       );
 
       return;
@@ -115,9 +109,7 @@ export class TeamUsersService {
      */
     if (!teamModel.is_active) {
       teamModel.is_active = true;
-      unitOfWork.addTransactionStep(
-        await this.teamRepository.update(teamModel)
-      );
+      await this.teamRepository.update(teamModel, unitOfWork);
     }
   }
 

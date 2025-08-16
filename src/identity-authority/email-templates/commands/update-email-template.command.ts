@@ -4,6 +4,7 @@ import { UnitOfWorkFactory } from "../../../core/workflow/unit-of-work.factory";
 import { IAuthRequesterFactory } from "../../requester/iauth-requester.factory";
 import { EmailTemplateUpdateService } from "../services/email-template-update.service";
 import { EmailTemplateRepository } from "../email-template.repository";
+import { ResourceAccessForbiddenException } from "../../../core/exceptions/exceptions";
 
 @injectable()
 export class UpdateEmailTemplateCommand {
@@ -30,13 +31,11 @@ export class UpdateEmailTemplateCommand {
       params.entityId
     );
     await this.emailTemplateUpdateService.update(
+      unitOfWork,
       iAuthRequester,
       emailTemplateModel,
       params.templateId,
       params.description
-    );
-    unitOfWork.addTransactionStep(
-      await this.emailTemplateRepository.update(emailTemplateModel)
     );
     await unitOfWork.commit();
     return;

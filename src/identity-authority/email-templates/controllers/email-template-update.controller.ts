@@ -3,10 +3,10 @@ import { patch } from "../../../core/router/route-decorators";
 import * as IdentityAuthority from "../../module/types";
 import * as Core from "../../../core/module/types";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
-import { IsValid } from "../../../core/helpers/isvalid";
-import { EmailTemplateValidator } from "../email-template.validator";
 import { UpdateEmailTemplateCommand } from "../commands/update-email-template.command";
-import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
+import { assertNonEmptyString } from "../../../core/utilities/assertValid";
+import { assertIsEmailTemplateDescription } from "../email-template.assertions";
+import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
 
 @injectable()
 export class EmailTemplateUpdateController {
@@ -23,10 +23,8 @@ export class EmailTemplateUpdateController {
   >(params: Core.Route.ControllerDTO<T>): Promise<T["response"]> {
     try {
       assertNonEmptyString(params.data.description);
-      EmailTemplateValidator.description(params.data.description);
-      assertNonEmptyString(params.data.entity_id);
+      assertIsEmailTemplateDescription(params.data.description);
       assertValidEntityId(params.data.entity_id);
-      assertNonEmptyString(params.data.template_id);
       assertValidEntityId(params.data.template_id);
     } catch (error) {
       throw new BadRequestException({

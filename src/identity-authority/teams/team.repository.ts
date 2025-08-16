@@ -7,13 +7,14 @@ import { IAuthDatabaseProvider } from "../providers/iauth-database.provider";
 
 @injectable()
 export class TeamRepository extends BaseRepository<TeamModel> {
-  protected collection: string = "teams";
-
   constructor(
     @inject(IAuthDatabaseProvider)
     private DatabaseProvider: AbstractDatabaseProvider,
     @inject(AbstractCacheProvider) private CacheProvider: AbstractCacheProvider
   ) {
-    super(TeamModel, DatabaseProvider, CacheProvider);
+    super("teams", TeamModel, {
+      database: DatabaseProvider,
+      cache: CacheProvider,
+    });
   }
 }

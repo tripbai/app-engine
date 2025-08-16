@@ -4,7 +4,6 @@ import * as Core from "../../../core/module/types";
 import * as IdentityAuthority from "../../module/types";
 import { UnitOfWorkFactory } from "../../../core/workflow/unit-of-work.factory";
 import { IAuthRequesterFactory } from "../../requester/iauth-requester.factory";
-import { EmailTemplateRepository } from "../email-template.repository";
 
 @injectable()
 export class CreateEmailTeamplateCommand {
@@ -14,9 +13,7 @@ export class CreateEmailTeamplateCommand {
     @inject(UnitOfWorkFactory)
     private unitOfWorkFactory: UnitOfWorkFactory,
     @inject(IAuthRequesterFactory)
-    private iAuthRequesterFactory: IAuthRequesterFactory,
-    @inject(EmailTemplateRepository)
-    private emailTemplateRepository: EmailTemplateRepository
+    private iAuthRequesterFactory: IAuthRequesterFactory
   ) {}
 
   async execute(
@@ -29,19 +26,12 @@ export class CreateEmailTeamplateCommand {
     const unitOfWork = this.unitOfWorkFactory.create();
     const emailTemplateModel =
       await this.emailTemplateCreateService.createEmailTemplate(
+        unitOfWork,
         iAuthRequester,
         templateType,
         templateId,
         description
       );
-    unitOfWork.addTransactionStep(
-      this.emailTemplateRepository.create(emailTemplateModel.entity_id, {
-        template_id: emailTemplateModel.template_id,
-        template_type: emailTemplateModel.template_type,
-        description: emailTemplateModel.description,
-        archived_at: null,
-      })
-    );
     await unitOfWork.commit();
     return {
       entity_id: emailTemplateModel.entity_id,

@@ -4,17 +4,20 @@ import { post } from "../../../core/router/route-decorators";
 import * as IdentityAuthority from "../../module/types";
 import * as Core from "../../../core/module/types";
 import { ImageHelperService } from "../../services/image-helper.service";
-import { IsValid } from "../../../core/helpers/isvalid";
-import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
+import {
+  assertFileObject,
+  assertNonEmptyString,
+} from "../../../core/utilities/assertValid";
+import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
 
 @injectable()
 export class ProfileImagesController {
   constructor(
     @inject(UploadProfileImagesCommand)
-    private readonly uploadProfileImagesCommand: UploadProfileImagesCommand,
+    private uploadProfileImagesCommand: UploadProfileImagesCommand,
     @inject(ImageHelperService)
-    private readonly imageAssertionService: ImageHelperService
+    private imageAssertionService: ImageHelperService
   ) {}
 
   @post<IdentityAuthority.Users.Endpoints.UploadImage>(
@@ -24,7 +27,6 @@ export class ProfileImagesController {
     T extends IdentityAuthority.Users.Endpoints.UploadImage
   >(params: Core.Route.ControllerDTO<T>): Promise<T["response"]> {
     try {
-      assertNonEmptyString(params.data.user_id);
       assertValidEntityId(params.data.user_id);
       assertNonEmptyString(params.data.type);
       if (
@@ -35,7 +37,7 @@ export class ProfileImagesController {
           `Invalid image type provided: ${params.data.type}. Expected 'profile_photo' or 'cover_photo'.`
         );
       }
-      IsValid.FileObject(params.data.file);
+      assertFileObject(params.data.file);
     } catch (error) {
       throw new BadRequestException({
         message: "failed to upload user image due to invalid parameters",

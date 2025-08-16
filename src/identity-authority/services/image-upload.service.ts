@@ -1,9 +1,9 @@
 import { inject, injectable } from "inversify";
 import { AbstractObjectStorageProvider } from "../../core/providers/storage/object-storage.provider";
 import * as IdentityAuthority from "../module/types";
-import { Core } from "../../core/module/module";
-import { Pseudorandom } from "../../core/helpers/pseudorandom";
-import { FileUploadPath } from "../../core/helpers/fileuploadpath";
+import * as Core from "../../core/module/types";
+import { createEntityId } from "../../core/utilities/entityToolkit";
+import { generateFileUploadPath } from "../../core/utilities/fileupath";
 
 @injectable()
 export class IAuthImageUploadService {
@@ -17,23 +17,23 @@ export class IAuthImageUploadService {
   async uploadProfilePhoto(
     fileExtension: IdentityAuthority.Images.SupportedExtensions,
     data: Buffer
-  ): Promise<Core.File.UploadPath> {
+  ): Promise<Core.Uploads.FilePath> {
     return this.uploadPhoto(fileExtension, data);
   }
 
   async uploadCoverPhoto(
     fileExtension: IdentityAuthority.Images.SupportedExtensions,
     data: Buffer
-  ): Promise<Core.File.UploadPath> {
+  ): Promise<Core.Uploads.FilePath> {
     return this.uploadPhoto(fileExtension, data);
   }
 
   private async uploadPhoto(
     fileExtension: IdentityAuthority.Images.SupportedExtensions,
     data: Buffer
-  ): Promise<Core.File.UploadPath> {
+  ): Promise<Core.Uploads.FilePath> {
     const fileName = createEntityId();
-    const uploadPath = FileUploadPath.generate(fileName, fileExtension);
+    const uploadPath = generateFileUploadPath(fileName, fileExtension);
     await this.abstractObjectStorageProvider.storeBuffer(
       data,
       this.collection,

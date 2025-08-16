@@ -1,7 +1,6 @@
 import { inject, injectable } from "inversify";
 import { ProfileModel } from "../profile.model";
 import * as IdentityAuthority from "../../module/types";
-import { ProfileValidator } from "../profile.validator";
 import * as Core from "../../../core/module/types";
 import { IAuthImageTokenService } from "../../services/image-token.service";
 import { UserModel } from "../../users/user.model";
@@ -9,6 +8,7 @@ import {
   BadRequestException,
   ResourceAccessForbiddenException,
 } from "../../../core/exceptions/exceptions";
+import { assertIsProfileAbout } from "../profile.assertions";
 
 @injectable()
 export class ProfileUpdateService {
@@ -32,7 +32,7 @@ export class ProfileUpdateService {
   }
 
   updateAbout(profileModel: ProfileModel, newAbout: string) {
-    ProfileValidator.about(newAbout);
+    assertIsProfileAbout(newAbout);
     profileModel.about = newAbout;
   }
 

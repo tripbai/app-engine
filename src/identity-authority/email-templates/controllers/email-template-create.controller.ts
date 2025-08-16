@@ -3,10 +3,10 @@ import { post } from "../../../core/router/route-decorators";
 import * as IdentityAuthority from "../../module/types";
 import * as Core from "../../../core/module/types";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
-import { IsValid } from "../../../core/helpers/isvalid";
-import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
-import { EmailTemplateValidator } from "../email-template.validator";
 import { CreateEmailTeamplateCommand } from "../commands/create-email-template.command";
+import { assertNonEmptyString } from "../../../core/utilities/assertValid";
+import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
+import { assertIsEmailTemplateDescription } from "../email-template.assertions";
 
 @injectable()
 export class EmailTemplateCreateController {
@@ -35,11 +35,10 @@ export class EmailTemplateCreateController {
           "email template type must be one of the pre-defined keys"
         );
       }
-      assertNonEmptyString(params.data.template_id);
       assertValidEntityId(params.data.template_id);
       if (params.data.description !== null) {
         assertNonEmptyString(params.data.description);
-        EmailTemplateValidator.description(params.data.description);
+        assertIsEmailTemplateDescription(params.data.description);
         description = params.data.description.trim();
       }
     } catch (error) {
