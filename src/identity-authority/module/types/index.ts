@@ -12,3 +12,4 @@ export * as Users from "./users";
 export * as Images from "./images";
 export * as EmailTemplatesRegistry from "./email-templates-registry";
 export * as Tenants from "./tenants";
+export * as Profile from "./profiles";

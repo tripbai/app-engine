@@ -10,7 +10,7 @@ import { ProfileValidator } from "../profiles/profile.validator";
 import { TenantValidator } from "./tenant.validator";
 
 @collection("tenants")
-export class TenantModel extends BaseEntity<TenantModel> {
+export class TenantModel extends BaseEntity {
   @length(64)
   @varchar(TenantValidator.name)
   name: string;

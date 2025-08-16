@@ -4,8 +4,6 @@ import { ProfileRepository } from "../profile.repository";
 import { UnitOfWork } from "../../../core/workflow/unit-of-work";
 import * as IdentityAuthority from "../../module/types";
 import * as Core from "../../../core/module/types";
-import { UserModel } from "../../users/user.model";
-import { TimeStamp } from "../../../core/helpers/timestamp";
 
 @injectable()
 export class ProfileCreateService {
@@ -20,19 +18,19 @@ export class ProfileCreateService {
     last_name: IdentityAuthority.Profile.Fields.LastName,
     profile_photo: IdentityAuthority.Profile.Fields.Image | null,
     cover_photo: IdentityAuthority.Profile.Fields.Image | null,
-    about: string | null
+    about: string | null,
+    unitOfWork: UnitOfWork
   ): ProfileModel {
-    const profileModel: ProfileModel = {
-      entity_id: user_id,
-      first_name: first_name,
-      last_name: last_name,
-      profile_photo: profile_photo,
-      cover_photo: cover_photo,
-      about: about,
-      created_at: TimeStamp.now(),
-      updated_at: TimeStamp.now(),
-      archived_at: null,
-    };
+    const profileModel = this.profileRepository.create(
+      {
+        first_name: first_name,
+        last_name: last_name,
+        profile_photo: profile_photo,
+        cover_photo: cover_photo,
+        about: about,
+      },
+      unitOfWork
+    );
     return profileModel;
   }
 }

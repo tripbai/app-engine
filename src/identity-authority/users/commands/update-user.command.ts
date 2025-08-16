@@ -3,7 +3,7 @@ import * as IdentityAuthority from "../../module/types";
 import * as Core from "../../../core/module/types";
 import { UserRepository } from "../user.repository";
 import {
-  BadRequestException,
+  BadInputException,
   ResourceAccessForbiddenException,
 } from "../../../core/exceptions/exceptions";
 import { ProfileRepository } from "../../profiles/profile.repository";
@@ -75,9 +75,7 @@ export class UpdateUserCommand {
         params.password.reset_confirmation_token,
         params.password.new_password
       );
-      unitOfWork.addTransactionStep(
-        await this.userRepository.update(userModel)
-      );
+      await this.userRepository.update(userModel, unitOfWork);
       await unitOfWork.commit();
       return;
     }
@@ -95,9 +93,7 @@ export class UpdateUserCommand {
         userModel,
         params.email_address.update_confirmation_token
       );
-      unitOfWork.addTransactionStep(
-        await this.userRepository.update(userModel)
-      );
+      await this.userRepository.update(userModel, unitOfWork);
       await unitOfWork.commit();
       return;
     }
@@ -115,9 +111,7 @@ export class UpdateUserCommand {
         userModel,
         params.is_email_verified.verification_confirmation_token
       );
-      unitOfWork.addTransactionStep(
-        await this.userRepository.update(userModel)
-      );
+      await this.userRepository.update(userModel, unitOfWork);
       await unitOfWork.commit();
       return;
     }
@@ -191,10 +185,8 @@ export class UpdateUserCommand {
       await this.userUpdateService.updateUsername(userModel, params.username);
     }
 
-    unitOfWork.addTransactionStep(await this.userRepository.update(userModel));
-    unitOfWork.addTransactionStep(
-      await this.profileRepository.update(profileModel)
-    );
+    await this.userRepository.update(userModel, unitOfWork);
+    await this.profileRepository.update(profileModel, unitOfWork);
 
     await unitOfWork.commit();
     await this.abstractEventManagerProvider.dispatch(

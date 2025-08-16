@@ -59,7 +59,7 @@ export class UpdateUserStatusCommand {
         params.suspended_until
       );
     }
-    unitOfWork.addTransactionStep(await this.userRepository.update(userModel));
+    await this.userRepository.update(userModel, unitOfWork);
     await unitOfWork.commit();
     await this.abstractEventManagerProvider.dispatch(
       new UserUpdateEvent(),

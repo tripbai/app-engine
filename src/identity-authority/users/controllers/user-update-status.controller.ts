@@ -3,17 +3,16 @@ import * as IdentityAuthority from "../../module/types";
 import * as Core from "../../../core/module/types";
 import { post } from "../../../core/router/route-decorators";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
-import { IsValid } from "../../../core/helpers/isvalid";
-import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
 import { stat } from "fs";
-import { UserAssertions } from "../user.assertions";
-import { TimeStamp } from "../../../core/helpers/timestamp";
 import { UpdateUserStatusCommand } from "../commands/update-user-status.command";
+import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
+import { assertIsStatus } from "../user.assertions";
+import { assertNonEmptyString } from "../../../core/utilities/assertValid";
+import { isValidTimestamp } from "../../../core/utilities/timestamp";
 
 @injectable()
 export class UserUpdateStatusController {
   constructor(
-    @inject(UserAssertions) private userAssertions: UserAssertions,
     @inject(UpdateUserStatusCommand)
     private updateUserStatusCommand: UpdateUserStatusCommand
   ) {}
@@ -31,12 +30,10 @@ export class UserUpdateStatusController {
     } = Object.create(null);
 
     try {
-      assertNonEmptyString(params.data.user_id);
       assertValidEntityId(params.data.user_id);
       dto.user_id = params.data.user_id;
 
-      assertNonEmptyString(params.data.status);
-      this.userAssertions.isStatus(params.data.status);
+      assertIsStatus(params.data.status);
       dto.status = params.data.status;
 
       if (params.data.status === "suspended") {
@@ -44,7 +41,7 @@ export class UserUpdateStatusController {
           throw new Error("Missing suspended_until field for suspended status");
         }
         assertNonEmptyString(params.data.suspended_until);
-        TimeStamp.isValid(params.data.suspended_until);
+        isValidTimestamp(params.data.suspended_until);
         dto.suspended_until = params.data.suspended_until;
       }
     } catch (error) {

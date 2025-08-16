@@ -8,9 +8,9 @@ import {
   IndexTaskItem,
 } from "../../../core/providers/indexer/indexer.provider";
 import * as IdentityAuthority from "../../module/types";
-import { AppENV } from "../../../core/application/appEnv";
-import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
 import * as Core from "../../../core/module/types";
+import { getEnv } from "../../../core/application/appEnv";
+import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
 
 /**
  * UserSnippetIndexer is an event listener that indexes user snippets.

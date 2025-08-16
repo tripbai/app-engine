@@ -3,21 +3,25 @@ import { patch } from "../../../core/router/route-decorators";
 import * as IdentityAuthority from "../../module/types";
 import * as Core from "../../../core/module/types";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
-import { UserValidator } from "../user.validator";
-import { IsValid } from "../../../core/helpers/isvalid";
 import { UpdateUserCommand } from "../commands/update-user.command";
-import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
-import { UserAssertions } from "../user.assertions";
-import { ProfileAssertions } from "../../profiles/profile.assertions";
+import {
+  assertIsFirstName,
+  assertIsLastName,
+  assertIsProfileAbout,
+} from "../../profiles/profile.assertions";
+import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
+import {
+  assertIsIdentityProvider,
+  assertIsRawPassword,
+  assertIsUsername,
+  assertIsUserType,
+} from "../user.assertions";
 
 @injectable()
 export class UserUpdateController {
   constructor(
     @inject(UpdateUserCommand)
-    private updateUserCommand: UpdateUserCommand,
-    @inject(UserAssertions) private userAssertions: UserAssertions,
-    @inject(ProfileAssertions)
-    private profileAssertions: ProfileAssertions
+    private updateUserCommand: UpdateUserCommand
   ) {}
 
   @patch<IdentityAuthority.Users.Endpoints.UpdateUser>(
@@ -33,25 +37,22 @@ export class UserUpdateController {
       assertValidEntityId(params.data.user_id);
 
       if (params.data.identity_provider) {
-        assertNonEmptyString(params.data.identity_provider);
-        this.userAssertions.isProvider(params.data.identity_provider);
+        assertIsIdentityProvider(params.data.identity_provider);
         commandParams.identity_provider = params.data.identity_provider;
       }
 
       if (params.data.first_name) {
-        assertNonEmptyString(params.data.first_name);
-        this.profileAssertions.isFirstName(params.data.first_name);
+        assertIsFirstName(params.data.first_name);
         commandParams.first_name = params.data.first_name;
       }
 
       if (params.data.last_name) {
-        assertNonEmptyString(params.data.last_name);
-        this.profileAssertions.isLastName(params.data.last_name);
+        assertIsLastName(params.data.last_name);
         commandParams.last_name = params.data.last_name;
       }
 
       if (params.data.about) {
-        assertNonEmptyString(params.data.about);
+        assertIsProfileAbout(params.data.about);
         commandParams.about = params.data.about;
       }
 
@@ -88,7 +89,7 @@ export class UserUpdateController {
         "new_password" in params.data.password &&
         typeof params.data.password.new_password === "string"
       ) {
-        this.userAssertions.isRawPassword(params.data.password.new_password);
+        assertIsRawPassword(params.data.password.new_password);
         if (
           "reset_confirmation_token" in params.data.password &&
           typeof params.data.password.reset_confirmation_token == "string"
@@ -102,9 +103,7 @@ export class UserUpdateController {
           "current_password" in params.data.password &&
           typeof params.data.password.current_password === "string"
         ) {
-          this.userAssertions.isRawPassword(
-            params.data.password.current_password
-          );
+          assertIsRawPassword(params.data.password.current_password);
           commandParams.password = {
             current_password: params.data.password.current_password,
             new_password: params.data.password.new_password,
@@ -115,7 +114,7 @@ export class UserUpdateController {
       }
 
       if (params.data.username && typeof params.data.username === "string") {
-        this.userAssertions.isUsername(params.data.username);
+        assertIsUsername(params.data.username);
         commandParams.username = params.data.username;
       }
 
@@ -149,7 +148,7 @@ export class UserUpdateController {
       }
 
       if (params.data.type && typeof params.data.type === "string") {
-        this.userAssertions.isType(params.data.type);
+        assertIsUserType(params.data.type);
         commandParams.type = params.data.type;
       }
     } catch (error) {

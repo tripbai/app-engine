@@ -10,11 +10,11 @@ import {
   RecordNotFoundException,
   ResourceAccessForbiddenException,
 } from "../../../core/exceptions/exceptions";
-import { IsValid } from "../../../core/helpers/isvalid";
-import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
 import { IAuthRequesterFactory } from "../../requester/iauth-requester.factory";
 import { IAuthForbiddenAccessException } from "../../requester/iauth-requester.exceptions";
-import { UserAssertions } from "../user.assertions";
+import { assertNonEmptyString } from "../../../core/utilities/assertValid";
+import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
+import { assertIsEmailAddress, assertIsUsername } from "../user.assertions";
 
 @injectable()
 export class UserGetController {
@@ -23,8 +23,7 @@ export class UserGetController {
     private iAuthRequesterFactory: IAuthRequesterFactory,
     @inject(UserRepository) private userRepository: UserRepository,
     @inject(ProfileRepository)
-    private profileRepository: ProfileRepository,
-    @inject(UserAssertions) private userAssertions: UserAssertions
+    private profileRepository: ProfileRepository
   ) {}
 
   @get<IdentityAuthority.Users.Endpoints.GetSelf>("/identity-authority/user/me")
@@ -116,7 +115,7 @@ export class UserGetController {
     }
 
     if (params.data.type === "email_address") {
-      this.userAssertions.isEmailAddress(params.data.value);
+      assertIsEmailAddress(params.data.value);
       const userModel = await this.userRepository.getByEmailAddress(
         params.data.value
       );
@@ -144,7 +143,7 @@ export class UserGetController {
     }
 
     if (params.data.type === "username") {
-      this.userAssertions.isUsername(params.data.value);
+      assertIsUsername(params.data.value);
       const userModel = await this.userRepository.getByUsername(
         params.data.value
       );

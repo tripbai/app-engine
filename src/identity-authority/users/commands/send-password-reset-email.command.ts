@@ -5,7 +5,7 @@ import { UserEmailSenderService } from "../services/user-email-sender.service";
 import { UserRepository } from "../user.repository";
 import * as Core from "../../../core/module/types";
 import * as IdentityAuthority from "../../module/types";
-import { BadRequestException } from "../../../core/exceptions/exceptions";
+import { BadInputException } from "../../../core/exceptions/exceptions";
 
 /**
  * Command to send a new email confirmation request to a user.
@@ -25,7 +25,7 @@ export class SendPasswordResetCommand {
   async execute(userEmail: IdentityAuthority.Users.Fields.EmailAddress) {
     const userModel = await this.userRepository.getByEmailAddress(userEmail);
     if (userModel === null) {
-      throw new BadRequestException({
+      throw new BadInputException({
         message: "User with this email does not exist.",
         data: { user_email: userEmail },
       });

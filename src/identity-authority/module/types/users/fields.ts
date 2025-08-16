@@ -36,3 +36,5 @@ export type HashedPassword = string & {
   maxLen: 64;
   key: "hashed_password";
 };
+export type Role = "webadmin" | "user" | "moderator";
+export type CreationContext = "external" | "internal";

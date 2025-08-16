@@ -6,6 +6,8 @@ import { UserPasswordService } from "../../services/user-password.service";
 import { UserOTPService } from "../../services/user-otp.service";
 import * as IdentityAuthority from "../../../module/types";
 import { createMock } from "../../../../core/utilities/mockup";
+import { UserRepository } from "../../user.repository";
+import { UnitOfWork } from "../../../../core/workflow/unit-of-work";
 
 describe("UserCreateService", () => {
   describe("createUser()", () => {
@@ -22,21 +24,24 @@ describe("UserCreateService", () => {
           return "<unique_username>" as IdentityAuthority.Users.Fields.UniqueUsername;
         },
       });
+      const userRepository = createMock(UserRepository);
       const service = new UserCreateService(
         new UserPasswordService(),
         new UserOTPService(),
-        userConstraintService
+        userConstraintService,
+        userRepository
       );
       try {
-        await service.createIAuthUser(
+        await service.createUser(
           "iauth",
-          "external",
-          "user",
-          "concrete",
           "sampleusername" as IdentityAuthority.Users.Fields.Username,
           alreadyExistEmail as IdentityAuthority.Users.Fields.EmailAddress,
           "helloworld" as IdentityAuthority.Users.Fields.RawPassword,
-          "active"
+          "concrete",
+          "external",
+          "user",
+          "active",
+          createMock(UnitOfWork)
         );
         throw new Error("Expected service.create() to throw");
       } catch (err) {
@@ -60,21 +65,24 @@ describe("UserCreateService", () => {
           });
         },
       });
+      const userRepository = createMock(UserRepository);
       const service = new UserCreateService(
         new UserPasswordService(),
         new UserOTPService(),
-        userConstraintService
+        userConstraintService,
+        userRepository
       );
       try {
-        await service.createIAuthUser(
+        await service.createUser(
           "iauth",
-          "external",
-          "user",
-          "concrete",
           alreadyExistUsername as IdentityAuthority.Users.Fields.Username,
           "sampleemail@gmail.com" as IdentityAuthority.Users.Fields.EmailAddress,
           "helloworld" as IdentityAuthority.Users.Fields.RawPassword,
-          "active"
+          "concrete",
+          "external",
+          "user",
+          "active",
+          createMock(UnitOfWork)
         );
         throw new Error("Expected service.create() to throw");
       } catch (err) {

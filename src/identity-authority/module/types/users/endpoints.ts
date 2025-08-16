@@ -25,16 +25,16 @@ export type Create = {
     };
   };
   response: {
-    type: "concrete";
-    context: "external";
-    provider: "iauth";
-    role: "user";
+    type: Type;
+    context: Fields.CreationContext;
+    provider: Providers.Identity;
+    role: Fields.Role;
     user_id: Core.Entity.Id;
     first_name: Profile.Fields.FirstName;
     last_name: Profile.Fields.LastName;
     username: Fields.UniqueUsername;
     email_address: Fields.UniqueEmailAddress;
-    status: Status.Pick<"unverified">;
+    status: Status.Type;
     iauth_token: string;
   };
 };

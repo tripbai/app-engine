@@ -3,19 +3,28 @@ import { UserCreateService } from "../services/user-create.service";
 import { post } from "../../../core/router/route-decorators";
 import * as IdentityAuthority from "../../module/types";
 import * as Core from "../../../core/module/types";
-import { UserAssertions } from "../user.assertions";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
-import { ProfileAssertions } from "../../profiles/profile.assertions";
+import {
+  assertIsFirstName,
+  assertIsLastName,
+} from "../../profiles/profile.assertions";
 import { CreateUserCommand } from "../commands/create-user.command";
+import {
+  assertIsCreationContext,
+  assertIsEmailAddress,
+  assertIsIdentityProvider,
+  assertIsRawPassword,
+  assertIsRole,
+  assertIsStatus,
+  assertIsUsername,
+  assertIsUserType,
+} from "../user.assertions";
 
 @injectable()
 export class UserCreateController {
   constructor(
     @inject(UserCreateService)
     private userCreateService: UserCreateService,
-    @inject(UserAssertions) private userAssertions: UserAssertions,
-    @inject(ProfileAssertions)
-    private profileAssertions: ProfileAssertions,
     @inject(CreateUserCommand)
     private createUserCommand: CreateUserCommand
   ) {}
@@ -25,19 +34,18 @@ export class UserCreateController {
     params: Core.Route.ControllerDTO<T>
   ): Promise<T["response"]> {
     let password: IdentityAuthority.Users.Fields.RawPassword | null = null;
-
     try {
-      this.profileAssertions.isFirstName(params.data.first_name);
-      this.profileAssertions.isLastName(params.data.last_name);
-      this.userAssertions.isUsername(params.data.username);
-      this.userAssertions.isEmailAddress(params.data.email_address);
-      this.userAssertions.isType(params.data.type);
-      this.userAssertions.isCreationContext(params.data.context);
-      this.userAssertions.isRole(params.data.role);
-      this.userAssertions.isProvider(params.data.provider);
-      this.userAssertions.isStatus(params.data.status);
+      assertIsFirstName(params.data.first_name);
+      assertIsLastName(params.data.last_name);
+      assertIsUsername(params.data.username);
+      assertIsEmailAddress(params.data.email_address);
+      assertIsUserType(params.data.type);
+      assertIsCreationContext(params.data.context);
+      assertIsRole(params.data.role);
+      assertIsIdentityProvider(params.data.provider);
+      assertIsStatus(params.data.status);
       if ("password" in params.data) {
-        this.userAssertions.isRawPassword(params.data.password);
+        assertIsRawPassword(params.data.password);
         password = params.data.password;
       }
     } catch (error) {

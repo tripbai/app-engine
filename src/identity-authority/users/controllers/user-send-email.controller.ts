@@ -3,15 +3,14 @@ import { post } from "../../../core/router/route-decorators";
 import * as IdentityAuthority from "../../module/types";
 import * as Core from "../../../core/module/types";
 import { ResendAccountVerificationEmailCommand } from "../commands/resend-account-verification-email.command";
-import { UserAssertions } from "../user.assertions";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
 import { SendPasswordResetCommand } from "../commands/send-password-reset-email.command";
 import { SendNewEmailConfirmationCommand } from "../commands/send-new-email-confirmation.command";
+import { assertIsEmailAddress } from "../user.assertions";
 
 @injectable()
 export class UserSendEmailController {
   constructor(
-    @inject(UserAssertions) private readonly userAssertions: UserAssertions,
     @inject(ResendAccountVerificationEmailCommand)
     private readonly resendAccountVerificationEmailCommand: ResendAccountVerificationEmailCommand,
     @inject(SendPasswordResetCommand)
@@ -37,7 +36,7 @@ export class UserSendEmailController {
     T extends IdentityAuthority.Users.Endpoints.SendEmailForPasswordReset
   >(params: Core.Route.ControllerDTO<T>): Promise<T["response"]> {
     try {
-      this.userAssertions.isEmailAddress(params.data.email_address);
+      assertIsEmailAddress(params.data.email_address);
     } catch (error) {
       throw new BadRequestException({
         message: "Invalid email address provided for password reset.",
@@ -55,7 +54,7 @@ export class UserSendEmailController {
     T extends IdentityAuthority.Users.Endpoints.SendEmailForNewEmailConfirmation
   >(params: Core.Route.ControllerDTO<T>): Promise<T["response"]> {
     try {
-      this.userAssertions.isEmailAddress(params.data.email_address);
+      assertIsEmailAddress(params.data.email_address);
     } catch (error) {
       throw new BadRequestException({
         message: "Invalid email address provided for new email confirmation.",

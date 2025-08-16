@@ -5,7 +5,7 @@ import { IAuthRequesterFactory } from "../../requester/iauth-requester.factory";
 import { UserUpdateService } from "../services/user-update.service";
 import * as Core from "../../../core/module/types";
 import * as IdentityAuthority from "../../module/types";
-import { BadRequestException } from "../../../core/exceptions/exceptions";
+import { BadInputException } from "../../../core/exceptions/exceptions";
 
 @injectable()
 export class UpdateUserRoleCommand {
@@ -41,14 +41,12 @@ export class UpdateUserRoleCommand {
         userModel
       );
     } else {
-      throw new BadRequestException({
+      throw new BadInputException({
         message: "Invalid role provided for user update",
         data: { user_id: params.user_id, role: params.newRole },
       });
     }
-
-    unitOfWork.addTransactionStep(await this.userRepository.update(userModel));
-
+    await this.userRepository.update(userModel, unitOfWork);
     await unitOfWork.commit();
     return;
   }
