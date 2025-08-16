@@ -1,4 +1,4 @@
-import { Core } from "../../core/module/module";
+import * as Core from "../../core/module/types";
 import { BaseEntity } from "../../core/orm/entity/base-entity";
 import {
   EntityId,
@@ -7,24 +7,27 @@ import {
   references,
   varchar,
 } from "../../core/orm/entity/entity-decorators";
-import { TripBai } from "../module/module.interface";
+import * as TripBai from "../module/types";
 import { PackageModel } from "../packages/package.model";
-import { OrganizationValidator } from "./organization.validator";
+import {
+  assertIsOrganizationBusinessName,
+  assertIsOrganizationStatus,
+} from "./organization.assertions";
 
 @collection("organizations")
-export class OrganizationModel extends BaseEntity<OrganizationModel> {
+export class OrganizationModel extends BaseEntity {
   @EntityId()
-  secret_key: string;
+  secret_key!: string;
 
   @length(120)
-  @varchar(OrganizationValidator.business_name)
-  business_name: string;
+  @varchar(assertIsOrganizationBusinessName)
+  business_name!: string;
 
   @references(PackageModel, "entity_id")
   @EntityId()
-  package_id: Core.Entity.Id;
+  package_id!: Core.Entity.Id;
 
   @length(16)
-  @varchar(OrganizationValidator.status)
-  status: TripBai.Organizations.Fields.Status;
+  @varchar(assertIsOrganizationStatus)
+  status!: TripBai.Organizations.Fields.Status;
 }

@@ -7,14 +7,14 @@ import {
   put,
   get,
 } from "../../../core/router/route-decorators";
-import { TripBai } from "../../module/module.interface";
+import * as TripBai from "../../module/types";
 import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
   LogicException,
 } from "../../../core/exceptions/exceptions";
-import { IsValid } from "../../../core/helpers/isvalid";
-import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
+import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
+import { assertNonEmptyString } from "../../../core/utilities/assertValid";
 
 @injectable()
 export class PackageDeleteController {

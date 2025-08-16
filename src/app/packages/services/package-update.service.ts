@@ -1,9 +1,9 @@
 import { inject, injectable } from "inversify";
 import { PackageRepository } from "../package.repository";
 import { PackageModel } from "../package.model";
-import { PackageValidator } from "../package.validator";
 import { UnitOfWork } from "../../../core/workflow/unit-of-work";
 import { LogicException } from "../../../core/exceptions/exceptions";
+import { assertIsPackageName } from "../package.assertions";
 
 @injectable()
 export class PackageUpdateService {
@@ -15,7 +15,7 @@ export class PackageUpdateService {
     if (packageModel.name === name) {
       return; // No change needed
     }
-    PackageValidator.name(name);
+    assertIsPackageName(name);
     packageModel.name = name;
   }
 
@@ -54,10 +54,8 @@ export class PackageUpdateService {
     }
     // If the package is being set as default, we need to swap it with the current default package
     this.swapDefaultPackage(currentDefaultPackage, packageModel);
-    unitOfWork.addTransactionStep(
-      // Update the current default package to non-default
-      await this.packageRepository.update(currentDefaultPackage)
-    );
+    // Update the current default package to non-default
+    await this.packageRepository.update(currentDefaultPackage, unitOfWork);
   }
 
   async updatePackage(
@@ -78,9 +76,7 @@ export class PackageUpdateService {
     if (params.is_default !== undefined) {
       await this.updateIsDefault(unitOfWork, params.is_default, packageModel);
     }
-    unitOfWork.addTransactionStep(
-      await this.packageRepository.update(packageModel)
-    );
+    await this.packageRepository.update(packageModel, unitOfWork);
   }
 
   private swapDefaultPackage(

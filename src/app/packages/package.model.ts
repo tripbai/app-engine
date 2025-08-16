@@ -5,16 +5,16 @@ import {
   length,
   varchar,
 } from "../../core/orm/entity/entity-decorators";
-import { PackageValidator } from "./package.validator";
+import { assertIsPackageName } from "./package.assertions";
 
 @collection("packages")
-export class PackageModel extends BaseEntity<PackageModel> {
+export class PackageModel extends BaseEntity {
   @length(32)
-  @varchar(PackageValidator.name)
-  name: string;
+  @varchar(assertIsPackageName)
+  name!: string;
 
   @boolean()
-  is_active: boolean;
+  is_active!: boolean;
 
   /**
    * Default packages are given to newly created organizations.
@@ -22,5 +22,5 @@ export class PackageModel extends BaseEntity<PackageModel> {
    * to be upgraded if different package is required.
    */
   @boolean()
-  is_default: boolean;
+  is_default!: boolean;
 }

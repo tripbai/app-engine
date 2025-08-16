@@ -4,7 +4,7 @@
   "description": "Backend application instance",
   "main": "index.js",
   "scripts": {
-    "test": "mocha dist/identity-authority/users/tests/services/user-create.service.test.js",
+    "test": "mocha dist/identity-authority/users/tests/services/access-user.test.js",
     "test2": "tsc && mocha dist/**/*.test.js",
     "container:build": "node bin/container/build.js",
     "start:development": "node bin/container/build.js && tsc && node dist/core/bootstrap.js --env=development --port=5458",

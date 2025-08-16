@@ -7,7 +7,7 @@ import {
   put,
   get,
 } from "../../../core/router/route-decorators";
-import { TripBai } from "../../module/module.interface";
+import * as TripBai from "../../module/types";
 import * as Core from "../../../core/module/types";
 import {
   BadRequestException,

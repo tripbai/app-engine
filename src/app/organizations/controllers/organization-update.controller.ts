@@ -7,23 +7,21 @@ import {
   put,
   get,
 } from "../../../core/router/route-decorators";
-import { TripBai } from "../../module/module.interface";
+import * as TripBai from "../../module/types";
 import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
   LogicException,
 } from "../../../core/exceptions/exceptions";
-import { OrganizationAssertions } from "../organization.assertions";
-import { IsValid } from "../../../core/helpers/isvalid";
-import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
+import { assertNonEmptyString } from "../../../core/utilities/assertValid";
+import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
+import { assertIsOrganizationStatus } from "../organization.assertions";
 
 @injectable()
 export class OrganizationUpdateController {
   constructor(
     @inject(UpdateOrganizationCommand)
-    private updateOrganizationCommand: UpdateOrganizationCommand,
-    @inject(OrganizationAssertions)
-    private organizationAssertions: OrganizationAssertions
+    private updateOrganizationCommand: UpdateOrganizationCommand
   ) {}
 
   @patch<TripBai.Organizations.Endpoints.UpdateOrganization>(
@@ -41,9 +39,7 @@ export class OrganizationUpdateController {
       commandDTO.organizationId = params.data.organization_id;
       if (params.data.status) {
         assertNonEmptyString(params.data.status);
-        this.organizationAssertions.assertOrganizationStatus(
-          params.data.status
-        );
+        assertIsOrganizationStatus(params.data.status);
         commandDTO.status = params.data.status;
       }
       if (params.data.business_name) {

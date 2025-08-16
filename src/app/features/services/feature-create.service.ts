@@ -7,13 +7,13 @@ import {
   RecordNotFoundException,
   ResourceAccessForbiddenException,
 } from "../../../core/exceptions/exceptions";
-import { Pseudorandom } from "../../../core/helpers/pseudorandom";
 import { FeaturesList } from "../features.list";
 import { DefaultFeaturesRepository } from "../default-features.repository";
 import { OrganizationRequester } from "../../requester/organization-requester";
 import { OrganizationModel } from "../../organizations/organization.model";
 import { StoreModel } from "../../stores/store.model";
 import { FeaturesOverrideRepository } from "../feature-overrides.repository";
+import { createEntityId } from "../../../core/utilities/entityToolkit";
 
 @injectable()
 export class FeatureCreateService {

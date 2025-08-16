@@ -1,9 +1,9 @@
 import { inject, injectable } from "inversify";
-import { Core } from "../../core/module/module";
+import * as Core from "../../core/module/types";
 import { OrganizationPermissionService } from "../organizations/services/organization-permission.service";
 import { AppAuthService } from "../../core/auth/services/app-auth-service";
-import { IdentityAuthority } from "../../identity-authority/module/module.interface";
-import { EntityToolkit } from "../../core/orm/entity/entity-toolkit";
+import * as IdentityAuthority from "../../identity-authority/module/types";
+import { assertValidEntityId } from "../../core/utilities/entityToolkit";
 
 /** A requester with status that is allowed, and an entity_id */
 type IAuthValidRequester = Core.Authorization.Requester & {

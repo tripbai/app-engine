@@ -7,7 +7,7 @@ import {
   put,
   get,
 } from "../../../core/router/route-decorators";
-import { TripBai } from "../../module/module.interface";
+import * as TripBai from "../../module/types";
 import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
@@ -21,11 +21,11 @@ export class UserFromStoreRemoveController {
     private removeUserFromStoreCommand: RemoveUserFromStoreCommand
   ) {}
 
-  @post<TripBai.AccessLibrary.Endpoints.RemoveUserFromStore>(
+  @post<TripBai.AccessDirectory.Endpoints.RemoveUserFromStore>(
     "/tripbai/access-directory/tenants/:tenant_id/remove-from-stores"
   )
   async removeUserFromStore<
-    T extends TripBai.AccessLibrary.Endpoints.RemoveUserFromStore
+    T extends TripBai.AccessDirectory.Endpoints.RemoveUserFromStore
   >(params: Core.Route.ControllerDTO<T>): Promise<T["response"]> {
     const commandDTO: Parameters<RemoveUserFromStoreCommand["execute"]>[0] =
       Object.create(null);

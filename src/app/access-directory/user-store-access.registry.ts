@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import { RegistryRepository } from "../../core/orm/repository/registry-repository";
 import { AccessDirectoryModel } from "./access-directory.model";
 import { AbstractDatabaseProvider } from "../../core/providers/database/database.provider";
-import { Core } from "../../core/module/module";
+import * as Core from "../../core/module/types";
 
 @injectable()
 export class UserStoreAccessRegistry extends RegistryRepository<AccessDirectoryModel> {

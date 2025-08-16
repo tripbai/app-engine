@@ -1,8 +1,8 @@
 import { inject, injectable } from "inversify";
-import { IdentityAuthority } from "../../../identity-authority/module/module.interface";
+import * as IdentityAuthority from "../../../identity-authority/module/types";
 import { AbstractJWTProvider } from "../../../core/providers/jwt/jwt.provider";
-import { AppENV } from "../../../core/application/appEnv";
-import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
+import { getEnv } from "../../../core/application/appEnv";
+import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
 
 @injectable()
 export class OrganizationIAuthTokenService {

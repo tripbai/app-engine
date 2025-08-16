@@ -4,19 +4,24 @@ import { AbstractDatabaseProvider } from "../../core/providers/database/database
 import { FeatureModel } from "./feature.model";
 import { BaseRepository } from "../../core/orm/repository/base-repository";
 import { FeaturesList } from "./features.list";
-import { Core } from "../../core/module/module";
+import * as Core from "../../core/module/types";
 import { DataIntegrityException } from "../../core/exceptions/exceptions";
+import { UnitOfWorkFactory } from "../../core/workflow/unit-of-work.factory";
 
 @injectable()
 export class DefaultFeaturesRepository extends BaseRepository<FeatureModel> {
-  protected collection: string = "default_features";
+  protected collectionName: string = "default_features";
 
   constructor(
     @inject(AbstractDatabaseProvider)
     private DatabaseProvider: AbstractDatabaseProvider,
-    @inject(AbstractCacheProvider) private CacheProvider: AbstractCacheProvider
+    @inject(AbstractCacheProvider) private CacheProvider: AbstractCacheProvider,
+    @inject(UnitOfWorkFactory) private UnitOfWorkFactory: UnitOfWorkFactory
   ) {
-    super(FeatureModel, DatabaseProvider, CacheProvider);
+    super("default_features", FeatureModel, {
+      database: DatabaseProvider,
+      cache: CacheProvider,
+    });
   }
 
   getFeatureKey<T extends keyof FeaturesList>(key: T) {
@@ -26,7 +31,7 @@ export class DefaultFeaturesRepository extends BaseRepository<FeatureModel> {
       ): Promise<InstanceType<FeaturesList[T]> | null> => {
         await this.DatabaseProvider.connect();
         const features = await this.DatabaseProvider.whereFieldHasValue(
-          this.collection,
+          this.collectionName,
           "package_id",
           package_id
         );
@@ -47,7 +52,7 @@ export class DefaultFeaturesRepository extends BaseRepository<FeatureModel> {
         }
         const FeatMap = new FeaturesList();
         const FeatObject = new FeatMap[key]();
-        this.ingest(FeatObject, filtered[0]);
+        this.ingestIntoModel(FeatObject, filtered[0]);
         return FeatObject as InstanceType<FeaturesList[T]>;
       },
     };
@@ -58,16 +63,19 @@ export class DefaultFeaturesRepository extends BaseRepository<FeatureModel> {
     featureModel: InstanceType<FeaturesList[T]>
   ): Promise<void> {
     await this.DatabaseProvider.connect();
-    const transaction = this.create(featureModel.entity_id, {
-      key: key,
-      value: featureModel.get(),
-      category: featureModel.category,
-      package_id: featureModel.package_id,
-      featurable_entity_id: null,
-      description: featureModel.description,
-      org_mutable: featureModel.org_mutable,
-      archived_at: null,
-    });
-    await this.DatabaseProvider.beginTransaction([transaction]);
+    const unitOfWork = this.UnitOfWorkFactory.create();
+    this.create(
+      {
+        key: key,
+        value: featureModel.get(),
+        category: featureModel.category,
+        package_id: featureModel.package_id,
+        featurable_entity_id: null,
+        description: featureModel.description,
+        org_mutable: featureModel.org_mutable,
+      },
+      unitOfWork
+    );
+    await unitOfWork.commit();
   }
 }

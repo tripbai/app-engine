@@ -37,31 +37,12 @@ export class CreateStoreCommand {
     const organizationModel = await this.organizationRepository.getById(
       params.organizationId
     );
-    this.storeCreateService.assertRequesterCanCreateStore(
-      requester,
-      organizationModel
-    );
-    this.storeCreateService.assertOrganizationCanCreateStore(organizationModel);
     const storeModel = await this.storeCreateService.createStore({
-      requester,
-      organizationModel,
+      requester: requester,
+      organizationModel: organizationModel,
       name: params.name,
+      unitOfWork: unitOfWork,
     });
-    unitOfWork.addTransactionStep(
-      this.storeRepository.create(storeModel.entity_id, {
-        name: storeModel.name,
-        organization_id: storeModel.organization_id,
-        package_id: storeModel.package_id,
-        about: storeModel.about,
-        profile_photo_src: storeModel.profile_photo_src,
-        cover_photo_src: storeModel.cover_photo_src,
-        location_id: storeModel.location_id,
-        secret_key: storeModel.secret_key,
-        status: storeModel.status,
-        archived_at: storeModel.archived_at,
-        language: storeModel.language,
-      })
-    );
     await unitOfWork.commit();
     this.abstractEventManagerProvider.dispatch(
       new StoreCreatedEvent(),

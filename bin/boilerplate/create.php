@@ -212,7 +212,7 @@ foreach ($boilerplates as $boilerplate) {
         import { inject, injectable } from "inversify";
         import { $commandOrQueryName } from "../$commandOrQueryFolderName/$commandOrQueryKebabCase.$commandOrQueryType";
         import { del, patch, post, put, get } from "../../../core/router/decorators";
-        import { TripBai } from "../../module/module.interface";
+        import * as TripBai from "../../module/types";
         import * as Core from "../../../core/module/types";
         import { BadRequestException, LogicException } from "../../../core/exceptions/exceptions";
 

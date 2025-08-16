@@ -7,15 +7,15 @@ import {
   put,
   get,
 } from "../../../core/router/route-decorators";
-import { TripBai } from "../../module/module.interface";
+import * as TripBai from "../../module/types";
 import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
   LogicException,
 } from "../../../core/exceptions/exceptions";
-import { IsValid } from "../../../core/helpers/isvalid";
-import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
-import { StoreValidator } from "../store.validator";
+import { assertNonEmptyString } from "../../../core/utilities/assertValid";
+import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
+import { assertIsStoreName } from "../store.assertions";
 
 @injectable()
 export class StoreCreateController {
@@ -37,7 +37,7 @@ export class StoreCreateController {
       commandDTO.organizationId = params.data.organization_id;
 
       assertNonEmptyString(params.data.name);
-      StoreValidator.name(params.data.name);
+      assertIsStoreName(params.data.name);
       commandDTO.name = params.data.name;
     } catch (error) {
       throw new BadRequestException({

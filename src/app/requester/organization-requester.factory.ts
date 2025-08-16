@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { OrganizationRequester } from "./organization-requester";
-import { Core } from "../../core/module/module";
+import * as Core from "../../core/module/types";
 import { OrganizationPermissionService } from "../organizations/services/organization-permission.service";
 import { AppAuthService } from "../../core/auth/services/app-auth-service";
 

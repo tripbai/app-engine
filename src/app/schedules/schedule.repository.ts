@@ -6,13 +6,14 @@ import { ScheduleModel } from "./schedule.model";
 
 @injectable()
 export class ScheduleRepository extends BaseRepository<ScheduleModel> {
-  protected collection: string = "schedules";
-
   constructor(
     @inject(AbstractDatabaseProvider)
     private DatabaseProvider: AbstractDatabaseProvider,
     @inject(AbstractCacheProvider) private CacheProvider: AbstractCacheProvider
   ) {
-    super(ScheduleModel, DatabaseProvider, CacheProvider);
+    super("schedules", ScheduleModel, {
+      database: DatabaseProvider,
+      cache: CacheProvider,
+    });
   }
 }

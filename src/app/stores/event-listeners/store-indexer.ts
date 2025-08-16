@@ -6,10 +6,10 @@ import {
   IndexTaskItem,
 } from "../../../core/providers/indexer/indexer.provider";
 import { StoreModel } from "../store.model";
-import { TripBai } from "../../module/module.interface";
-import { AppENV } from "../../../core/application/appEnv";
-import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
+import * as TripBai from "../../module/types";
 import * as Core from "../../../core/module/types";
+import { getEnv } from "../../../core/application/appEnv";
+import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
 
 @injectable()
 export class StoreIndexer

@@ -7,7 +7,7 @@ import { UnitOfWorkFactory } from "../../../core/workflow/unit-of-work.factory";
 import { OrganizationUpdateService } from "../services/organization-update.service";
 import { OrganizationRepository } from "../organization.repository";
 import { PackageRepository } from "../../packages/package.repository";
-import { TripBai } from "../../module/module.interface";
+import * as TripBai from "../../module/types";
 import { OrganizationUpdatedEvent } from "../organization.events";
 
 @injectable()
@@ -46,6 +46,7 @@ export class UpdateOrganizationCommand {
     >[0] = Object.create(null);
     serviceParams.organizationModel = organizationModel;
     serviceParams.organizationRequester = requester;
+    serviceParams.unitOfWork = unitOfWork;
     if (params.packageId) {
       const packageModel = await this.packageRepository.getById(
         params.packageId
@@ -59,9 +60,6 @@ export class UpdateOrganizationCommand {
       serviceParams.status = params.status;
     }
     this.organizationUpdateService.updateOrganization(serviceParams);
-    unitOfWork.addTransactionStep(
-      await this.organizationRepository.update(organizationModel)
-    );
     await unitOfWork.commit();
     this.abstractEventManagerProvider.dispatch(
       new OrganizationUpdatedEvent(),

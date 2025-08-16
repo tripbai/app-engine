@@ -7,15 +7,18 @@ import {
   put,
   get,
 } from "../../../core/router/route-decorators";
-import { TripBai } from "../../module/module.interface";
+import * as TripBai from "../../module/types";
 import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
   LogicException,
 } from "../../../core/exceptions/exceptions";
-import { IsValid } from "../../../core/helpers/isvalid";
-import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
-import { PackageValidator } from "../package.validator";
+import {
+  assertBooleanValue,
+  assertNonEmptyString,
+} from "../../../core/utilities/assertValid";
+import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
+import { assertIsPackageName } from "../package.assertions";
 
 @injectable()
 export class PackageUpdateController {
@@ -40,17 +43,17 @@ export class PackageUpdateController {
 
       if (params.data.name) {
         assertNonEmptyString(params.data.name);
-        PackageValidator.name(params.data.name);
+        assertIsPackageName(params.data.name);
         commandDTO.name = params.data.name;
       }
 
       if (params.data.is_active !== undefined) {
-        IsValid.BooleanValue(params.data.is_active);
+        assertBooleanValue(params.data.is_active);
         commandDTO.isActive = params.data.is_active;
       }
 
       if (params.data.is_default !== undefined) {
-        IsValid.BooleanValue(params.data.is_default);
+        assertBooleanValue(params.data.is_default);
         commandDTO.isDefault = params.data.is_default;
       }
     } catch (error) {

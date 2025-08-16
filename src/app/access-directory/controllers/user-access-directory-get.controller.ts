@@ -7,7 +7,7 @@ import {
   put,
   get,
 } from "../../../core/router/route-decorators";
-import { TripBai } from "../../module/module.interface";
+import * as TripBai from "../../module/types";
 import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
@@ -21,11 +21,11 @@ export class UserAccessLibraryGetController {
     private getUserAccessDirectoryQuery: GetUserAccessDirectoryQuery
   ) {}
 
-  @get<TripBai.AccessLibrary.Endpoints.GetUserAccessLibrary>(
+  @get<TripBai.AccessDirectory.Endpoints.GetUserAccessLibrary>(
     "/tripbai/access-directory/users/:user_id"
   )
   async getUserAccessLibrary<
-    T extends TripBai.AccessLibrary.Endpoints.GetUserAccessLibrary
+    T extends TripBai.AccessDirectory.Endpoints.GetUserAccessLibrary
   >(params: Core.Route.ControllerDTO<T>): Promise<T["response"]> {
     const commandDTO: Parameters<GetUserAccessDirectoryQuery["execute"]>[0] =
       Object.create(null);

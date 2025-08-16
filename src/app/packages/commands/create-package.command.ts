@@ -30,15 +30,8 @@ export class CreatePackageCommand {
     const unitOfWork = this.unitOfWorkFactory.create();
     const packageModel = this.packageCreateService.createPackage(
       this.organizationRequesterFactory.create(params.requester),
-      params.name
-    );
-    unitOfWork.addTransactionStep(
-      this.packageRepository.create(packageModel.entity_id, {
-        name: packageModel.name,
-        is_active: packageModel.is_active,
-        is_default: packageModel.is_default,
-        archived_at: packageModel.archived_at,
-      })
+      params.name,
+      unitOfWork
     );
     await unitOfWork.commit();
     await this.abstractEventManagerProvider.dispatch(

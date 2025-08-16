@@ -1,4 +1,4 @@
-import { Core } from "../../core/module/module";
+import * as Core from "../../core/module/types";
 import { BaseEntity } from "../../core/orm/entity/base-entity";
 import {
   boolean,
@@ -9,14 +9,14 @@ import {
 import { StoreModel } from "../stores/store.model";
 
 @collection("access_directory")
-export class AccessDirectoryModel extends BaseEntity<AccessDirectoryModel> {
+export class AccessDirectoryModel extends BaseEntity {
   @EntityId()
-  user_id: Core.Entity.Id;
+  user_id!: Core.Entity.Id;
 
   @references(StoreModel, "entity_id")
   @EntityId()
-  store_id: Core.Entity.Id;
+  store_id!: Core.Entity.Id;
 
   @boolean()
-  is_active: boolean;
+  is_active!: boolean;
 }

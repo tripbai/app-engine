@@ -6,13 +6,14 @@ import { ImageModel } from "./image.model";
 
 @injectable()
 export class ImageRepository extends BaseRepository<ImageModel> {
-  protected collection: string = "images";
-
   constructor(
     @inject(AbstractDatabaseProvider)
     private DatabaseProvider: AbstractDatabaseProvider,
     @inject(AbstractCacheProvider) private CacheProvider: AbstractCacheProvider
   ) {
-    super(ImageModel, DatabaseProvider, CacheProvider);
+    super("images", ImageModel, {
+      database: DatabaseProvider,
+      cache: CacheProvider,
+    });
   }
 }

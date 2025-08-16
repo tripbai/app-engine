@@ -9,7 +9,6 @@ import { StoreModel } from "../../stores/store.model";
 import { OrganizationPermissionService } from "./organization-permission.service";
 import { RequesterTokenService } from "../../../core/requester/requester-token.service";
 import { OrganizationRequester } from "../../requester/organization-requester";
-import { Return } from "aws-sdk/clients/cloudsearchdomain";
 
 @injectable()
 export class OrganizationAuthService {

@@ -6,9 +6,13 @@ import {
   BadRequestException,
   ResourceAccessForbiddenException,
 } from "../../../core/exceptions/exceptions";
-import { OrganizationValidator } from "../organization.validator";
-import { TripBai } from "../../module/module.interface";
+import * as TripBai from "../../module/types";
 import { OrganizationRequester } from "../../requester/organization-requester";
+import {
+  assertIsOrganizationBusinessName,
+  assertIsOrganizationStatus,
+} from "../organization.assertions";
+import { UnitOfWork } from "../../../core/workflow/unit-of-work";
 
 @injectable()
 export class OrganizationUpdateService {
@@ -34,7 +38,7 @@ export class OrganizationUpdateService {
     organizationModel: OrganizationModel,
     businessName: string
   ) {
-    OrganizationValidator.business_name(businessName);
+    assertIsOrganizationBusinessName(businessName);
     organizationModel.business_name = businessName;
   }
 
@@ -43,19 +47,20 @@ export class OrganizationUpdateService {
     organizationModel: OrganizationModel,
     newStatus: TripBai.Organizations.Fields.Status
   ) {
-    OrganizationValidator.status(newStatus);
+    assertIsOrganizationStatus(newStatus);
     if (!organizationRequester.isWebAdmin()) {
       throw new ResourceAccessForbiddenException({
         message: "Only web admins can update organization status",
-        data: { requester: organizationRequester.requester },
+        data: { requester: organizationRequester },
       });
     }
     organizationModel.status = newStatus;
   }
 
-  updateOrganization(params: {
+  async updateOrganization(params: {
     organizationModel: OrganizationModel;
     organizationRequester: OrganizationRequester;
+    unitOfWork: UnitOfWork;
     packageModel?: PackageModel;
     businessName?: string;
     status?: TripBai.Organizations.Fields.Status;
@@ -82,5 +87,9 @@ export class OrganizationUpdateService {
         params.status
       );
     }
+    await this.organizationRepository.update(
+      params.organizationModel,
+      params.unitOfWork
+    );
   }
 }

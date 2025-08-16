@@ -1,4 +1,4 @@
-import { Core } from "../../core/module/module";
+import * as Core from "../../core/module/types";
 import { BaseEntity } from "../../core/orm/entity/base-entity";
 import {
   EntityId,
@@ -10,30 +10,33 @@ import {
   length,
 } from "../../core/orm/entity/entity-decorators";
 import { PackageModel } from "../packages/package.model";
-import { FeatureValidator } from "./feature.validator";
+import {
+  assertIsFeatureCategory,
+  assertIsFeatureKey,
+} from "./feature.assertions";
 import { FeaturesList } from "./features.list";
 
-export class FeatureModel extends BaseEntity<FeatureModel> {
+export class FeatureModel extends BaseEntity {
   @length(32)
-  @varchar(FeatureValidator.key)
-  key: keyof FeaturesList;
+  @varchar(assertIsFeatureKey)
+  key!: keyof FeaturesList;
 
   @length(64)
   @varchar()
-  value: string;
+  value!: string;
 
   @length(64)
-  @varchar(FeatureValidator.category)
-  category: string;
+  @varchar(assertIsFeatureCategory)
+  category!: string;
 
   @references(PackageModel, "entity_id")
   @EntityId()
-  package_id: Core.Entity.Id;
+  package_id!: Core.Entity.Id;
 
   @length(256)
   @nullable()
   @varchar()
-  description: string | null;
+  description!: string | null;
 
   /**
    * The organization_id, if the feature is organization-level
@@ -41,12 +44,12 @@ export class FeatureModel extends BaseEntity<FeatureModel> {
    */
   @nullable()
   @EntityId()
-  featurable_entity_id: Core.Entity.Id | null;
+  featurable_entity_id!: Core.Entity.Id | null;
 
   /**
    * Tells whether organization is able
    * to update this feature
    */
   @boolean()
-  org_mutable: boolean;
+  org_mutable!: boolean;
 }

@@ -9,8 +9,8 @@ import { AbstractEventManagerProvider } from "../../../core/providers/event/even
 import { UnitOfWorkFactory } from "../../../core/workflow/unit-of-work.factory";
 import { PackageDeleteService } from "../services/package-delete.service";
 import { PackageRepository } from "../package.repository";
-import { TimeStamp } from "../../../core/helpers/timestamp";
 import { PackageDeletedEvent } from "../package.events";
+import { getTimestampNow } from "../../../core/utilities/timestamp";
 
 @injectable()
 export class DeletePackageCommand {
@@ -41,11 +41,12 @@ export class DeletePackageCommand {
         data: {},
       });
     }
+    /**
+     * @TODO Please transfer all this code to PackageDelete service
+     */
     const packageModel = await this.packageRepository.getById(params.packageId);
-    packageModel.archived_at = TimeStamp.now();
-    unitOfWork.addTransactionStep(
-      await this.packageRepository.update(packageModel)
-    );
+    packageModel.archived_at = getTimestampNow();
+    await this.packageRepository.update(packageModel, unitOfWork);
     await unitOfWork.commit();
     await this.abstractEventManagerProvider.dispatch(
       new PackageDeletedEvent(),

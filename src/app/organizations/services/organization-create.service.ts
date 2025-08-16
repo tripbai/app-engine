@@ -3,12 +3,11 @@ import { OrganizationRepository } from "../organization.repository";
 import { OrganizationIAuthTokenService } from "./organization-iauth-token.service";
 import { ResourceAccessForbiddenException } from "../../../core/exceptions/exceptions";
 import { OrganizationModel } from "../organization.model";
-import { Pseudorandom } from "../../../core/helpers/pseudorandom";
 import { PackageModel } from "../../packages/package.model";
-import { TimeStamp } from "../../../core/helpers/timestamp";
 import * as Core from "../../../core/module/types";
 import { OrganizationRequester } from "../../requester/organization-requester";
 import { UnitOfWork } from "../../../core/workflow/unit-of-work";
+import { createEntityId } from "../../../core/utilities/entityToolkit";
 
 @injectable()
 export class OrganizationCreateService {
@@ -58,12 +57,8 @@ export class OrganizationCreateService {
     }
     const tenantId = tokenData.tenant_id;
     try {
-      const organizationModel = await this.organizationRepository.getById(
-        tenantId,
-        {
-          allow_archived_record: true,
-        }
-      );
+      const organizationModel =
+        await this.organizationRepository.getByIdWithArchived(tenantId);
       if (organizationModel.archived_at !== null) {
         // Users will need to reach out to support to unarchive the organization
         throw new Error("Organization is archived, cannot create a new one");
@@ -71,6 +66,9 @@ export class OrganizationCreateService {
       // organization already exists, no need to create a new one
       return organizationModel;
     } catch (error) {
+      if (!(error instanceof Error)) {
+        throw new Error("Unknown error occurred");
+      }
       if (
         error.message === "Organization is archived, cannot create a new one"
       ) {
@@ -83,24 +81,14 @@ export class OrganizationCreateService {
       // we can proceed to create a new organization
     }
     const secretKey = createEntityId();
-    const organizationModel: OrganizationModel = {
-      entity_id: tenantId,
-      secret_key: secretKey,
-      business_name: params.businessName,
-      package_id: params.packageModel.entity_id,
-      status: "active",
-      created_at: TimeStamp.now(),
-      updated_at: TimeStamp.now(),
-      archived_at: null,
-    };
-    params.unitOfWork.addTransactionStep(
-      this.organizationRepository.create(tenantId, {
+    const organizationModel = this.organizationRepository.create(
+      {
         secret_key: secretKey,
         business_name: params.businessName,
         package_id: params.packageModel.entity_id,
         status: "active",
-        archived_at: null,
-      })
+      },
+      params.unitOfWork
     );
     return organizationModel;
   }

@@ -4,24 +4,26 @@ import { AbstractDatabaseProvider } from "../../core/providers/database/database
 import { AbstractCacheProvider } from "../../core/providers/cache/cache.provider";
 import { PackageModel } from "./package.model";
 import { DataIntegrityException } from "../../core/exceptions/exceptions";
-import { TimeStamp } from "../../core/helpers/timestamp";
 
 @injectable()
 export class PackageRepository extends BaseRepository<PackageModel> {
-  protected collection: string = "packages";
+  protected collectionName: string = "packages";
 
   constructor(
     @inject(AbstractDatabaseProvider)
     private DatabaseProvider: AbstractDatabaseProvider,
     @inject(AbstractCacheProvider) private CacheProvider: AbstractCacheProvider
   ) {
-    super(PackageModel, DatabaseProvider, CacheProvider);
+    super("packages", PackageModel, {
+      database: DatabaseProvider,
+      cache: CacheProvider,
+    });
   }
 
   async getAllNonArchivedPackages() {
     const models: Array<PackageModel> = [];
     const results = await this.DatabaseProvider.whereFieldHasValue(
-      this.collection,
+      this.collectionName,
       "archived_at",
       null
     );
@@ -32,14 +34,7 @@ export class PackageRepository extends BaseRepository<PackageModel> {
       const data = results[i];
       const Registry: PackageModel = new PackageModel();
       try {
-        for (const key in data) {
-          if (BaseRepository.isDateObject(data[key])) {
-            // @ts-expect-error the above check will determine if the value is Date object
-            Registry[key] = TimeStamp.normalize(data[key]);
-          } else {
-            Registry[key] = data[key];
-          }
-        }
+        this.ingestIntoModel(Registry, data);
       } catch (error) {
         throw new DataIntegrityException({
           message: "one of package records contains invalid data",
@@ -56,7 +51,7 @@ export class PackageRepository extends BaseRepository<PackageModel> {
 
   async hasDefaultPackage(): Promise<boolean> {
     const results = await this.DatabaseProvider.whereFieldHasValue(
-      this.collection,
+      this.collectionName,
       "is_default",
       true
     );
@@ -65,7 +60,7 @@ export class PackageRepository extends BaseRepository<PackageModel> {
 
   async getCurrentDefaultPackage(): Promise<PackageModel> {
     const results = await this.DatabaseProvider.whereFieldHasValue(
-      this.collection,
+      this.collectionName,
       "is_default",
       true
     );
@@ -85,15 +80,7 @@ export class PackageRepository extends BaseRepository<PackageModel> {
     const data = results[0];
     const model: PackageModel = new PackageModel();
     try {
-      for (const key in data) {
-        if (BaseRepository.isDateObject(data[key])) {
-          // @ts-expect-error the above check will determine if the value is Date object
-          const dateobj = new Date(data[key]);
-          model[key] = TimeStamp.normalize(dateobj);
-        } else {
-          model[key] = data[key];
-        }
-      }
+      this.ingestIntoModel(model, data);
     } catch (error) {
       throw new DataIntegrityException({
         message: "one of package records contains invalid data",

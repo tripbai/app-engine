@@ -7,7 +7,7 @@ import {
   put,
   get,
 } from "../../../core/router/route-decorators";
-import { TripBai } from "../../module/module.interface";
+import * as TripBai from "../../module/types";
 import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
@@ -21,11 +21,11 @@ export class UserToStoreAddController {
     private addUserToStoreCommand: AddUserToStoreCommand
   ) {}
 
-  @post<TripBai.AccessLibrary.Endpoints.AddUserToStore>(
+  @post<TripBai.AccessDirectory.Endpoints.AddUserToStore>(
     "/tripbai/access-directory/tenants/:tenant_id/add-to-stores"
   )
   async addUserToStore<
-    T extends TripBai.AccessLibrary.Endpoints.AddUserToStore
+    T extends TripBai.AccessDirectory.Endpoints.AddUserToStore
   >(params: Core.Route.ControllerDTO<T>): Promise<T["response"]> {
     const commandDTO: Parameters<AddUserToStoreCommand["execute"]>[0] =
       Object.create(null);

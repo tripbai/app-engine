@@ -6,13 +6,14 @@ import { TourModel } from "./tour.model";
 
 @injectable()
 export class TourRepository extends BaseRepository<TourModel> {
-  protected collection: string = "tours";
-
   constructor(
     @inject(AbstractDatabaseProvider)
     private DatabaseProvider: AbstractDatabaseProvider,
     @inject(AbstractCacheProvider) private CacheProvider: AbstractCacheProvider
   ) {
-    super(TourModel, DatabaseProvider, CacheProvider);
+    super("tours", TourModel, {
+      database: DatabaseProvider,
+      cache: CacheProvider,
+    });
   }
 }

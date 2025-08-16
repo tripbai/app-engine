@@ -4,21 +4,25 @@ import { AbstractCacheProvider } from "../../core/providers/cache/cache.provider
 import { AbstractDatabaseProvider } from "../../core/providers/database/database.provider";
 import { FeatureModel } from "./feature.model";
 import { FeaturesList } from "./features.list";
-import { Core } from "../../core/module/module";
+import * as Core from "../../core/module/types";
 import { DataIntegrityException } from "../../core/exceptions/exceptions";
-import { Pseudorandom } from "../../core/helpers/pseudorandom";
+import { UnitOfWorkFactory } from "../../core/workflow/unit-of-work.factory";
 
 @injectable()
 export class FeaturesOverrideRepository extends BaseRepository<FeatureModel> {
-  protected collection: string = "feature_overrides";
+  protected collectionName: string = "feature_overrides";
 
   constructor(
     @inject(AbstractDatabaseProvider)
     private DatabaseProvider: AbstractDatabaseProvider,
     @inject(AbstractCacheProvider)
-    private CacheProvider: AbstractCacheProvider
+    private CacheProvider: AbstractCacheProvider,
+    @inject(UnitOfWorkFactory) private UnitOfWorkFactory: UnitOfWorkFactory
   ) {
-    super(FeatureModel, DatabaseProvider, CacheProvider);
+    super("feature_overrides", FeatureModel, {
+      database: DatabaseProvider,
+      cache: CacheProvider,
+    });
   }
 
   getFeatureKeyOfPackage<T extends keyof FeaturesList>(
@@ -31,7 +35,7 @@ export class FeaturesOverrideRepository extends BaseRepository<FeatureModel> {
       ): Promise<InstanceType<FeaturesList[T]> | null> => {
         await this.DatabaseProvider.connect();
         const features = await this.DatabaseProvider.whereFieldHasValue(
-          this.collection,
+          this.collectionName,
           "featurable_entity_id",
           ownerId
         );
@@ -54,7 +58,7 @@ export class FeaturesOverrideRepository extends BaseRepository<FeatureModel> {
         }
         const FeatMap = new FeaturesList();
         const FeatObject = new FeatMap[key]();
-        this.ingest(FeatObject, filtered[0]);
+        this.ingestIntoModel(FeatObject, filtered[0]);
         return FeatObject as InstanceType<FeaturesList[T]>;
       },
     };
@@ -64,18 +68,20 @@ export class FeaturesOverrideRepository extends BaseRepository<FeatureModel> {
     key: T,
     featureModel: InstanceType<FeaturesList[T]>
   ) {
-    const overrideEntityId = createEntityId();
     await this.DatabaseProvider.connect();
-    const transaction = this.create(overrideEntityId, {
-      key: key,
-      value: featureModel.get(),
-      category: featureModel.category,
-      package_id: featureModel.package_id,
-      featurable_entity_id: featureModel.featurable_entity_id,
-      description: featureModel.description,
-      org_mutable: featureModel.org_mutable,
-      archived_at: null,
-    });
-    await this.DatabaseProvider.beginTransaction([transaction]);
+    const unitOfWork = this.UnitOfWorkFactory.create();
+    this.create(
+      {
+        key: key,
+        value: featureModel.get(),
+        category: featureModel.category,
+        package_id: featureModel.package_id,
+        featurable_entity_id: featureModel.featurable_entity_id,
+        description: featureModel.description,
+        org_mutable: featureModel.org_mutable,
+      },
+      unitOfWork
+    );
+    await unitOfWork.commit();
   }
 }

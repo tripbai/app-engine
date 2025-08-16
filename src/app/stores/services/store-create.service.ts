@@ -8,9 +8,9 @@ import { PackageModel } from "../../packages/package.model";
 import { StoreOrganizationRegistry } from "../store-organization.registry";
 import { PackageRepository } from "../../packages/package.repository";
 import { StoreModel } from "../store.model";
-import { Pseudorandom } from "../../../core/helpers/pseudorandom";
-import { TimeStamp } from "../../../core/helpers/timestamp";
-import { StoreValidator } from "../store.validator";
+import { assertIsStoreName } from "../store.assertions";
+import { createEntityId } from "../../../core/utilities/entityToolkit";
+import { UnitOfWork } from "../../../core/workflow/unit-of-work";
 
 @injectable()
 export class StoreCreateService {
@@ -28,6 +28,7 @@ export class StoreCreateService {
     requester: OrganizationRequester;
     organizationModel: OrganizationModel;
     name: string;
+    unitOfWork: UnitOfWork;
   }) {
     this.assertRequesterCanCreateStore(
       params.requester,
@@ -44,23 +45,22 @@ export class StoreCreateService {
         data: { organization_id: params.organizationModel.entity_id },
       });
     }
-    StoreValidator.name(params.name);
-    const storeModel: StoreModel = {
-      entity_id: createEntityId(),
-      organization_id: params.organizationModel.entity_id,
-      name: params.name,
-      profile_photo_src: null,
-      cover_photo_src: null,
-      package_id: this.assignDefaultPackageToStore(params.organizationModel),
-      about: null,
-      language: this.assignDefaultLanguageToStore(),
-      location_id: null,
-      secret_key: createEntityId(),
-      status: "active",
-      created_at: TimeStamp.now(),
-      updated_at: TimeStamp.now(),
-      archived_at: null,
-    };
+    assertIsStoreName(params.name);
+    const storeModel = this.storeRepository.create(
+      {
+        organization_id: params.organizationModel.entity_id,
+        name: params.name,
+        profile_photo_src: null,
+        cover_photo_src: null,
+        package_id: this.assignDefaultPackageToStore(params.organizationModel),
+        about: null,
+        language: this.assignDefaultLanguageToStore(),
+        location_id: null,
+        secret_key: createEntityId(),
+        status: "active",
+      },
+      params.unitOfWork
+    );
     return storeModel;
   }
 

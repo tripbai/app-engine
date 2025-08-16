@@ -6,13 +6,14 @@ import { OrganizationModel } from "./organization.model";
 
 @injectable()
 export class OrganizationRepository extends BaseRepository<OrganizationModel> {
-  protected collection: string = "organizations";
-
   constructor(
     @inject(AbstractDatabaseProvider)
     private DatabaseProvider: AbstractDatabaseProvider,
     @inject(AbstractCacheProvider) private CacheProvider: AbstractCacheProvider
   ) {
-    super(OrganizationModel, DatabaseProvider, CacheProvider);
+    super("organizations", OrganizationModel, {
+      database: DatabaseProvider,
+      cache: CacheProvider,
+    });
   }
 }

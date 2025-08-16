@@ -7,15 +7,15 @@ import {
   put,
   get,
 } from "../../../core/router/route-decorators";
-import { TripBai } from "../../module/module.interface";
+import * as TripBai from "../../module/types";
 import * as Core from "../../../core/module/types";
 import {
   BadRequestException,
   LogicException,
 } from "../../../core/exceptions/exceptions";
-import { IsValid } from "../../../core/helpers/isvalid";
-import { OrganizationValidator } from "../organization.validator";
-import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
+import { assertNonEmptyString } from "../../../core/utilities/assertValid";
+import { assertIsOrganizationBusinessName } from "../organization.assertions";
+import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
 
 @injectable()
 export class OrganizationCreateController {
@@ -39,7 +39,7 @@ export class OrganizationCreateController {
         params.data.tenant_access_certification_token;
 
       assertNonEmptyString(params.data.business_name);
-      OrganizationValidator.business_name(params.data.business_name);
+      assertIsOrganizationBusinessName(params.data.business_name);
       commandDTO.businessName = params.data.business_name;
 
       assertNonEmptyString(params.data.package_id);
