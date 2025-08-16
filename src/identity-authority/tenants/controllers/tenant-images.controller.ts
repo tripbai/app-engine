@@ -3,10 +3,13 @@ import { post } from "../../../core/router/route-decorators";
 import * as IdentityAuthority from "../../module/types";
 import * as Core from "../../../core/module/types";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
-import { IsValid } from "../../../core/helpers/isvalid";
-import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
 import { ImageHelperService } from "../../services/image-helper.service";
 import { UploadTenantImagesCommand } from "../commands/upload-tenant-images.command";
+import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
+import {
+  assertFileObject,
+  assertNonEmptyString,
+} from "../../../core/utilities/assertValid";
 
 @injectable()
 export class TenantImagesController {
@@ -24,7 +27,6 @@ export class TenantImagesController {
     T extends IdentityAuthority.Tenants.Endpoints.UploadImage
   >(params: Core.Route.ControllerDTO<T>): Promise<T["response"]> {
     try {
-      assertNonEmptyString(params.data.tenant_id);
       assertValidEntityId(params.data.tenant_id);
       assertNonEmptyString(params.data.type);
       if (
@@ -35,7 +37,7 @@ export class TenantImagesController {
           `Invalid image type provided: ${params.data.type}. Expected 'profile_photo' or 'cover_photo'.`
         );
       }
-      IsValid.FileObject(params.data.file);
+      assertFileObject(params.data.file);
     } catch (error) {
       throw new BadRequestException({
         message: "failed to upload tenant image due to invalid parameters",

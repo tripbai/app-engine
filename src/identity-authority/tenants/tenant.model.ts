@@ -1,4 +1,4 @@
-import { Core } from "../../core/module/module";
+import * as Core from "../../core/module/types";
 import { BaseEntity } from "../../core/orm/entity/base-entity";
 import {
   collection,
@@ -7,25 +7,28 @@ import {
   varchar,
 } from "../../core/orm/entity/entity-decorators";
 import { ProfileValidator } from "../profiles/profile.validator";
-import { TenantValidator } from "./tenant.validator";
+import {
+  assertIsTenantName,
+  assertIsTenantSecretKey,
+} from "./tenant.assertions";
 
 @collection("tenants")
 export class TenantModel extends BaseEntity {
   @length(64)
-  @varchar(TenantValidator.name)
-  name: string;
+  @varchar(assertIsTenantName)
+  name!: string;
 
   @length(32)
-  @varchar(TenantValidator.secret_key)
-  secret_key: string;
+  @varchar(assertIsTenantSecretKey)
+  secret_key!: string;
 
   @length(384)
   @nullable()
   @varchar(ProfileValidator.image)
-  profile_photo: Core.File.UploadPath | null;
+  profile_photo!: Core.Uploads.FilePath | null;
 
   @length(384)
   @nullable()
   @varchar(ProfileValidator.image)
-  cover_photo: Core.File.UploadPath | null;
+  cover_photo!: Core.Uploads.FilePath | null;
 }

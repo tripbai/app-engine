@@ -23,7 +23,7 @@ export class TenantImagesService {
   generateUploadToken(
     tenantId: Core.Entity.Id,
     type: "profile_photo" | "cover_photo",
-    imagePath: Core.File.UploadPath
+    imagePath: Core.Uploads.FilePath
   ): string {
     return this.iAuthImageTokenService.generate(type, tenantId, imagePath);
   }
@@ -40,7 +40,7 @@ export class TenantImagesService {
   ): {
     type: "profile_photo" | "cover_photo";
     tenant_id: Core.Entity.Id;
-    image_path: Core.File.UploadPath;
+    image_path: Core.Uploads.FilePath;
   } {
     const tokenPayload = this.iAuthImageTokenService.parse(
       tenantId,

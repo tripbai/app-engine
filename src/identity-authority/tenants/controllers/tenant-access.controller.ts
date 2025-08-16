@@ -5,8 +5,8 @@ import { del, post } from "../../../core/router/route-decorators";
 import * as IdentityAuthority from "../../module/types";
 import * as Core from "../../../core/module/types";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
-import { IsValid } from "../../../core/helpers/isvalid";
-import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
+import { assertNonEmptyString } from "../../../core/utilities/assertValid";
+import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
 
 @injectable()
 export class TenantAccessController {
@@ -24,10 +24,7 @@ export class TenantAccessController {
     T extends IdentityAuthority.Tenants.Endpoints.AddUserToTeam
   >(params: Core.Route.ControllerDTO<T>): Promise<T["response"]> {
     try {
-      assertNonEmptyString(params.data.tenant_id);
       assertValidEntityId(params.data.tenant_id);
-
-      assertNonEmptyString(params.data.user_id);
       assertValidEntityId(params.data.user_id);
     } catch (error) {
       throw new BadRequestException({

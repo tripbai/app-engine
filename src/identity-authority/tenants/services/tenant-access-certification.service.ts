@@ -7,7 +7,7 @@ import { TenantUsersRegistry } from "../../teams/tenant-users.registry";
 import { TeamRepository } from "../../teams/team.repository";
 import { UserAccessRegistry } from "../../teams/user-access.registry";
 import * as IdentityAuthority from "../../module/types";
-import { AppENV } from "../../../core/application/appEnv";
+import { getEnv } from "../../../core/application/appEnv";
 
 @injectable()
 export class TenantAccessCertificationService {

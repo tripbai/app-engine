@@ -3,11 +3,10 @@ import { post } from "../../../core/router/route-decorators";
 import * as IdentityAuthority from "../../module/types";
 import * as Core from "../../../core/module/types";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
-import { IsValid } from "../../../core/helpers/isvalid";
-import { TenantValidator } from "../tenant.validator";
 import { CreateTenantCommand } from "../commands/create-tenant.command";
 import { TenantRepository } from "../tenant.repository";
 import { UserAccessRegistry } from "../../teams/user-access.registry";
+import { assertIsTenantName } from "../tenant.assertions";
 
 /**
  * Controller for creating a new tenant.
@@ -28,8 +27,7 @@ export class TenantCreateController {
     T extends IdentityAuthority.Tenants.Endpoints.CreateTenant
   >(params: Core.Route.ControllerDTO<T>): Promise<T["response"]> {
     try {
-      assertNonEmptyString(params.data.name);
-      TenantValidator.name(params.data.name);
+      assertIsTenantName(params.data.name);
     } catch (error) {
       throw new BadRequestException({
         message: "failed to create tenant due to invalid input",

@@ -6,10 +6,9 @@ import {
   BadRequestException,
   ResourceAccessForbiddenException,
 } from "../../../core/exceptions/exceptions";
-import * as Core from "../../../core/module/types";
 import { IAuthImageTokenService } from "../../services/image-token.service";
 import { TenantImagesService } from "./tenant-images.service";
-import { TenantValidator } from "../tenant.validator";
+import { assertIsTenantName } from "../tenant.assertions";
 
 @injectable()
 export class TenantUpdateService {
@@ -27,7 +26,7 @@ export class TenantUpdateService {
    */
   async updateTenantName(tenantModelToUpdate: TenantModel, name: string) {
     try {
-      TenantValidator.name(name);
+      assertIsTenantName(name);
     } catch (error) {
       throw new BadRequestException({
         message: "invalid tenant name provided for update",

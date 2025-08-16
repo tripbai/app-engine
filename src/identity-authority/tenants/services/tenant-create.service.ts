@@ -1,9 +1,5 @@
 import { inject, injectable } from "inversify";
 import { TenantModel } from "../tenant.model";
-import { TimeStamp } from "../../../core/helpers/timestamp";
-import { Pseudorandom } from "../../../core/helpers/pseudorandom";
-import { IAuthRequesterFactory } from "../../requester/iauth-requester.factory";
-import * as Core from "../../../core/module/types";
 import {
   RecordAlreadyExistsException,
   ResourceAccessForbiddenException,
@@ -12,17 +8,21 @@ import { IAuthRequester } from "../../requester/iauth-requester";
 import { UserAccessRegistry } from "../../teams/user-access.registry";
 import { TenantRepository } from "../tenant.repository";
 import { UserModel } from "../../users/user.model";
+import { UnitOfWork } from "../../../core/workflow/unit-of-work";
+import { createEntityId } from "../../../core/utilities/entityToolkit";
 
 @injectable()
 export class TenantCreateService {
   constructor(
     @inject(UserAccessRegistry)
-    private userAccessRegistry: UserAccessRegistry
+    private userAccessRegistry: UserAccessRegistry,
+    @inject(TenantRepository) private tenantRepository: TenantRepository
   ) {}
 
   async createTenantIfNotExist(
     ownerUserModel: UserModel,
-    name: string
+    name: string,
+    unitOfWork: UnitOfWork
   ): Promise<
     | {
         isNew: true;
@@ -49,16 +49,16 @@ export class TenantCreateService {
         isNew: false,
       };
     }
-    const tenantModel: Readonly<TenantModel> = {
-      entity_id: createEntityId(),
-      name: name,
-      secret_key: createEntityId(),
-      profile_photo: null,
-      cover_photo: null,
-      created_at: TimeStamp.now(),
-      updated_at: TimeStamp.now(),
-      archived_at: null,
-    };
+    const secretKey = createEntityId();
+    const tenantModel = this.tenantRepository.create(
+      {
+        secret_key: secretKey,
+        name: name,
+        profile_photo: null,
+        cover_photo: null,
+      },
+      unitOfWork
+    );
     return {
       isNew: true,
       tenantModel: tenantModel,

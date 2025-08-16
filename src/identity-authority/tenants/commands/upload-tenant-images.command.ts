@@ -3,6 +3,7 @@ import * as Core from "../../../core/module/types";
 import { IAuthRequesterFactory } from "../../requester/iauth-requester.factory";
 import { IAuthImageUploadService } from "../../services/image-upload.service";
 import {
+  BadInputException,
   BadRequestException,
   ResourceAccessForbiddenException,
 } from "../../../core/exceptions/exceptions";
@@ -34,7 +35,7 @@ export class UploadTenantImagesCommand {
     fileExtension: IdentityAuthority.Images.SupportedExtensions,
     buffer: Buffer
   ): Promise<{
-    file_path: Core.File.UploadPath;
+    file_path: Core.Uploads.FilePath;
     upload_token: string;
   }> {
     const requesterAuth = this.iAuthRequesterFactory.create(requester);
@@ -79,7 +80,7 @@ export class UploadTenantImagesCommand {
         upload_token: uploadToken,
       };
     }
-    throw new BadRequestException({
+    throw new BadInputException({
       message: "invalid image type provided for upload",
       data: { type, tenant_id: tenantModel.entity_id },
     });

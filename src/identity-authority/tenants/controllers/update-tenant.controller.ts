@@ -4,9 +4,9 @@ import { patch } from "../../../core/router/route-decorators";
 import * as IdentityAuthority from "../../module/types";
 import * as Core from "../../../core/module/types";
 import { BadRequestException } from "../../../core/exceptions/exceptions";
-import { IsValid } from "../../../core/helpers/isvalid";
-import { TenantValidator } from "../tenant.validator";
-import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
+import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
+import { assertIsTenantName } from "../tenant.assertions";
+import { assertNonEmptyString } from "../../../core/utilities/assertValid";
 
 @injectable()
 export class UpdateTenantController {
@@ -33,9 +33,7 @@ export class UpdateTenantController {
 
     try {
       assertValidEntityId(params.data.tenant_id);
-
-      assertNonEmptyString(params.data.name);
-      TenantValidator.name(params.data.name);
+      assertIsTenantName(params.data.name);
       updateParams.name = params.data.name;
 
       if (

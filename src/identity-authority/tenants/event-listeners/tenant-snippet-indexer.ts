@@ -6,8 +6,8 @@ import {
   AbstractIndexerProvider,
   IndexTaskItem,
 } from "../../../core/providers/indexer/indexer.provider";
-import { AppENV } from "../../../core/application/appEnv";
-import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
+import { getEnv } from "../../../core/application/appEnv";
+import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
 
 @injectable()
 export class TenantSnippetIndexer

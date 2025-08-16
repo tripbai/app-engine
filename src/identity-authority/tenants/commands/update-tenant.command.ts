@@ -79,9 +79,7 @@ export class UpdateTenantCommand {
         params.cover_photo.upload_token
       );
     }
-    unitOfWork.addTransactionStep(
-      await this.tenantRepository.update(tenantModelToUpdate)
-    );
+    await this.tenantRepository.update(tenantModelToUpdate, unitOfWork);
     await unitOfWork.commit();
     await this.abstractEventManagerProvider.dispatch(
       new TenantUpdateEvent(),

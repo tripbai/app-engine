@@ -2,8 +2,6 @@ import { inject, injectable } from "inversify";
 import { get } from "../../../core/router/route-decorators";
 import * as IdentityAuthority from "../../module/types";
 import * as Core from "../../../core/module/types";
-import { IsValid } from "../../../core/helpers/isvalid";
-import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
 import {
   BadRequestException,
   LogicException,
@@ -13,6 +11,7 @@ import { TenantRepository } from "../tenant.repository";
 import { TenantUsersRegistry } from "../../teams/tenant-users.registry";
 import { IAuthRequesterFactory } from "../../requester/iauth-requester.factory";
 import { UserAccessRegistry } from "../../teams/user-access.registry";
+import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
 
 @injectable()
 export class GetTenantController {
@@ -34,7 +33,6 @@ export class GetTenantController {
     params: Core.Route.ControllerDTO<T>
   ): Promise<T["response"]> {
     try {
-      assertNonEmptyString(params.data.tenant_id);
       assertValidEntityId(params.data.tenant_id);
     } catch (error) {
       throw new BadRequestException({

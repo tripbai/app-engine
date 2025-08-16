@@ -46,7 +46,11 @@ export class CreateTenantCommand {
     const userModel = await this.userRepository.getById(userId);
     const unitOfWork = this.unitOfWorkFactory.create();
     const createTenantResult =
-      await this.tenantCreateService.createTenantIfNotExist(userModel, name);
+      await this.tenantCreateService.createTenantIfNotExist(
+        userModel,
+        name,
+        unitOfWork
+      );
     if (!createTenantResult.isNew) {
       const tenantId = await this.userAccessRegistry.getOwnedTenantIdOfUserId(
         iAuthRequester.get().user.entity_id
@@ -75,14 +79,6 @@ export class CreateTenantCommand {
       userModel,
       tenantModel
     );
-    const transaction = this.tenantRepository.create(tenantModel.entity_id, {
-      secret_key: tenantModel.secret_key,
-      name: tenantModel.name,
-      profile_photo: tenantModel.profile_photo,
-      cover_photo: tenantModel.cover_photo,
-      archived_at: null,
-    });
-    unitOfWork.addTransactionStep(transaction);
     await unitOfWork.commit();
     await this.abstractEventManager.dispatch(
       new TenantCreateEvent(),

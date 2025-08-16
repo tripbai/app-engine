@@ -1,22 +1,25 @@
-import { Core } from "../../core/module/module"
-import { EventInterface } from "../../core/providers/event/event-manager.provider"
-import { UserModel } from "../users/user.model"
-import { TenantModel } from "./tenant.model"
+import { EventInterface } from "../../core/providers/event/event-manager.provider";
+import { UserModel } from "../users/user.model";
+import { TenantModel } from "./tenant.model";
 
 /**
  * `TenantCreateEvent` is dispatched when a user creates a tenant.
  */
 export class TenantCreateEvent implements EventInterface {
-  id() {return '4d80c7df-040f-49a9-918a-b99bb1a5ad0f'}
-  async handler(Tenant: TenantModel){}
+  id() {
+    return "4d80c7df-040f-49a9-918a-b99bb1a5ad0f";
+  }
+  async handler(Tenant: TenantModel) {}
 }
 
 /**
  * `TenantUpdateEvent` is dispatched when tenant data is updated.
  */
 export class TenantUpdateEvent implements EventInterface {
-  id() {return '9302cfcc-b48b-41f8-a71d-cb68bfd6b385'}
-  async handler(Tenant: TenantModel){}
+  id() {
+    return "9302cfcc-b48b-41f8-a71d-cb68bfd6b385";
+  }
+  async handler(Tenant: TenantModel) {}
 }
 
 /**
@@ -26,10 +29,12 @@ export class TenantUpdateEvent implements EventInterface {
  * member of their own tenant.
  */
 export class TenantTeamAccessEvent implements EventInterface {
-  id() {return '85cc3c9d-be0a-468d-852e-16e098de23d5'}
+  id() {
+    return "85cc3c9d-be0a-468d-852e-16e098de23d5";
+  }
   async handler(
-    action: 'add:user' | 'remove:user', 
-    userModel: UserModel, 
-    tenantModel: TenantModel,
-  ){}
+    action: "add:user" | "remove:user",
+    userModel: UserModel,
+    tenantModel: TenantModel
+  ) {}
 }
