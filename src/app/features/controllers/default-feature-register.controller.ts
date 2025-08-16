@@ -13,17 +13,15 @@ import {
   BadRequestException,
   LogicException,
 } from "../../../core/exceptions/exceptions";
-import { FeatureAssertions } from "../feature.assertions";
-import { IsValid } from "../../../core/helpers/isvalid";
-import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
+import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
+import { assertIsFeatureKey } from "../feature.assertions";
+import { assertNonEmptyString } from "../../../core/utilities/assertValid";
 
 @injectable()
 export class DefaultFeatureRegisterController {
   constructor(
     @inject(RegisterDefaultFeatureCommand)
-    private registerDefaultFeatureCommand: RegisterDefaultFeatureCommand,
-    @inject(FeatureAssertions)
-    private featureAssertions: FeatureAssertions
+    private registerDefaultFeatureCommand: RegisterDefaultFeatureCommand
   ) {}
 
   @post<TripBai.Features.Endpoints.RegisterDefaultFeature>("/tripbai/features")
@@ -34,7 +32,7 @@ export class DefaultFeatureRegisterController {
       Object.create(null);
     commandDTO.requester = params.requester;
     try {
-      this.featureAssertions.isValidKey(params.data.key);
+      assertIsFeatureKey(params.data.key);
       commandDTO.featureKey = params.data.key;
 
       assertNonEmptyString(params.data.value);

@@ -13,17 +13,15 @@ import {
   BadRequestException,
   LogicException,
 } from "../../../core/exceptions/exceptions";
-import { IsValid } from "../../../core/helpers/isvalid";
-import { EntityToolkit } from "../../../core/orm/entity/entity-toolkit";
-import { FeatureAssertions } from "../feature.assertions";
+import { assertNonEmptyString } from "../../../core/utilities/assertValid";
+import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
+import { assertIsFeatureKey } from "../feature.assertions";
 
 @injectable()
 export class FeatureOverrideCreateController {
   constructor(
     @inject(CreateFeatureOverrideCommand)
-    private createFeatureOverrideCommand: CreateFeatureOverrideCommand,
-    @inject(FeatureAssertions)
-    private featureAssertions: FeatureAssertions
+    private createFeatureOverrideCommand: CreateFeatureOverrideCommand
   ) {}
 
   @post<TripBai.Features.Endpoints.CreateFeatureOverride>(
@@ -41,7 +39,7 @@ export class FeatureOverrideCreateController {
       commandDTO.organizationId = params.data.organization_id;
 
       assertNonEmptyString(params.data.key);
-      this.featureAssertions.isValidKey(params.data.key);
+      assertIsFeatureKey(params.data.key);
       commandDTO.featureKey = params.data.key;
 
       assertNonEmptyString(params.data.value);

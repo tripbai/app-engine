@@ -6,7 +6,7 @@ import {
   nullable,
   varchar,
 } from "../../core/orm/entity/entity-decorators";
-import { ProfileValidator } from "../profiles/profile.validator";
+import { assertIsFileUploadPath } from "../../core/utilities/fileupath";
 import {
   assertIsTenantName,
   assertIsTenantSecretKey,
@@ -24,11 +24,11 @@ export class TenantModel extends BaseEntity {
 
   @length(384)
   @nullable()
-  @varchar(ProfileValidator.image)
+  @varchar(assertIsFileUploadPath)
   profile_photo!: Core.Uploads.FilePath | null;
 
   @length(384)
   @nullable()
-  @varchar(ProfileValidator.image)
+  @varchar(assertIsFileUploadPath)
   cover_photo!: Core.Uploads.FilePath | null;
 }

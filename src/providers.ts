@@ -29,42 +29,44 @@ import { AbstractObjectStorageProvider } from "./core/providers/storage/object-s
 import { AmazonS3StorageService } from "./core/providers/storage/aws3/aws3-storage.service";
 import { IAuthDatabaseProvider } from "./identity-authority/providers/iauth-database.provider";
 import { JSONFileDB } from "./core/providers/database/jsonfiledb/jsonfile-database.service";
-import { Application } from "./core/application";
 import { FirestoreService } from "./core/providers/database/firestore/firestore.service";
 import { InMemoryCacheService } from "./core/providers/cache/inmemory/inmemory-cache.service";
 import { Notif8701TopicPublisher } from "./core/providers/topics/notif8701/notif8701-topic-publisher.service";
+import { getEnvironmentContext } from "./core/application/environmentContext";
 
 export const providers = (container: Container) => {
-
   /** Configs */
-  container.bind(AbstractAWSCredentials).to(AWSEnvCredentials)
-  container.bind(AbstractKryptodocConfig).to(KryptodocEnvConfig)
-  container.bind(AbstractMySqlConfig).to(MySqlEnvConfig)
-  container.bind(AbstractMySqlPoolService).to(MySqlPoolService)
-  container.bind(AbstractNodeEmitterConfig).to(NodeEmitterEnvConfig)
+  container.bind(AbstractAWSCredentials).to(AWSEnvCredentials);
+  container.bind(AbstractKryptodocConfig).to(KryptodocEnvConfig);
+  container.bind(AbstractMySqlConfig).to(MySqlEnvConfig);
+  container.bind(AbstractMySqlPoolService).to(MySqlPoolService);
+  container.bind(AbstractNodeEmitterConfig).to(NodeEmitterEnvConfig);
 
-  container.bind(AbstractDatabaseProvider).to(MySqlService)
-  container.bind(AbstractJWTProvider).to(JsonWebToken)
-  container.bind(AbstractIndexerProvider).to(KryptodocIndexerService)
-  container.bind(AbstractAuthorizationProvider).to(NativeRBACService)
-  container.bind(AbstractMailProvider).to(MailmanMail)
-  container.bind(AbstractEventManagerProvider).to(SimpleNodeEmitter)
-  container.bind(AbstractObjectStorageProvider).to(AmazonS3StorageService)
+  container.bind(AbstractDatabaseProvider).to(MySqlService);
+  container.bind(AbstractJWTProvider).to(JsonWebToken);
+  container.bind(AbstractIndexerProvider).to(KryptodocIndexerService);
+  container.bind(AbstractAuthorizationProvider).to(NativeRBACService);
+  container.bind(AbstractMailProvider).to(MailmanMail);
+  container.bind(AbstractEventManagerProvider).to(SimpleNodeEmitter);
+  container.bind(AbstractObjectStorageProvider).to(AmazonS3StorageService);
 
   // Declare bindings based on environment
-  if (Application.environment() === 'development') {
-    container.bind(IAuthDatabaseProvider).to(JSONFileDB)
-    container.bind(AbstractCacheProvider).to(InMemoryCacheService)
-    container.bind(AbstractTopicPublisherProvider).to(Notif8701TopicPublisher)
-  } else if (Application.environment() === 'staging') {
-    container.bind(IAuthDatabaseProvider).to(FirestoreService)
-    container.bind(AbstractCacheProvider).to(RedisCacheService)
-    container.bind(AbstractTopicPublisherProvider).to(AmazonSNSTopicPublisherService)
-  } else if (Application.environment() === 'production') {
-    container.bind(IAuthDatabaseProvider).to(FirestoreService)
-    container.bind(AbstractCacheProvider).to(RedisCacheService)
-    container.bind(AbstractTopicPublisherProvider).to(AmazonSNSTopicPublisherService)
+  if (getEnvironmentContext() === "development") {
+    container.bind(IAuthDatabaseProvider).to(JSONFileDB);
+    container.bind(AbstractCacheProvider).to(InMemoryCacheService);
+    container.bind(AbstractTopicPublisherProvider).to(Notif8701TopicPublisher);
+  } else if (getEnvironmentContext() === "staging") {
+    container.bind(IAuthDatabaseProvider).to(FirestoreService);
+    container.bind(AbstractCacheProvider).to(RedisCacheService);
+    container
+      .bind(AbstractTopicPublisherProvider)
+      .to(AmazonSNSTopicPublisherService);
+  } else if (getEnvironmentContext() === "production") {
+    container.bind(IAuthDatabaseProvider).to(FirestoreService);
+    container.bind(AbstractCacheProvider).to(RedisCacheService);
+    container
+      .bind(AbstractTopicPublisherProvider)
+      .to(AmazonSNSTopicPublisherService);
   } else {
-
   }
-}
+};

@@ -6,14 +6,15 @@ import { StoreModel } from "./store.model";
 
 @injectable()
 export class StoreRepository extends BaseRepository<StoreModel> {
-  protected collection: string = "stores";
-
   constructor(
     @inject(AbstractDatabaseProvider)
     private DatabaseProvider: AbstractDatabaseProvider,
     @inject(AbstractCacheProvider) private CacheProvider: AbstractCacheProvider
   ) {
-    super(StoreModel, DatabaseProvider, CacheProvider);
+    super("stores", StoreModel, {
+      database: DatabaseProvider,
+      cache: CacheProvider,
+    });
   }
 
   async getStoresByOrganizationId(
