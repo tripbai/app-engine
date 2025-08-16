@@ -12,6 +12,7 @@ import { PackageModel } from "../packages/package.model";
 import {
   assertIsOrganizationBusinessName,
   assertIsOrganizationStatus,
+  assertIsOrganizationType,
 } from "./organization.assertions";
 
 @collection("organizations")
@@ -30,4 +31,8 @@ export class OrganizationModel extends BaseEntity {
   @length(16)
   @varchar(assertIsOrganizationStatus)
   status!: TripBai.Organizations.Fields.Status;
+
+  @length(16)
+  @varchar(assertIsOrganizationType)
+  type!: TripBai.Organizations.Fields.Type;
 }

@@ -33,6 +33,7 @@ export class UpdateOrganizationCommand {
     packageId?: Core.Entity.Id;
     businessName?: string;
     status?: TripBai.Organizations.Fields.Status;
+    type?: TripBai.Organizations.Fields.Type;
   }) {
     const unitOfWork = this.unitOfWorkFactory.create();
     const requester = this.organizationRequesterFactory.create(
@@ -58,6 +59,9 @@ export class UpdateOrganizationCommand {
     }
     if (params.status) {
       serviceParams.status = params.status;
+    }
+    if (params.type) {
+      serviceParams.type = params.type;
     }
     this.organizationUpdateService.updateOrganization(serviceParams);
     await unitOfWork.commit();

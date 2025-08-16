@@ -11,6 +11,7 @@ import { OrganizationCreateService } from "../services/organization-create.servi
 import { OrganizationRepository } from "../organization.repository";
 import { PackageRepository } from "../../packages/package.repository";
 import { OrganizationCreatedEvent } from "../organization.events";
+import * as TripBai from "../../module/types";
 
 @injectable()
 export class CreateOrganizationCommand {
@@ -34,6 +35,7 @@ export class CreateOrganizationCommand {
     accessCertificationToken: string;
     businessName: string;
     packageId: Core.Entity.Id;
+    organizationType: TripBai.Organizations.Fields.Type;
   }) {
     const unitOfWork = this.unitOfWorkFactory.create();
     const requester = this.organizationRequesterFactory.create(
@@ -52,7 +54,8 @@ export class CreateOrganizationCommand {
         requester: requester,
         businessName: params.businessName,
         accessCertificationToken: params.accessCertificationToken,
-        packageModel,
+        packageModel: packageModel,
+        organizationType: params.organizationType,
       });
     await unitOfWork.commit();
     this.abstractEventManagerProvider.dispatch(

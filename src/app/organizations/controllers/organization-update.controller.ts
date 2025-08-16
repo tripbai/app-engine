@@ -15,7 +15,10 @@ import {
 } from "../../../core/exceptions/exceptions";
 import { assertNonEmptyString } from "../../../core/utilities/assertValid";
 import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
-import { assertIsOrganizationStatus } from "../organization.assertions";
+import {
+  assertIsOrganizationStatus,
+  assertIsOrganizationType,
+} from "../organization.assertions";
 
 @injectable()
 export class OrganizationUpdateController {
@@ -50,6 +53,10 @@ export class OrganizationUpdateController {
         assertNonEmptyString(params.data.package_id);
         assertValidEntityId(params.data.package_id);
         commandDTO.packageId = params.data.package_id;
+      }
+      if (params.data.type) {
+        assertIsOrganizationType(params.data.type);
+        commandDTO.type = params.data.type;
       }
     } catch (error) {
       throw new BadRequestException({

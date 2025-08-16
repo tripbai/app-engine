@@ -17,6 +17,17 @@ export function assertIsOrganizationStatus(
   }
 }
 
+export function assertIsOrganizationType(
+  value: unknown
+): asserts value is TripBai.Organizations.Fields.Type {
+  if (typeof value !== "string") {
+    throw new Error("invalid organization type value");
+  }
+  if (value !== "personal" && value !== "business") {
+    throw new Error("invalid organization type value");
+  }
+}
+
 export function assertIsOrganizationBusinessName(
   value: unknown
 ): asserts value is string {

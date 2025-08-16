@@ -35,6 +35,12 @@ export class StoreCreateService {
       params.organizationModel
     );
     this.assertOrganizationCanCreateStore(params.organizationModel);
+    if (await this.isLimitedToOneStore(params.organizationModel)) {
+      throw new ResourceAccessForbiddenException({
+        message: "Only business organization-type can create multiple stores",
+        data: { organization_id: params.organizationModel.entity_id },
+      });
+    }
     const packageId = params.organizationModel.package_id;
     const packageModel = await this.packageRepository.getById(packageId);
     if (
@@ -98,6 +104,24 @@ export class StoreCreateService {
    */
   assignDefaultPackageToStore(organizationModel: OrganizationModel) {
     return organizationModel.package_id;
+  }
+
+  /**
+   * Checks if the organization is limited to one store.
+   * @param organizationModel
+   * @returns
+   */
+  async isLimitedToOneStore(
+    organizationModel: OrganizationModel
+  ): Promise<boolean> {
+    if (organizationModel.type === "business") {
+      return false; // Business organizations can have multiple stores
+    }
+    const listOfStores =
+      await this.storeOrganizationRegistry.getActiveStoresByOrganizationId(
+        organizationModel.entity_id
+      );
+    return listOfStores.length > 0; // Limited to one store
   }
 
   /**

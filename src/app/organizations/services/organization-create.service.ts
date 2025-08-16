@@ -8,6 +8,7 @@ import * as Core from "../../../core/module/types";
 import { OrganizationRequester } from "../../requester/organization-requester";
 import { UnitOfWork } from "../../../core/workflow/unit-of-work";
 import { createEntityId } from "../../../core/utilities/entityToolkit";
+import * as TripBai from "../../module/types";
 
 @injectable()
 export class OrganizationCreateService {
@@ -24,6 +25,7 @@ export class OrganizationCreateService {
     businessName: string;
     accessCertificationToken: string;
     packageModel: PackageModel;
+    organizationType: TripBai.Organizations.Fields.Type;
   }) {
     const tokenData = await this.organizationIAuthTokenService.parseToken(
       params.accessCertificationToken
@@ -87,6 +89,7 @@ export class OrganizationCreateService {
         business_name: params.businessName,
         package_id: params.packageModel.entity_id,
         status: "active",
+        type: params.organizationType,
       },
       params.unitOfWork
     );

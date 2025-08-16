@@ -14,7 +14,10 @@ import {
   LogicException,
 } from "../../../core/exceptions/exceptions";
 import { assertNonEmptyString } from "../../../core/utilities/assertValid";
-import { assertIsOrganizationBusinessName } from "../organization.assertions";
+import {
+  assertIsOrganizationBusinessName,
+  assertIsOrganizationType,
+} from "../organization.assertions";
 import { assertValidEntityId } from "../../../core/utilities/entityToolkit";
 
 @injectable()
@@ -45,6 +48,9 @@ export class OrganizationCreateController {
       assertNonEmptyString(params.data.package_id);
       assertValidEntityId(params.data.package_id);
       commandDTO.packageId = params.data.package_id;
+
+      assertIsOrganizationType(params.data.type);
+      commandDTO.organizationType = params.data.type;
     } catch (error) {
       throw new BadRequestException({
         message: "request failed due to invalid params",

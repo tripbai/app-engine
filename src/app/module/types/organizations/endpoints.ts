@@ -10,6 +10,7 @@ export type CreateOrganization = {
       package_id: Core.Entity.Id;
       // A token that certifies the user has access to the tenant
       tenant_access_certification_token: string;
+      type: Fields.Type;
     };
   };
   response: {
@@ -38,6 +39,7 @@ export type UpdateOrganization = {
       business_name?: string;
       package_id?: Core.Entity.Id;
       status?: Fields.Status;
+      type?: Fields.Type;
     };
   };
   response: {};

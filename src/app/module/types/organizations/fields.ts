@@ -4,3 +4,4 @@ export type Status =
   | "suspended"
   | "pending"
   | "archived";
+export type Type = "personal" | "business";

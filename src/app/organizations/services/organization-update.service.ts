@@ -42,6 +42,29 @@ export class OrganizationUpdateService {
     organizationModel.business_name = businessName;
   }
 
+  updateType(
+    organizationRequester: OrganizationRequester,
+    organizationModel: OrganizationModel,
+    newType: TripBai.Organizations.Fields.Type
+  ) {
+    if (!organizationRequester.isWebAdmin()) {
+      throw new ResourceAccessForbiddenException({
+        message: "Only web admins can update organization type",
+        data: { requester: organizationRequester },
+      });
+    }
+    if (organizationModel.type === newType) {
+      return; // do nothing
+    }
+    if (organizationModel.type === "business" && newType === "personal") {
+      throw new ResourceAccessForbiddenException({
+        message: "Cannot change organization type from business to personal",
+        data: { organization_id: organizationModel.entity_id },
+      });
+    }
+    organizationModel.type = newType;
+  }
+
   updateStatus(
     organizationRequester: OrganizationRequester,
     organizationModel: OrganizationModel,
@@ -64,6 +87,7 @@ export class OrganizationUpdateService {
     packageModel?: PackageModel;
     businessName?: string;
     status?: TripBai.Organizations.Fields.Status;
+    type?: TripBai.Organizations.Fields.Type;
   }) {
     if (params.organizationModel.status !== "active") {
       throw new ResourceAccessForbiddenException({
@@ -79,6 +103,13 @@ export class OrganizationUpdateService {
     }
     if (params.businessName) {
       this.updateBusinessName(params.organizationModel, params.businessName);
+    }
+    if (params.type) {
+      this.updateType(
+        params.organizationRequester,
+        params.organizationModel,
+        params.type
+      );
     }
     if (params.status) {
       this.updateStatus(
