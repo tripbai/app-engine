@@ -1,4 +1,3 @@
-import { describe, it } from "node:test";
 import { expect } from "chai";
 import { BaseEntity } from "../../entity/base-entity";
 import { int } from "../../entity/entity-decorators";

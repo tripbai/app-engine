@@ -1,4 +1,3 @@
-import { describe, it } from "node:test";
 import { assert, expect } from "chai";
 import {
   assertValidEntityId,
@@ -27,7 +26,6 @@ describe("flattenEntity", () => {
       firstName: "John",
       _lastName: "Doe",
       age: 30,
-      archived_at: null,
     });
   });
   it("should not include function members", () => {
