@@ -1,6 +1,14 @@
 import { Container } from "inversify";
 
-const _c = new Container();
+/**
+ * A singleton instance of the application container.
+ */
+const container = new Container();
+
+/**
+ * Get the application container.
+ * @returns {Container} The application container.
+ */
 export const appContainer = () => {
-  return _c;
+  return container;
 };

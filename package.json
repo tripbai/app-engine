@@ -6,7 +6,7 @@
   "scripts": {
     "test": "tsc --project tsconfig.json && mocha dist/**/*.test.js",
     "container:build": "node bin/container/build.js",
-    "start:development": "node bin/container/build.js && tsc --project tsconfig.json && node dist/core/bootstrap.js --env=development --port=5458",
+    "start:development": "node bin/container/build.js && tsc --project tsconfig.json && node dist/core/application/bootstrap.js --env=development --port=5458",
     "migrate:mysql": "tsc --project tsconfig.json && node bin/migrations/mysql",
     "migrate:development:start": "node bin/migrations/umzug --env=development --action=up",
     "migrate:development": "node bin/migrations/umzug --env=development --action=next",

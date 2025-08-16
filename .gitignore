@@ -3,7 +3,10 @@ data/*
 !data/README.md
 dist
 src/test.ts
-.development.env
+.env.test
+.env.development
+.env.staging
+.env.production
 vault/*
 !vault/README.md
 aws_lambda/*

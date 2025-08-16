@@ -20,7 +20,7 @@ export function extractAppEnvKeys(dirPath) {
         walkDirectory(fullPath); // Recurse into subdirectory
       } else if (stat.isFile() && fullPath.endsWith(".ts")) {
         const content = fs.readFileSync(fullPath, "utf-8");
-        const regex = /AppENV\.get\(\s*['"]([^'"]+)['"]\s*\)/g;
+        const regex = /getEnv\(\s*['"]([^'"]+)['"]\s*\)/g;
 
         let match;
         while ((match = regex.exec(content)) !== null) {

@@ -14,3 +14,7 @@ export const setEnvironmentContext = (name: Exclude<Environment, null>) => {
 export const getEnvironmentContext = (): Exclude<Environment, null> => {
   return environment ?? "test";
 };
+
+export const getEnvFilePath = (appRoot: string, environment: Environment) => {
+  return `${appRoot}/.env.${environment}`;
+};

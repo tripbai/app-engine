@@ -17,3 +17,7 @@ export const registerRoute = (
   routes.push(config);
   return routes;
 };
+
+export const getRegisteredRoutes = () => {
+  return routes;
+};
