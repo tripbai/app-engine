@@ -12,7 +12,7 @@ import {
 import { assertValidRecord } from "../../utilities/assertValid";
 import { assertFlatDatabaseRecord } from "./assertions";
 import { FlatDatabaseRecord } from "../../providers/database/database.provider";
-import { flattenEntity } from "../../utilities/entityToolkit";
+import { createEntityId, flattenEntity } from "../../utilities/entityToolkit";
 import { UnitOfWork } from "../../workflow/unit-of-work";
 import { OverridingReservedFieldsException } from "./exceptions";
 
@@ -204,13 +204,9 @@ export class BaseRepository<TModel extends BaseEntity> {
    * excluding reserved fields.
    */
   create(
-    entityId: Core.Entity.Id,
-    data: Omit<{ [K in keyof TModel]: unknown }, Core.Entity.ReservedFields>,
+    data: Omit<{ [K in keyof TModel]: TModel[K] }, Core.Entity.ReservedFields>,
     unitOfWork: UnitOfWork
-  ): void {
-    if (this.containsReservedFields(data)) {
-      throw new OverridingReservedFieldsException(data);
-    }
+  ): TModel {
     if (this.containsReservedFields(data)) {
       throw new OverridingReservedFieldsException(data);
     }
@@ -226,7 +222,7 @@ export class BaseRepository<TModel extends BaseEntity> {
         },
       });
     }
-    model.entity_id = entityId;
+    model.entity_id = createEntityId();
     model.created_at = getTimestampNow();
     model.updated_at = getTimestampNow();
     model.archived_at = null;
@@ -236,6 +232,7 @@ export class BaseRepository<TModel extends BaseEntity> {
       flattenedRecord
     );
     unitOfWork.addTransactionStep(transactionStep);
+    return model;
   }
 
   /**

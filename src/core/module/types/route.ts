@@ -88,7 +88,8 @@ export type ValidatorDTO<T extends EndpointSchema> = {
 };
 
 export type ControllerDTO<T extends EndpointSchema> = {
-  data: ExtractParams<T["request"]["path"]> & T["request"]["data"];
+  data: ExtractParams<T["request"]["path"]> &
+    Utils.ToUnknownKeys<T["request"]["data"]>;
   requester: Authorization.Requester;
 };
 

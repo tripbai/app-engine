@@ -63,6 +63,44 @@ export class InvalidArgumentException extends Error {
   }
 }
 
+export class BadRequestException extends Error {
+  code: number;
+  constructor({
+    message,
+    data,
+  }: {
+    message: string;
+    data: Record<string, any>;
+  }) {
+    super(message);
+    const severity = 5;
+    logError({ severity, message, data });
+    this.message = message;
+    this.name = this.constructor.name;
+    Error.captureStackTrace(this, this.constructor);
+    this.code = 400;
+  }
+}
+
+export class BadInputException extends Error {
+  code: number;
+  constructor({
+    message,
+    data,
+  }: {
+    message: string;
+    data: Record<string, any>;
+  }) {
+    super(message);
+    const severity = 5;
+    logError({ severity, message, data });
+    this.message = message;
+    this.name = this.constructor.name;
+    Error.captureStackTrace(this, this.constructor);
+    this.code = 400;
+  }
+}
+
 export class RecordNotFoundException extends Error {
   code: number;
   constructor({
