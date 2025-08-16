@@ -205,7 +205,10 @@ export class BaseRepository<TModel extends BaseEntity> {
    */
   create(
     data: Omit<{ [K in keyof TModel]: TModel[K] }, Core.Entity.ReservedFields>,
-    unitOfWork: UnitOfWork
+    unitOfWork: UnitOfWork,
+    options?: {
+      useEntityId?: Core.Entity.Id;
+    }
   ): TModel {
     if (this.containsReservedFields(data)) {
       throw new OverridingReservedFieldsException(data);
@@ -222,7 +225,11 @@ export class BaseRepository<TModel extends BaseEntity> {
         },
       });
     }
-    model.entity_id = createEntityId();
+    if (options !== undefined && options.useEntityId !== undefined) {
+      model.entity_id = options.useEntityId;
+    } else {
+      model.entity_id = createEntityId();
+    }
     model.created_at = getTimestampNow();
     model.updated_at = getTimestampNow();
     model.archived_at = null;
