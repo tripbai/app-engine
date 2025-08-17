@@ -22,13 +22,13 @@ type UmzugDatabaseClient = {
 const get_env_path = (env: string, rootdir: string) => {
   switch (env) {
     case "development":
-      return `${rootdir}/.development.env`;
+      return `${rootdir}/.env.development`;
     case "staging":
-      return `${rootdir}/.staging.env`;
+      return `${rootdir}/.env.staging`;
     case "production":
-      return `${rootdir}/.env`;
+      return `${rootdir}/.env.production`;
     default:
-      return `${rootdir}/.test.env`;
+      return `${rootdir}/.env.test`;
   }
 };
 

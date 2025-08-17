@@ -264,6 +264,12 @@
         "type": "varchar",
         "is_nullable": false,
         "length": 16
+      },
+      {
+        "name": "type",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 16
       }
     ]
   },

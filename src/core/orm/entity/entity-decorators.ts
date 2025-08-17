@@ -43,10 +43,7 @@ export function nullable(): PropertyDecorator {
  */
 export function collection(name: string): ClassDecorator {
   return function (target) {
-    EntitySchemaRegistry.registerCollection(
-      target.constructor as ClassConstructor,
-      name
-    );
+    EntitySchemaRegistry.registerCollection(target as any, name);
   };
 }
 
