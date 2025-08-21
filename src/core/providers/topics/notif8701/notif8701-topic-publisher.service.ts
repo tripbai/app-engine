@@ -23,6 +23,7 @@ export class Notif8701TopicPublisher implements AbstractTopicPublisherProvider {
         }
       | undefined
   ): Promise<void> {
+    if (!started) __init();
     queue.push({
       topic: topicId,
       message: JSON.stringify(message),
