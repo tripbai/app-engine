@@ -217,3 +217,13 @@ export type RefreshAccessToken = {
     token: string;
   };
 };
+export type BackfillUserSnippet = {
+  request: {
+    method: "POST";
+    path: "/identity-authority/backfills/user-snippet";
+    data: {
+      user_id: Core.Entity.Id;
+    };
+  };
+  response: {};
+};

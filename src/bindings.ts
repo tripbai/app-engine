@@ -178,6 +178,7 @@ import { TenantImagesService } from "./identity-authority/tenants/services/tenan
 import { TenantUpdateService } from "./identity-authority/tenants/services/tenant-update.service";
 import { TenantRepository } from "./identity-authority/tenants/tenant.repository";
 import { UserAccessCommand } from "./identity-authority/users/commands/access-user.command";
+import { BackfillUserSnippetCommand } from "./identity-authority/users/commands/backfill-user-snippet.command";
 import { CreateUserCommand } from "./identity-authority/users/commands/create-user.command";
 import { RefreshAccessTokenCommand } from "./identity-authority/users/commands/refresh-access-token.command";
 import { ResendAccountVerificationEmailCommand } from "./identity-authority/users/commands/resend-account-verification-email.command";
@@ -188,6 +189,7 @@ import { UpdateUserStatusCommand } from "./identity-authority/users/commands/upd
 import { UpdateUserCommand } from "./identity-authority/users/commands/update-user.command";
 import { UserAccessReportController } from "./identity-authority/users/controllers/user-access-report.controller";
 import { UserAccessTokenController } from "./identity-authority/users/controllers/user-access-token.controller";
+import { UserBackfillController } from "./identity-authority/users/controllers/user-backfill.controller";
 import { UserCreateController } from "./identity-authority/users/controllers/user-create.controller";
 import { UserGetController } from "./identity-authority/users/controllers/user-get.controller";
 import { UserSendEmailController } from "./identity-authority/users/controllers/user-send-email.controller";
@@ -388,6 +390,7 @@ export const bind = (container: Container) => {
   container.bind(TenantUpdateService).toSelf();
   container.bind(TenantRepository).toSelf();
   container.bind(UserAccessCommand).toSelf();
+  container.bind(BackfillUserSnippetCommand).toSelf();
   container.bind(CreateUserCommand).toSelf();
   container.bind(RefreshAccessTokenCommand).toSelf();
   container.bind(ResendAccountVerificationEmailCommand).toSelf();
@@ -398,6 +401,7 @@ export const bind = (container: Container) => {
   container.bind(UpdateUserCommand).toSelf();
   container.bind(UserAccessReportController).toSelf();
   container.bind(UserAccessTokenController).toSelf();
+  container.bind(UserBackfillController).toSelf();
   container.bind(UserCreateController).toSelf();
   container.bind(UserGetController).toSelf();
   container.bind(UserSendEmailController).toSelf();
