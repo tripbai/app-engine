@@ -78,7 +78,14 @@ export class UserGetController {
       throw new IAuthForbiddenAccessException(params.requester);
     const userIdToRetrieve = params.data.user_id;
     const userModel = await this.userRepository.getById(userIdToRetrieve);
+    const profileModel = await this.profileRepository.getById(userIdToRetrieve);
     return {
+      id: userModel.entity_id,
+      first_name: profileModel.first_name,
+      last_name: profileModel.last_name,
+      profile_photo: profileModel.profile_photo,
+      cover_photo: profileModel.cover_photo,
+      about: profileModel.about,
       identity_provider: userModel.identity_provider,
       email_address: userModel.email_address,
       username: userModel.username,
@@ -89,6 +96,9 @@ export class UserGetController {
       role: userModel.role,
       status: userModel.status,
       type: userModel.type,
+      created_at: userModel.created_at,
+      updated_at: userModel.updated_at,
+      archived_at: userModel.archived_at,
     };
   }
 

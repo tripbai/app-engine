@@ -77,6 +77,12 @@ export type GetModel = {
     path: "/identity-authority/users/:user_id";
   };
   response: {
+    id: Core.Entity.Id;
+    first_name: Profile.Fields.FirstName;
+    last_name: Profile.Fields.LastName;
+    profile_photo: Profile.Fields.Image | null;
+    cover_photo: Profile.Fields.Image | null;
+    about: string | null;
     identity_provider: Providers.Identity;
     email_address: Fields.UniqueEmailAddress;
     username: Fields.UniqueUsername;
@@ -87,6 +93,9 @@ export type GetModel = {
     role: "webadmin" | "user" | "moderator";
     status: Status.Type;
     type: Type;
+    created_at: string;
+    updated_at: string;
+    archived_at: string | null;
   };
 };
 export type GetByEmailOrUsername = {
