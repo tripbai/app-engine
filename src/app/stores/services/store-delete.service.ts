@@ -1,0 +1,9 @@
+import { inject, injectable } from "inversify";
+import { StoreRepository } from "../store.repository";
+
+@injectable()
+export class StoreDeleteService {
+  constructor(
+    @inject(StoreRepository) private storeRepository: StoreRepository
+  ) {}
+}

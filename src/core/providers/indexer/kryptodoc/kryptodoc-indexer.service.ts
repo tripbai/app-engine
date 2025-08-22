@@ -1,0 +1,48 @@
+import { inject, injectable } from "inversify";
+import { AbstractIndexerProvider, IndexTaskItem } from "../indexer.provider";
+import { AbstractTopicPublisherProvider } from "../../topics/topic-publisher.provider";
+import { KryptodocEnvConfig } from "../../../services/kryptodoc/kryptodoc-env-config";
+import { AbstractKryptodocConfig } from "../../../services/kryptodoc/kryptodoc-config.interface";
+import { logError } from "../../../application/appLogger";
+const crypto = require("crypto");
+
+@injectable()
+export class KryptodocIndexerService implements AbstractIndexerProvider {
+  constructor(
+    @inject(KryptodocEnvConfig)
+    private kryptodocConfig: AbstractKryptodocConfig,
+    @inject(AbstractTopicPublisherProvider)
+    private topicPublisherService: AbstractTopicPublisherProvider
+  ) {}
+
+  async index(tasks: Array<IndexTaskItem>): Promise<void> {
+    const deduplicationHash = this.createDeduplicationHash(tasks);
+    const message = JSON.stringify(tasks);
+    try {
+      await this.topicPublisherService.publishTopic(
+        this.kryptodocConfig.getTopicId(),
+        message,
+        {
+          messageGroupId: this.kryptodocConfig.getMessageGroupId(),
+          messageDeduplicationId: deduplicationHash,
+        }
+      );
+    } catch (error) {
+      logError({
+        severity: 3,
+        message: "indexer publish tasks failed due to an error",
+        data: { error: error },
+      });
+      throw error;
+    }
+  }
+
+  private createDeduplicationHash(tasks: Array<IndexTaskItem>) {
+    let hashable = "";
+    for (let i = 0; i < tasks.length; i++) {
+      const task = tasks[i];
+      hashable += JSON.stringify(task);
+    }
+    return crypto.createHash("md5").update(hashable).digest("hex").toString();
+  }
+}

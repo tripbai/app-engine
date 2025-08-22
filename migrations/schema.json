@@ -1,0 +1,351 @@
+[
+  {
+    "collection": "users",
+    "created_at": "2025-06-06T21:38:42.384Z",
+    "updated_at": "2025-06-06T21:38:42.384Z",
+    "fields": [
+      {
+        "name": "identity_provider",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 12
+      },
+      {
+        "name": "email_address",
+        "type": "varchar",
+        "is_nullable": false,
+        "unique": true,
+        "length": 64
+      },
+      {
+        "name": "username",
+        "type": "varchar",
+        "is_nullable": false,
+        "unique": true,
+        "length": 32
+      },
+      {
+        "name": "is_email_verified",
+        "type": "boolean",
+        "is_nullable": false
+      },
+      {
+        "name": "verified_since",
+        "type": "timestamp",
+        "is_nullable": true
+      },
+      {
+        "name": "suspended_until",
+        "type": "timestamp",
+        "is_nullable": true
+      },
+      {
+        "name": "creation_context",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 12
+      },
+      {
+        "name": "role",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 12
+      },
+      {
+        "name": "password_hash",
+        "type": "varchar",
+        "is_nullable": true,
+        "length": 512
+      },
+      {
+        "name": "status",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 12
+      },
+      {
+        "name": "type",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 12
+      },
+      {
+        "name": "otp_secret",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 64
+      }
+    ]
+  },
+  {
+    "collection": "profiles",
+    "created_at": "2025-06-06T21:38:42.384Z",
+    "updated_at": "2025-06-06T21:38:42.384Z",
+    "fields": [
+      {
+        "name": "first_name",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 32
+      },
+      {
+        "name": "last_name",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 32
+      },
+      {
+        "name": "profile_photo",
+        "type": "varchar",
+        "is_nullable": true,
+        "length": 384
+      },
+      {
+        "name": "cover_photo",
+        "type": "varchar",
+        "is_nullable": true,
+        "length": 384
+      },
+      {
+        "name": "about",
+        "type": "varchar",
+        "is_nullable": true,
+        "length": 512
+      }
+    ]
+  },
+  {
+    "collection": "teams",
+    "created_at": "2025-06-06T21:38:42.384Z",
+    "updated_at": "2025-06-06T21:38:42.384Z",
+    "fields": [
+      {
+        "name": "tenant_id",
+        "type": "char",
+        "is_nullable": false,
+        "length": 32
+      },
+      {
+        "name": "user_id",
+        "type": "char",
+        "is_nullable": false,
+        "length": 32,
+        "references": {
+          "collection": "users",
+          "field": "entity_id"
+        }
+      },
+      {
+        "name": "role_id",
+        "type": "char",
+        "is_nullable": true,
+        "length": 32
+      },
+      {
+        "name": "is_active",
+        "type": "boolean",
+        "is_nullable": false
+      },
+      {
+        "name": "is_owner",
+        "type": "boolean",
+        "is_nullable": false
+      }
+    ]
+  },
+  {
+    "collection": "tenants",
+    "created_at": "2025-06-16T15:14:16.542Z",
+    "updated_at": "2025-06-16T15:14:16.542Z",
+    "fields": [
+      {
+        "name": "name",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 64
+      },
+      {
+        "name": "secret_key",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 32
+      },
+      {
+        "name": "profile_photo",
+        "type": "varchar",
+        "is_nullable": true,
+        "length": 384
+      },
+      {
+        "name": "cover_photo",
+        "type": "varchar",
+        "is_nullable": true,
+        "length": 384
+      }
+    ]
+  },
+  {
+    "collection": "email_templates",
+    "created_at": "2025-06-16T15:24:54.197Z",
+    "updated_at": "2025-06-16T15:24:54.197Z",
+    "fields": [
+      {
+        "name": "template_type",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 12
+      },
+      {
+        "name": "template_id",
+        "type": "char",
+        "is_nullable": false,
+        "length": 32
+      },
+      {
+        "name": "description",
+        "type": "varchar",
+        "is_nullable": true,
+        "length": 150
+      }
+    ]
+  },
+  {
+    "collection": "packages",
+    "created_at": "2025-06-18T20:53:10.135Z",
+    "updated_at": "2025-06-18T20:53:10.135Z",
+    "fields": [
+      {
+        "name": "name",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 32
+      },
+      {
+        "name": "is_active",
+        "type": "boolean",
+        "is_nullable": false
+      },
+      {
+        "name": "is_default",
+        "type": "boolean",
+        "is_nullable": false
+      }
+    ]
+  },
+  {
+    "collection": "organizations",
+    "created_at": "2025-06-19T15:56:31.386Z",
+    "updated_at": "2025-06-19T15:56:31.386Z",
+    "fields": [
+      {
+        "name": "secret_key",
+        "type": "char",
+        "is_nullable": false,
+        "length": 32
+      },
+      {
+        "name": "business_name",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 120
+      },
+      {
+        "name": "package_id",
+        "type": "char",
+        "is_nullable": false,
+        "length": 32,
+        "references": {
+          "collection": "packages",
+          "field": "entity_id"
+        }
+      },
+      {
+        "name": "status",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 16
+      },
+      {
+        "name": "type",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 16
+      }
+    ]
+  },
+  {
+    "collection": "stores",
+    "created_at": "2025-06-19T20:24:00.805Z",
+    "updated_at": "2025-06-19T20:24:00.805Z",
+    "fields": [
+      {
+        "name": "organization_id",
+        "type": "char",
+        "is_nullable": false,
+        "length": 32,
+        "references": {
+          "collection": "organizations",
+          "field": "entity_id"
+        }
+      },
+      {
+        "name": "name",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 64
+      },
+      {
+        "name": "profile_photo_src",
+        "type": "varchar",
+        "is_nullable": true,
+        "length": 360
+      },
+      {
+        "name": "cover_photo_src",
+        "type": "varchar",
+        "is_nullable": true,
+        "length": 360
+      },
+      {
+        "name": "package_id",
+        "type": "char",
+        "is_nullable": false,
+        "length": 32,
+        "references": {
+          "collection": "packages",
+          "field": "entity_id"
+        }
+      },
+      {
+        "name": "about",
+        "type": "varchar",
+        "is_nullable": true,
+        "length": 320
+      },
+      {
+        "name": "language",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 12
+      },
+      {
+        "name": "location_id",
+        "type": "varchar",
+        "is_nullable": true,
+        "length": 32
+      },
+      {
+        "name": "secret_key",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 64
+      },
+      {
+        "name": "status",
+        "type": "varchar",
+        "is_nullable": false,
+        "length": 12
+      }
+    ]
+  }
+]

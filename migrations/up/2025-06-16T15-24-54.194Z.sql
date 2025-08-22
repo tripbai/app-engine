@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS email_templates (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `entity_id` CHAR(32) NOT NULL UNIQUE,
+  `template_type` VARCHAR(12) NOT NULL,
+  `template_id` CHAR(32) NOT NULL,
+  `description` VARCHAR(150),
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `archived_at` TIMESTAMP NULL,
+  PRIMARY KEY (id)
+);

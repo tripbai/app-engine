@@ -1,0 +1,15 @@
+CREATE TABLE IF NOT EXISTS organizations (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `entity_id` CHAR(32) NOT NULL UNIQUE,
+  `secret_key` CHAR(32) NOT NULL,
+  `business_name` VARCHAR(120) NOT NULL,
+  `package_id` CHAR(32) NOT NULL,
+  `status` VARCHAR(16) NOT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `archived_at` TIMESTAMP NULL,
+  FOREIGN KEY (package_id) REFERENCES packages(entity_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  PRIMARY KEY (id)
+);

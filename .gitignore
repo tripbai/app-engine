@@ -1,0 +1,13 @@
+node_modules
+data/*
+!data/README.md
+dist
+src/test.ts
+.env.test
+.env.development
+.env.staging
+.env.production
+vault/*
+!vault/README.md
+aws_lambda/*
+!aws_lambda/README.md
