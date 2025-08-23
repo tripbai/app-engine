@@ -6,3 +6,6 @@ export type RepositoryServiceProviders = {
   database: AbstractDatabaseProvider;
   cache: AbstractCacheProvider;
 };
+
+export type PartiallyReadonly<T, K extends keyof T> = Readonly<Pick<T, K>> &
+  Omit<T, K>;

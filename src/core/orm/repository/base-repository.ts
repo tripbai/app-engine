@@ -1,5 +1,5 @@
 import { BaseEntity } from "../entity/base-entity";
-import { RepositoryServiceProviders } from "./types";
+import { RepositoryServiceProviders, PartiallyReadonly } from "./types";
 import * as Core from "../../module/types";
 import { getTimestampNow, normalizeTimestamp } from "../../utilities/timestamp";
 import { isParsableJSON } from "../../utilities/jsonHelper";
@@ -56,7 +56,11 @@ export class BaseRepository<TModel extends BaseEntity> {
    * @param entityId The ID of the entity to retrieve
    * @returns The entity if found
    */
-  async getById(entityId: Core.Entity.Id): Promise<TModel> {
+  async getById(
+    entityId: Core.Entity.Id
+  ): Promise<
+    PartiallyReadonly<TModel, "entity_id" | "created_at" | "updated_at">
+  > {
     const model = await this.getByIdWithArchived(entityId);
     if (model.archived_at !== null) {
       throw new ArchivedRecordException(model.entity_id);
@@ -69,7 +73,11 @@ export class BaseRepository<TModel extends BaseEntity> {
    * @param entityId The ID of the entity to retrieve
    * @returns The entity if found
    */
-  async getByIdWithArchived(entityId: Core.Entity.Id): Promise<TModel> {
+  async getByIdWithArchived(
+    entityId: Core.Entity.Id
+  ): Promise<
+    PartiallyReadonly<TModel, "entity_id" | "created_at" | "updated_at">
+  > {
     await this.initproviders();
     // we'll first attempt to retrieve data from cache
     let recordExistsInCache = true;
