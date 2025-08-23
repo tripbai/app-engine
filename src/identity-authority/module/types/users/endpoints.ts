@@ -137,6 +137,22 @@ export type UpdateUser = {
   };
   response: {};
 };
+export type InternalUserUpdate = {
+  request: {
+    method: "PATCH";
+    path: "/identity-authority/update/user";
+    data: {
+      user_id: Core.Entity.Id;
+      first_name?: Profile.Fields.FirstName;
+      last_name?: Profile.Fields.LastName;
+      about?: string;
+      username?: Fields.Username;
+      email_address?: Fields.EmailAddress;
+      is_email_verified?: boolean;
+    };
+  };
+  response: {};
+};
 export type UpdateUserStatus = {
   request: {
     method: "POST";

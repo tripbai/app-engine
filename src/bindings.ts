@@ -184,6 +184,7 @@ import { RefreshAccessTokenCommand } from "./identity-authority/users/commands/r
 import { ResendAccountVerificationEmailCommand } from "./identity-authority/users/commands/resend-account-verification-email.command";
 import { SendNewEmailConfirmationCommand } from "./identity-authority/users/commands/send-new-email-confirmation.command";
 import { SendPasswordResetCommand } from "./identity-authority/users/commands/send-password-reset-email.command";
+import { UpdateUserInternalCommand } from "./identity-authority/users/commands/update-user-internal.command";
 import { UpdateUserRoleCommand } from "./identity-authority/users/commands/update-user-role.command";
 import { UpdateUserStatusCommand } from "./identity-authority/users/commands/update-user-status.command";
 import { UpdateUserCommand } from "./identity-authority/users/commands/update-user.command";
@@ -193,6 +194,7 @@ import { UserBackfillController } from "./identity-authority/users/controllers/u
 import { UserCreateController } from "./identity-authority/users/controllers/user-create.controller";
 import { UserGetController } from "./identity-authority/users/controllers/user-get.controller";
 import { UserSendEmailController } from "./identity-authority/users/controllers/user-send-email.controller";
+import { UserUpdateInternalController } from "./identity-authority/users/controllers/user-update-internal.controller";
 import { UserUpdateRoleController } from "./identity-authority/users/controllers/user-update-role.controller";
 import { UserUpdateStatusController } from "./identity-authority/users/controllers/user-update-status.controller";
 import { UserUpdateController } from "./identity-authority/users/controllers/user-update.controller";
@@ -396,6 +398,7 @@ export const bind = (container: Container) => {
   container.bind(ResendAccountVerificationEmailCommand).toSelf();
   container.bind(SendNewEmailConfirmationCommand).toSelf();
   container.bind(SendPasswordResetCommand).toSelf();
+  container.bind(UpdateUserInternalCommand).toSelf();
   container.bind(UpdateUserRoleCommand).toSelf();
   container.bind(UpdateUserStatusCommand).toSelf();
   container.bind(UpdateUserCommand).toSelf();
@@ -405,6 +408,7 @@ export const bind = (container: Container) => {
   container.bind(UserCreateController).toSelf();
   container.bind(UserGetController).toSelf();
   container.bind(UserSendEmailController).toSelf();
+  container.bind(UserUpdateInternalController).toSelf();
   container.bind(UserUpdateRoleController).toSelf();
   container.bind(UserUpdateStatusController).toSelf();
   container.bind(UserUpdateController).toSelf();

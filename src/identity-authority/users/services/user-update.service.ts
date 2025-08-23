@@ -166,6 +166,45 @@ export class UserUpdateService {
     this.setUserAsVerified(userModel);
   }
 
+  async forceUpdateEmail(
+    iAuthRequester: IAuthRequester,
+    userModel: UserModel,
+    newEmailAddress: IdentityAuthority.Users.Fields.EmailAddress
+  ) {
+    if (!iAuthRequester.isAModerator()) {
+      throw new ResourceAccessForbiddenException({
+        message: "only moderator or above can force update email",
+        data: { user_id: userModel.entity_id, requester: iAuthRequester.get() },
+      });
+    }
+    if (!this.isStatusAllowedForEmailUpdate(userModel)) {
+      throw new ResourceAccessForbiddenException({
+        message: "unable to update email address due to user status",
+        data: { user_id: userModel.entity_id, status: userModel.status },
+      });
+    }
+    const uniqueEmailAddress =
+      await this.userConstraintService.isUniqueEmailAddress(newEmailAddress);
+    userModel.email_address = uniqueEmailAddress;
+    this.setUserAsUnverified(userModel);
+  }
+
+  private async setUserAsUnverified(userModel: UserModel) {
+    userModel.is_email_verified = false;
+    userModel.verified_since = null;
+    userModel.status = "unverified";
+  }
+
+  forceVerifyUser(iAuthRequester: IAuthRequester, userModel: UserModel) {
+    if (!iAuthRequester.isAModerator()) {
+      throw new ResourceAccessForbiddenException({
+        message: "only moderator or above can force verify user",
+        data: { user_id: userModel.entity_id, requester: iAuthRequester.get() },
+      });
+    }
+    this.setUserAsVerified(userModel);
+  }
+
   async setUserAsVerifiedUsingVerificationToken(
     userModel: UserModel,
     verificationToken: string
