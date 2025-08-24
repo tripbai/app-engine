@@ -1,8 +1,8 @@
 import { AbstractCacheProvider, CacheItem } from "../cache.provider";
 
-export class InMemoryCacheService implements AbstractCacheProvider {
-  private cache: Map<string, Map<string, string>> = new Map();
+const cacheStorage: Map<string, Map<string, string>> = new Map();
 
+export class InMemoryCacheService implements AbstractCacheProvider {
   async connect(): Promise<boolean> {
     return true;
   }
@@ -11,24 +11,24 @@ export class InMemoryCacheService implements AbstractCacheProvider {
     { collection, entityId }: CacheItem,
     cacheContent: string
   ): Promise<string> {
-    if (!this.cache.has(collection)) {
-      this.cache.set(collection, new Map());
+    if (!cacheStorage.has(collection)) {
+      cacheStorage.set(collection, new Map());
     }
 
-    const collectionCache = this.cache.get(collection)!;
+    const collectionCache = cacheStorage.get(collection)!;
     // Store a copy
     collectionCache.set(entityId, `${cacheContent}`);
     return `${cacheContent}`;
   }
 
   async flushItem({ collection, entityId }: CacheItem): Promise<boolean> {
-    const collectionCache = this.cache.get(collection);
+    const collectionCache = cacheStorage.get(collection);
     if (!collectionCache) return false;
     return collectionCache.delete(entityId);
   }
 
   async getItem({ collection, entityId }: CacheItem): Promise<string | null> {
-    const collectionCache = this.cache.get(collection);
+    const collectionCache = cacheStorage.get(collection);
     if (!collectionCache) return null;
 
     const cachedValue = collectionCache.get(entityId);
@@ -38,7 +38,7 @@ export class InMemoryCacheService implements AbstractCacheProvider {
 
   async getItems(items: Array<CacheItem>): Promise<Array<string | null>> {
     return items.map(({ collection, entityId }) => {
-      const collectionCache = this.cache.get(collection);
+      const collectionCache = cacheStorage.get(collection);
       const cachedValue = collectionCache?.get(entityId) ?? null;
       return cachedValue != null ? `${cachedValue}` : null;
     });
