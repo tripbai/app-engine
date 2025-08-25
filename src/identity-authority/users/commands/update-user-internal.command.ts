@@ -8,6 +8,8 @@ import { UnitOfWorkFactory } from "../../../core/workflow/unit-of-work.factory";
 import { ResourceAccessForbiddenException } from "../../../core/exceptions/exceptions";
 import { ProfileUpdateService } from "../../profiles/services/profile-update.service";
 import { UserUpdateService } from "../services/user-update.service";
+import { AbstractEventManagerProvider } from "../../../core/providers/event/event-manager.provider";
+import { UserUpdateEvent } from "../user.events";
 
 @injectable()
 export class UpdateUserInternalCommand {
@@ -20,7 +22,9 @@ export class UpdateUserInternalCommand {
     @inject(ProfileUpdateService)
     private profileUpdateService: ProfileUpdateService,
     @inject(UserUpdateService)
-    private userUpdateService: UserUpdateService
+    private userUpdateService: UserUpdateService,
+    @inject(AbstractEventManagerProvider)
+    private abstractEventManagerProvider: AbstractEventManagerProvider
   ) {}
 
   async execute(
@@ -76,6 +80,11 @@ export class UpdateUserInternalCommand {
     await this.profileRepository.update(profileModel, unitOfWork);
     await this.userRepository.update(userModel, unitOfWork);
     await unitOfWork.commit();
+    await this.abstractEventManagerProvider.dispatch(
+      new UserUpdateEvent(),
+      userModel,
+      profileModel
+    );
     return;
   }
 }
